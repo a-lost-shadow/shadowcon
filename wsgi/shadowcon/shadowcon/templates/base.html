@@ -43,6 +43,7 @@
             <li><a href="{% url 'con:user_profile' %}">Account</a>
               <ul>
                 <li><a href="{% url 'logout' %}">Logout</a></li>
+                {% admin_link request.user %}
               </ul>
             </li>
             {% else %}
