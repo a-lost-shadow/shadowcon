@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<form action="." method="POST">
+  {% csrf_token %}
+  {{ form.media }}
+  {{ form.as_p }}
+  <input type="submit" value="Submit Game">
+  <input type="hidden" name="next" value="{{ next }}" />
+</form>
+{% endblock %}

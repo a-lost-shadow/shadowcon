@@ -1,0 +1,5 @@
+Django==1.9.2
+argparse==1.2.1
+django-registration==2.0.4
+django-ckeditor==5.0.3
+wsgiref==0.1.2

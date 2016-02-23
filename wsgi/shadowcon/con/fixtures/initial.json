@@ -1,0 +1,86 @@
+[
+  {"model": "con.coninfo", "pk": 1, "fields": {"date": "2016-04-01", "pre_reg_deadline": "2016-03-15", "game_sub_deadline": "2016-03-22", "location": "Behind the tardis", "pre_reg_cost": 10.0, "door_cost": 20.0}},
+  {"model": "con.timeblock", "pk": 1, "fields": {"text": "Friday Night", "sort_id": 1}},
+  {"model": "con.timeblock", "pk": 2, "fields": {"text": "Friday Midnight", "sort_id": 2}},
+  {"model": "con.timeblock", "pk": 3, "fields": {"text": "Saturday Morning", "sort_id": 3}},
+  {"model": "con.timeblock", "pk": 4, "fields": {"text": "Saturday Afternoon", "sort_id": 4}},
+  {"model": "con.timeblock", "pk": 5, "fields": {"text": "Saturday Evening", "sort_id": 5}},
+  {"model": "con.timeblock", "pk": 6, "fields": {"text": "Saturday Midnight", "sort_id": 6}},
+  {"model": "con.timeblock", "pk": 7, "fields": {"text": "Sunday Morning", "sort_id": 7}},
+
+  {"model": "con.timeslot", "pk": 1, "fields": {"start": "0", "stop": 6}},
+  {"model": "con.timeslot", "pk": 2, "fields": {"start": "0", "stop": 4}},
+  {"model": "con.timeslot", "pk": 3, "fields": {"start": "10", "stop": 17}},
+  {"model": "con.timeslot", "pk": 4, "fields": {"start": "10", "stop": 16}},
+  {"model": "con.timeslot", "pk": 5, "fields": {"start": "18", "stop": 0}},
+  {"model": "con.timeslot", "pk": 6, "fields": {"start": "18", "stop": 2}},
+  {"model": "con.timeslot", "pk": 7, "fields": {"start": "18", "stop": 23.5}},
+  {"model": "con.timeslot", "pk": 8, "fields": {"start": "19", "stop": 2}},
+  {"model": "con.timeslot", "pk": 9, "fields": {"start": "19.5", "stop": 23.5}},
+
+  {"model": "con.game", "pk": 1, "fields": {"title": "New Title", "gm": "Adrian's Friend Isaac", "time_block": 2, "time_slot": 6, "location": null, "number_players": "20", "duration": "7 hours", "system": "WoD", "triggers": "Violence", "description": "<p>I edited it.</p>", "user": 1}}, {"model": "con.game", "pk": 2, "fields": {"title": "Created with a view2", "gm": "Adrian Barnes", "time_block": null, "time_slot": null, "location": null, "number_players": "2", "duration": "4 hours", "system": "Daystar", "triggers": "Sunshine and Rainbows", "description": "<p>First attempt at submitting a game via a view.</p>", "user": 1}},
+
+  {
+    "model": "con.blockregistration",
+    "pk": 1,
+    "fields": {
+      "time_block": 1,
+      "user": 1,
+      "attendance": "N"
+    }
+  },
+  {
+    "model": "con.blockregistration",
+    "pk": 2,
+    "fields": {
+      "time_block": 2,
+      "user": 1,
+      "attendance": "N"
+    }
+  },
+  {
+    "model": "con.blockregistration",
+    "pk": 3,
+    "fields": {
+      "time_block": 3,
+      "user": 1,
+      "attendance": "N"
+    }
+  },
+  {
+    "model": "con.blockregistration",
+    "pk": 4,
+    "fields": {
+      "time_block": 4,
+      "user": 1,
+      "attendance": "M"
+    }
+  },
+  {
+    "model": "con.blockregistration",
+    "pk": 5,
+    "fields": {
+      "time_block": 5,
+      "user": 1,
+      "attendance": "N"
+    }
+  },
+  {
+    "model": "con.blockregistration",
+    "pk": 6,
+    "fields": {
+      "time_block": 6,
+      "user": 1,
+      "attendance": "N"
+    }
+  },
+  {
+    "model": "con.blockregistration",
+    "pk": 7,
+    "fields": {
+      "time_block": 7,
+      "user": 1,
+      "attendance": "N"
+    }
+  }
+]

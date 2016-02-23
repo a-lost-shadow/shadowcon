@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load con_info %}
+{% load games %}
+{% load staticfiles %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block additional_header %}
+  <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <link rel="stylesheet" href="{% static 'user/profile.css' %}" />
+  <script>
+    $(function() {
+      $( "#accordion" ).accordion( {
+        heightStyle: "content"
+      });
+    });
+  </script>
+
+{% endblock %}
+
+{% block content %}
+<h2>{{ name }} Account Profile</h2>
+{% con_year %} Registration:
+<ul>
+  {% for entry in registration %}
+  <li>{{ entry }}</li>
+  {% endfor %}
+</ul>
+<a href="{% url 'con:register_attendance' %}">Change Registration</a>
+<br />
+<br />
+{% show_user_games request.user %}
+{% endblock %}

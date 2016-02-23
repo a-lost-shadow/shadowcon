@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+{% load con_info %}
+<html>
+  <head>
+    <!--<meta http-equiv="refresh" content="3" /> <!-- For Debugging -->
+    <title>ShadowCon {% con_year %} {% block title %}{% endblock %}</title>
+    <meta name="author" content="Adrian Barnes" />
+    <link rel="stylesheet" href="{% static 'css/base.css' %}" />
+    <link href='https://fonts.googleapis.com/css?family=Special+Elite' rel='stylesheet' type='text/css'>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="{% static 'js/base.js' %}"></script>
+    {% block additional_header %}{% endblock %}
+  </head>
+
+  <body>
+
+    <div id="container">
+      <div id="head_and_nav">
+        <header>
+          <h1>ShadowCon</h1>
+          <p>{% con_date %}<br>
+             {% con_location %}</p>
+        </header>
+        <nav>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="{% url 'con:show_schedule' %}">Games</a>
+              <ul>
+                <li><a href="{% url 'con:show_schedule' %}">Schedule</a></li>
+                <li><a href="{% url 'con:games_list' %}">Description</a></li>
+                <li><a href="{% url 'con:user_profile' %}">Edit Submissions</a></li>
+              </ul>
+            </li>
+            <li><a href="{% url 'page:display' 'site/directions' %}">Site</a>
+              <ul>
+                <li><a href="{% url 'page:display' 'site/directions' %}">Directions</a></li>
+                <li><a href="{% url 'page:display' 'site/rules' %}">Rules</a></li>
+                <li><a href="{% url 'page:display' 'site/amenities' %}">Amenities</a></li>
+              </ul>
+            </li>
+            {% if user.is_authenticated %}
+            <li><a href="{% url 'con:user_profile' %}">Account</a>
+              <ul>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+              </ul>
+            </li>
+            {% else %}
+              <li><a href="{% url 'login' %}?next={% block login-next %}{{ request.get_full_path }}{% endblock %}">Login</a></li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+
+      <div id="boxes">
+        <section id="main" role="main">
+          {% block content %}<h1>Content goes here</h1>{% endblock %}
+        </section>
+
+        <aside>
+          <ul>
+            <li><a href="{% url 'con:register_attendance' %}">Register</a></li>
+            <li><a href="{% url 'con:submit_game' %}">Submit Game</a></li>
+            <li id="deadlines">
+              <h3>Deadlines:</h3>
+              <ul>
+                <li>Pre-Registration:<br />
+                  <ul><li>{% con_pre_reg_deadline %}</li></ul>
+                </li>
+                <li>Game Submission:<br />
+                  <ul><li>{% con_game_sub_deadline %}</li></ul>
+                </li>
+              </ul>
+            </li>
+            <li id="costs">
+              <h3>Cost:</h3>
+              <ul>
+                <li>Pre-Registered: {% con_pre_reg_cost %}</li>
+                <li>At the door: {% con_door_cost %}</li>
+              </ul>
+            </li>
+          </ul>
+        </aside>
+      </div>
+
+      <footer>
+        <a href="{% url 'contact:contact' %}">Contact Us</a>
+      </footer>
+    </div>
+
+    
+    <script>window.jQuery ||
+      document.write('<script src="js/libs/jquery-1.6.2.min.js"><\/script>')
+    </script>
+      
+      <script>
+        $(document).ready(function(){
+          return;
+          /* Make boxes same height */
+          $('#boxes').makeChildrenSameHeight();
+        });
+    </script>
+  </body>
+</html>

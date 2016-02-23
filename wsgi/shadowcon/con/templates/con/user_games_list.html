@@ -1,0 +1,25 @@
+<h3>Submitted Games</h3>
+<div id="accordion">
+  {% for game in games %}
+  <h3>
+    <svg>
+      <polygon id="selected" points="6,4.5 10,8 6,11.5"></polygon>
+      <polygon id="unselected" points="4,6 12,6 8,10"></polygon>
+    </svg>
+    {{ game.title }}
+  </h3>
+  <div>
+    <b>Players:</b> {{ game.number_players }}<br />
+    <b>System:</b> {{ game.system }}<br />
+    <b>Potential Triggers:</b> {{ game.triggers }}<br />
+    <br />
+    <b>Description:</b><br>
+    {{ game.description | safe }}<br>
+    <table width="100%">
+      <tr>
+        <td><a href="{% url 'con:edit_game' game.id %}">Edit</a></td>
+      </tr>
+    </table>
+  </div>
+  {% endfor %}
+</div>

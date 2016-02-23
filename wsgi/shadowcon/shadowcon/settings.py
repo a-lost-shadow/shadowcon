@@ -1,5 +1,5 @@
 """
-Django settings for myproject project.
+Django settings for shadowcon project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.8/topics/settings/
@@ -42,6 +42,10 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = (
+    'page.apps.PageConfig',
+    'ckeditor',
+    'contact.apps.ContactConfig',
+    'con.apps.ConConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -51,6 +55,7 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -60,13 +65,12 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-# GETTING-STARTED: change 'myproject' to your project name:
-ROOT_URLCONF = 'myproject.urls'
+ROOT_URLCONF = 'shadowcon.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(DJ_PROJECT_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -79,7 +83,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'myproject.wsgi.application'
+WSGI_APPLICATION = 'shadowcon.wsgi.application'
 
 
 # Database
@@ -92,6 +96,27 @@ DATABASES = {
         'NAME': os.path.join(DATA_DIR, 'db.sqlite3'),
     }
 }
+
+# Password validation
+# https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 3,     # TODO Don't ship with this
+        }
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    # },
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -110,5 +135,46 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
+STATICFILES_DIRS = [
+    os.path.join(DJ_PROJECT_DIR, 'static'),
+]
+
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(WSGI_DIR, 'static')
+
+CKEDITOR_JQUERY_URL = '//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
+
+CKEDITOR_ALLOW_NONIMAGE_FILES = False
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'stardard',
+        'toolbarGroups':  [
+            {'name': 'document', 'groups': [ 'mode', 'document', 'doctools' ] },
+            {'name': 'clipboard', 'groups': [ 'clipboard', 'undo' ] },
+            {'name': 'editing', 'groups': [ 'find', 'selection', 'spellchecker', 'editing' ] },
+            {'name': 'forms', 'groups': [ 'forms' ] },
+            {'name': 'insert', 'groups': [ 'insert' ] },
+            {'name': 'basicstyles', 'groups': [ 'basicstyles', 'cleanup' ] },
+            {'name': 'paragraph', 'groups': [ 'list', 'indent', 'blocks', 'align', 'bidi', 'paragraph' ] },
+            {'name': 'links', 'groups': [ 'links' ] },
+            {'name': 'styles', 'groups': [ 'styles' ] },
+            {'name': 'colors', 'groups': [ 'colors' ] },
+            {'name': 'tools', 'groups': [ 'tools' ] },
+            {'name': 'others', 'groups': [ 'others' ] },
+            {'name': 'about', 'groups': [ 'about' ] }
+        ],
+        'removeButtons': 'Source,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,Flash,Iframe,CreateDiv,Language',
+        'width': "685px",
+    },
+}
+
+LOGIN_REDIRECT_URL = '/user//profile/'
+LOGIN_URL = '/login/'
+
+EMAIL_HOST = 'mailtrap.io'
+EMAIL_PORT = '2525'
+EMAIL_HOST_USER = 'd7ab5d07b2e713'
+EMAIL_HOST_PASSWORD = '311e614f5e104f'
+
+ACCOUNT_ACTIVATION_DAYS = 7  # One-week registration activation window;

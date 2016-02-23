@@ -1,0 +1,59 @@
+.ui-helper-hidden-accessible {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+.ui-button {
+	display: inline-block;
+	position: relative;
+	padding: 0;
+	line-height: normal;
+	margin-right: .1em;
+	cursor: pointer;
+	vertical-align: middle;
+	text-align: center;
+	overflow: visible; /* removes extra width in IE */
+  text-decoration:none;
+  margin-left: 0;
+  margin-right: -.3em;
+}
+.ui-state-default {
+  border: 1px solid #d3d3d3;
+  background: #e6e6e6;
+  color: #555555;
+}
+.ui-corner-left {
+  border-bottom-left-radius: 4px;
+  border-top-left-radius: 4px;
+}
+.ui-corner-right {
+  border-bottom-right-radius: 4px;
+  border-top-right-radius: 4px;
+}
+.ui-button .ui-button-text {
+	display: block;
+	line-height: normal;
+}
+.ui-button-text {
+	padding: .4em 1em;
+}
+
+
+.ui-state-hover {
+	border: 1px solid #999999;
+	background: #dadada;
+	font-weight: normal;
+	color: #212121;
+}
+
+.ui-state-active {
+	border: 1px solid #aaaaaa;
+	background: #ffffff;
+	font-weight: normal;
+	color: #212121;
+}

@@ -1,0 +1,9 @@
+Thank you for creating an account for ShadownCon.
+
+In order to activate your account, please go to: http://{{ site }}{% url 'registration_activate' activation_key %}
+
+This link will expire in {{ expiration_days }} days.
+
+
+ShadowCon
+http://{{ site }}

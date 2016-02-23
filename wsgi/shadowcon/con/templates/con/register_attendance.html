@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block additional_header %}
+<script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<link rel="stylesheet" href="{% static 'user/choice.css' %}" />
+<script>
+    $(function() {
+      $( ".radio" ).buttonset();
+    });/**/
+  </script>
+{% endblock %}
+
+{% block content %}
+<h2>{{ action }} for {{ name }}</h2>
+<form action="." method="POST">
+  {% csrf_token %}
+  <table>
+    {% for item in items %}
+    <tr class="radio">
+      <td>{{ item.time_block.text }}</td>
+      {% for choice in choices %}
+      <td>
+        <input type="radio"
+               id="{{ item.time_block.text }}{{ choice.0 }}"
+               name="{{ item.time_block.text }}"
+               value="{{ choice.0 }}"
+               {% if item.attendance == choice.0 %}checked />{% else %}/>{% endif %}
+        <label for="{{ item.time_block.text }}{{ choice.0 }}">{{ choice.1 }}</label>
+      </td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </table>
+  <input type="submit" value="Submit Registration">
+  <input type="hidden" name="next" value="{{ next }}" />
+</form>
+{% endblock %}

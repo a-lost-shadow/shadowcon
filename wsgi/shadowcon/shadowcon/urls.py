@@ -1,4 +1,4 @@
-"""myproject URL Configuration
+"""shadowcon URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.8/topics/http/urls/
@@ -17,5 +17,10 @@ from django.conf.urls import include, url
 from django.contrib import admin
 
 urlpatterns = [
+    url(r'^', include('page.urls')),
+    url(r'^', include('con.urls')),
+    url(r'^', include('django.contrib.auth.urls')),
+    url(r'^accounts/', include('registration.backends.hmac.urls')),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^contact/', include('contact.urls')),
 ]

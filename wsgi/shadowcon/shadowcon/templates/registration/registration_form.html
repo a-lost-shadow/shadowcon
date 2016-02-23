@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block login-next %}{% url 'con:user_profile' %}{% endblock %}
+
+{% block content %}
+<h2>Create New Account</h2>
+  <form action="." method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Create Account">
+    <input type="hidden" name="next" value="{{ next }}" />
+  </form>
+{% endblock %}

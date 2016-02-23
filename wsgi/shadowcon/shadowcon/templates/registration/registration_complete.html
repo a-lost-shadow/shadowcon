@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block login-next %}{% url 'con:user_profile' %}{% endblock %}
+
+{% block content %}
+<h2>Activation e-mail sent</h2>
+<p>We've emailed you instructions for activating your account. You should receive them shortly.</p>
+<p>If you don't receive an email, please make double check the e-mail you registered with, and check your spam folder.</p>
+{% endblock %}

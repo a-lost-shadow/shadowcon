@@ -1,0 +1,196 @@
+article, aside, details, figcaption, figure, footer, header,
+hgroup, nav, section {
+    display: block;
+}
+
+body {
+    /*background-color:#303030; /* For debugging */
+    background-color: #000000;
+    color:#FFFFFF;
+    font-family: 'Special Elite', cursive;
+}
+
+a {
+    color:#FFFFFF
+}
+
+/* Header */
+
+div#head_and_nav {
+    background-image:url('../img/header.jpg');
+    background-size:cover;
+    background-repat:no-repeat;
+                        
+    width:960px; 
+    height:177px;
+}
+
+header h1 {
+    font-size:60px;
+    position:relative;
+    margin:0px;
+    top:15px;
+    left:15px;
+}
+
+header p {
+    position:relative;
+    top:-5px;
+    left:60px;
+                 
+}
+
+
+/* Nav Bar */
+nav {
+    height:45px;
+}
+
+nav ul {
+    font-size:25px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+nav ul li {
+    display: block;
+    position: relative;
+    float: left;
+}
+
+nav li ul { 
+    display: none; 
+}
+
+nav ul li a {
+    display: block;
+    text-decoration: none;
+    padding: 12px 20px 1px 20px;
+
+    background-color:#000000; 
+    margin-left: 5px;
+    white-space: nowrap;
+    height:30px; /* Width and height of top-level nav items */
+    text-align:center;
+    border:3px solid #4B4B4B; 
+    border-radius: 20px; 
+    overflow:hidden;    
+}
+
+nav ul li a:hover { 
+    background: #A15720;
+}
+
+nav li:hover ul {
+    display: block;
+    position: absolute;
+    height:30px;
+}
+
+nav li:hover li {
+    float: none;
+    font-size: 11px;
+    
+}
+
+nav li:hover a { 
+    padding: 12px 20px 1px 20px;
+    background: #2b1d12;/*#2d2d2d; /*#4B290F; /*#3A464F; */
+}
+
+nav ul li ul li a {
+    height:20px;
+    text-align:left;
+}
+
+
+/* Middle Container */
+div#container {
+    width:960px;
+    margin:auto;
+    margin-top:0px;
+}
+
+/* Main Content */
+section#main {
+    /*background-color:#1d1d1d; /* For debugging */
+    background-color: #000000;
+    width:685px;
+    float:left;
+    padding-left:25px; 
+    padding-right:25px;
+    padding-bottom:20px; 
+
+}
+
+/* Side bar */
+aside {
+    /*background-color:#505050; /* For debugging */
+    background-color: #000000;
+    width:225px;
+    float:right;
+    padding-bottom:20px;
+}
+
+aside ul {
+    list-style: none;
+    margin:10px;
+    padding:0px;
+}
+
+aside a {
+    font-size:18px;
+}
+
+aside li {
+    padding:0px 0px 10px 0px;
+}
+
+aside h3 {
+    margin:0px;
+    margin-top:20px;
+    margin-bottom:5px;
+}
+
+aside ul {
+    list-style: none;
+    margin:0px;
+    padding:0px;
+    padding-bottom:5px;
+}
+
+aside li#deadlines ul li {
+    margin:0px;
+    margin-left:10px;
+    padding:0px;
+    padding-left:10px;
+}
+
+aside li#costs h3 {
+    margin-top:10px;
+}
+
+
+aside li#costs ul li {
+    margin:0px;
+    margin-left:10px;
+    margin-bottom:5px;
+    padding:0px;
+    padding-left:10px;
+}
+
+/* Footer */
+footer {
+    /*background-color:#2C5463;  /* For debugging */
+    background-color: #000000;
+    clear:both;
+    height:27px;
+}
+
+footer a {
+    position:relative;
+    top:5px;
+    left:15px;
+    font-size:12px;
+}

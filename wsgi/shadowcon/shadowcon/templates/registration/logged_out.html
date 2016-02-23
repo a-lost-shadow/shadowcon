@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+
+{% block login-next %}{% url 'con:user_profile' %}{% endblock %}
+
+{% block content %}
+<h2>Logged out</h2>
+You have successfully logged out of the system.
+{% endblock %}
