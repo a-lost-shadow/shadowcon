@@ -29,4 +29,4 @@ class LocationAdmin(admin.ModelAdmin):
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
     model = Game
-    list_display = ('title', 'gm', 'time_block', 'time_slot')
+    list_display = ('title', 'gm', 'time_block', 'time_slot', 'location')
