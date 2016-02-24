@@ -40,8 +40,11 @@ class TimeBlock(models.Model):
     def __str__(self):
         return self.text + "[" + str(self.sort_id) + "]"
 
+    def first_word(self):
+        return str(self.text).split()[0].strip()
+
     def get_combined(self, time_slot):
-        block_first_word = str(self.text).split()[0].strip()
+        block_first_word = self.first_word()
         if weekdays.get(unicode(block_first_word.lower()), False):
             return block_first_word + " " + str(time_slot)
         else:

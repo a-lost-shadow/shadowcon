@@ -1,9 +1,19 @@
 {% extends "base.html" %}
 {% load con_info %}
+{% load games %}
+{% load staticfiles %}
 {% block title %}- {{ con_year }} Schedule{% endblock %}
 
+{% block additional_header %}
+<link rel="stylesheet" href="{% static 'con/schedule.css' %}" />
+{% endblock %}
+
 {% block content %}
-<h2>{{ con_year }} Schedule</h2>
+<h2>{% con_year %} Schedule</h2>
+{% location_schedule %}
+<br />
+<br />
+<br />
 {% for time_block, games in object_list.items %}
 <table border="1" width="100%">
   <tr><th colspan="4" align="left">{{ time_block }}</th></tr>

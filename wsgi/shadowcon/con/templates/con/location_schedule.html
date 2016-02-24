@@ -1,0 +1,38 @@
+<svg width="{{ total.width }}" height="{{ total.height }}">
+  <defs>
+    <pattern id="smallGrid" width="{{ hour.width }}" height="{{ row_height }}" x="{{ grid.light.x }}" y="{{ grid.light.y }}" patternUnits="userSpaceOnUse">
+      <path d="M {{ hour.width }} 0 L 0 0 0 {{ row_height }}" class="light"/>
+    </pattern>
+    <pattern id="grid" width="{{ hour.block_width }}" height="{{ row_height }}" x="{{ grid.bold.x }}" y="{{ grid.bold.y }}" patternUnits="userSpaceOnUse">
+      <rect width="{{ hour.block_width }}" height="{{ row_height }}" fill="url(#smallGrid)"/>
+      <path d="M {{ hour.block_width }} 0 L 0 0 0 {{ row_height }}" class="heavy"/>
+    </pattern>
+    <pattern id="label_bars" width="{{ grid.x }}" height="{{ row_height }}" y="11" patternUnits="userSpaceOnUse">
+      <polyline points="0,{{ row_height }} {{ grid.x }},{{ row_height }} {{ grid.x }},0" class="heavy"/>
+    </pattern>
+    <pattern class="heavy" id="days" width="{{ days.width }}" height="{{ days.height }}" y="{{ days.y }}" x="{{ days.x }}" patternUnits="userSpaceOnUse">
+      <polyline points="0,0 0,{{ days.height }}"/>
+    </pattern>
+  </defs>
+
+  <rect width="{{ grid.width }}" height="100%" x="{{ grid.x }}" y="{{ grid.y }}" fill="url(#grid)"/>
+  <rect width="{{ grid.x }}" height="100%" y="{{ grid.y }}" fill="url(#label_bars)"/>
+  <rect width="{{ grid.width }}" height="{{ days.height }}" fill="url(#days)"/>
+  <text class="header" y="{{ day_header.y }}">
+    <tspan x="{{ day_header.friday }}">Friday</tspan>
+    <tspan x="{{ day_header.saturday }}">Saturday</tspan>
+    <tspan x="{{ day_header.sunday }}">Sunday</tspan>
+  </text>
+  <text class="header" y="{{ hour_header.y }}">
+    {% for x, header in hour_headers.items %}
+    <tspan x="{{ x }}">{{ header }}</tspan>
+    {% endfor %}
+  </text>
+  {% for location in locations %}
+  <text class="location" width="{{ grid.x }}" x="4" y="{{ location.text_offset }}">{{ location.text }}</text>
+  {% for game in location.games %}
+  <rect width="{{ game.width }}" height="{{ game_height }}" x="{{ game.x }}" y="{{ location.game_offset }}"
+        class="game" id="{{ game.game.header_target }}" />
+  {% endfor %}
+  {% endfor %}
+</svg>
