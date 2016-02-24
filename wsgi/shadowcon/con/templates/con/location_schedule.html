@@ -29,10 +29,11 @@
     {% endfor %}
   </text>
   {% for location in locations %}
-  <text class="location" width="{{ grid.x }}" x="4" y="{{ location.text_offset }}">{{ location.text }}</text>
+  <text class="location" width="{{ grid.x }}" x="{{ location.text.x }}" y="{{ location.text.y }}">{{ location.text.value }}</text>
   {% for game in location.games %}
   <rect width="{{ game.width }}" height="{{ game_height }}" x="{{ game.x }}" y="{{ location.game_offset }}"
         class="game" id="{{ game.game.header_target }}" />
+  <text x="{{ game.text.x }}" y="{{ location.text.y }}" class="game_title">{{ game.game.title }}</text>
   {% endfor %}
   {% endfor %}
 </svg>

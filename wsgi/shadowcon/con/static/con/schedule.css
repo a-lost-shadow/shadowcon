@@ -14,11 +14,15 @@ stroke-width:0.5px;
 fill:white;
 }
 
-.location{
+.location {
 fill:white;
 }
 
-.game{
+.game_title {
+fill:white;
+}
+
+.game {
 fill:#462F1D;
 stroke:rgb(200,200,200);
 }

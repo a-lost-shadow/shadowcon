@@ -26,6 +26,7 @@ day_header = {"y": 15,
               "saturday": grid["x"] + 18 * hour["width"] - hour_header["offset"] - 20,
               "sunday": grid["x"] + 36 * hour["width"] - hour_header["offset"] + 30,
               }
+text_offset = 4
 
 
 @register.inclusion_tag('con/user_games_list.html')
@@ -40,6 +41,7 @@ class ScheduleGameBlock:
         self.x = offsets.get(unicode(game.time_block.first_word().lower()), 100) + game.time_slot.start
         self.x *= hour["width"]
         self.x += grid["x"]
+        self.text = {"x": self.x + text_offset}
 
         self.width = game.time_slot.stop - game.time_slot.start
         if self.width < 0:
@@ -49,10 +51,9 @@ class ScheduleGameBlock:
 
 class ScheduleLocationBlock:
     def __init__(self, location, row_counter):
-        self.text = location.text
         self.games = map(lambda x: ScheduleGameBlock(x), Game.objects.filter(location=location))
         self.row = row_counter.increment_and_get()
-        self.text_offset = 61 + row_height * self.row
+        self.text = {"x": text_offset, "y": 61 + row_height * self.row, "value": location.text}
         self.game_offset = 42 + row_height * self.row
 
 
