@@ -7,7 +7,7 @@
   <form action="." method="POST">
     {% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Create Account">
+    <input class="submit" type="submit" value="Create Account">
     <input type="hidden" name="next" value="{{ next }}" />
   </form>
 {% endblock %}

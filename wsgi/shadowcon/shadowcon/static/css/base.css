@@ -52,7 +52,11 @@ a:focus, a:hover, h1, h2, h3 {
     padding-left:0px;
 }
 
-p label {
+select, input, textarea {
+    color:black;
+}
+
+p label, th label {
     font-weight:normal;
 }
 
@@ -72,7 +76,7 @@ h3 {
     font-size:18.72px;
 }
 
-p {
+p, form {
     margin:16px 0px 16px 0px;
 }
 
