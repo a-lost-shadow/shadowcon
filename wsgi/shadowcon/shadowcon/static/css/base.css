@@ -8,21 +8,51 @@ body {
     background-color: #000000;
     color:#FFFFFF;
     font-family: 'Special Elite', cursive;
+    line-height:normal;
+    margin:0px 8px 8px 8px;
+    font-size:16px;
 }
 
-a {
-    color:#FFFFFF
+a, a:focus, a:hover {
+    color:#FFFFFF;
+    text-decoration:underline;
+}
+
+a:focus, a:hover, h1, h2, h3 {
+    font-weight:bold;
+}
+
+th {
+    padding:5px 0px 0px 2px;
+}
+
+td {
+    padding:5px 10px 2px 10px;
+}
+
+h2 {
+    font-size:24px;
+}
+
+h3 {
+    font-size:18.72px;
+}
+
+p {
+    margin:16px 0px 16px 0px;
 }
 
 /* Header */
 
 div#head_and_nav {
     background-image:url('../img/header.jpg');
-    background-size:cover;
-    background-repat:no-repeat;
-                        
-    width:960px; 
+    background-position:right;
+    background-size:960px 177px;
+    background-repeat:no-repeat;
+
+    width:100%;
     height:177px;
+    box-sizing:content-box;
 }
 
 header h1 {
@@ -37,7 +67,7 @@ header p {
     position:relative;
     top:-5px;
     left:60px;
-                 
+    margin:14px 0px 14px 0px;
 }
 
 
@@ -75,7 +105,8 @@ nav ul li a {
     text-align:center;
     border:3px solid #4B4B4B; 
     border-radius: 20px; 
-    overflow:hidden;    
+    overflow:hidden;
+    box-sizing:content-box;
 }
 
 nav ul li a:hover { 
@@ -83,6 +114,7 @@ nav ul li a:hover {
 }
 
 nav li:hover ul {
+    z-index:10;
     display: block;
     position: absolute;
     height:30px;
@@ -114,11 +146,7 @@ div#container {
 
 /* Main Content */
 section#main {
-    /*background-color:#1d1d1d; /* For debugging */
-    background-color: #000000;
-    width:685px;
-    float:left;
-    padding-left:25px; 
+    padding-left:25px;
     padding-right:25px;
     padding-bottom:20px; 
 
@@ -126,10 +154,6 @@ section#main {
 
 /* Side bar */
 aside {
-    /*background-color:#505050; /* For debugging */
-    background-color: #000000;
-    width:225px;
-    float:right;
     padding-bottom:20px;
 }
 
