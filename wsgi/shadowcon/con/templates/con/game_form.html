@@ -6,7 +6,7 @@
   {% csrf_token %}
   {{ form.media }}
   {{ form.as_p }}
-  <input type="submit" value="Submit Game">
+  <input class="submit" type="submit" value="Submit Game">
   <input type="hidden" name="next" value="{{ next }}" />
 </form>
 {% endblock %}

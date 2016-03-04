@@ -19,7 +19,7 @@
   <table>
     {% for item in items %}
     <tr class="radio">
-      <td>{{ item.time_block.text }}</td>
+      <td class="header">{{ item.time_block.text }}</td>
       {% for choice in choices %}
       <td>
         <input type="radio"
@@ -33,7 +33,7 @@
     </tr>
     {% endfor %}
   </table>
-  <input type="submit" value="Submit Registration">
+  <input class="submit" type="submit" value="Submit Registration">
   <input type="hidden" name="next" value="{{ next }}" />
 </form>
 {% endblock %}

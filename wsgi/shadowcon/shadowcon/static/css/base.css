@@ -22,12 +22,46 @@ a:focus, a:hover, h1, h2, h3 {
     font-weight:bold;
 }
 
-th {
+.schedule th {
     padding:5px 0px 0px 2px;
 }
 
-td {
+.schedule td {
     padding:5px 10px 2px 10px;
+}
+
+.radio td, .radio th {
+    padding-bottom:4px;
+}
+
+.radio .header {
+    padding:0px 10px 0px 0px;
+}
+
+.submit {
+    margin-top:10px;
+    color:black;
+    padding-top:4px;
+}
+
+.submit:hover {
+    background-color:rgb(190,190,190);
+}
+
+.radio label {
+    padding-left:0px;
+}
+
+p label {
+    font-weight:normal;
+}
+
+table .radio {
+    display:table-row;
+}
+
+input.submit {
+    font-size:14px;
 }
 
 h2 {
