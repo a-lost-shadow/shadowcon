@@ -148,13 +148,12 @@ div#container {
 section#main {
     padding-left:25px;
     padding-right:25px;
-    padding-bottom:20px; 
-
+    margin-bottom:20px;
 }
 
 /* Side bar */
 aside {
-    padding-bottom:20px;
+    margin:16px 0px 20px 0px;
 }
 
 aside ul {
