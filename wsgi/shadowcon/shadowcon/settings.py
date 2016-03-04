@@ -34,8 +34,8 @@ from socket import gethostname
 ALLOWED_HOSTS = [
     gethostname(), # For internal OpenShift load balancer security purposes.
     os.environ.get('OPENSHIFT_APP_DNS'), # Dynamically map to the OpenShift gear name.
-    new.shadowcon.net,
-    www.shadowcon.net,
+    "new.shadowcon.net",
+    "www.shadowcon.net",
     #'example.com', # First DNS alias (set up in the app)
     #'www.example.com', # Second DNS alias (set up in the app)
 ]
