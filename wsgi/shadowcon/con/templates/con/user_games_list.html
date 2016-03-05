@@ -15,11 +15,9 @@
     <br />
     <b>Description:</b><br>
     {{ game.description | safe }}<br>
-    <table width="100%">
-      <tr>
-        <td><a href="{% url 'con:edit_game' game.id %}">Edit</a></td>
-      </tr>
-    </table>
+    {% if registration_open %}
+    <a href="{% url 'con:edit_game' game.id %}">Edit</a>
+    {% endif %}
   </div>
   {% endfor %}
 </div>
