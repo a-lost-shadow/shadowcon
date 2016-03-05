@@ -1,11 +1,11 @@
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
-from django.core.urlresolvers import reverse
 from django.views.generic.edit import FormView
+from django.utils import timezone
 from registration.backends.hmac.views import RegistrationView as BaseRegistrationView
 
-from ..forms import NewUserForm, AttendenceForm
+from ..forms import NewUserForm, AttendanceForm
 from ..models import TimeBlock, BlockRegistration, get_choice, Registration
 from ..utils import friendly_username
 
@@ -44,63 +44,33 @@ def show_profile(request):
     return render(request, 'con/user_profile.html', context)
 
 
-@login_required
-def register(request):
-    item_dict = {}
-    for item in BlockRegistration.objects.filter(user=request.user):
-        item_dict[item.time_block] = item
-
-    if 'POST' == request.method:
-        for time_block in TimeBlock.objects.exclude(text__startswith='Not').order_by('sort_id'):
-            if time_block not in item_dict:
-                reg = BlockRegistration(user=request.user,
-                                        time_block=time_block,
-                                        attendance=request.POST[time_block.text])
-                reg.save()
-            else:
-                item_dict[time_block].attendance = request.POST[time_block.text]
-                item_dict[time_block].save()
-                del item_dict[time_block]
-
-        for item in item_dict.values():
-            print "deleting " + str(item)
-            item.delete()
-
-        return HttpResponseRedirect(reverse('con:user_profile'))
-    else:
-        action = "Updating Registration"
-        items = []
-        for time_block in TimeBlock.objects.exclude(text__startswith='Not').order_by('sort_id'):
-            if time_block not in item_dict:
-                items.append(BlockRegistration(user=request.user, time_block=time_block))
-                action = "Initial Registration"
-            else:
-                items.append(item_dict[time_block])
-
-        context = {'title': ' - Register',
-                   'name': friendly_username(request.user),
-                   'action': action,
-                   'items': items,
-                   'choices': BlockRegistration.ATTENDANCE_CHOICES,
-                   }
-        return render(request, 'con/register_attendance.html', context)
-
-
-class NewUserView(BaseRegistrationView):
-    form_class = NewUserForm
-
-
-class NewAttendanceView(FormView):
-    template_name = 'con/register_attendance_form.html'
-    form_class = AttendenceForm
+class NewAttendanceView(LoginRequiredMixin, FormView):
+    template_name = 'con/register_attendance.html'
+    form_class = AttendanceForm
     model = Registration
     success_url = '/new_attend/'
 
     def form_valid(self, form):
-        print "Hey I got a %s " % form
+        registration = Registration.objects.filter(user=self.request.user)
+        if 0 == len(registration):
+            registration = Registration(user=self.request.user,
+                                        registration_date=timezone.now(),
+                                        payment=Registration.PAYMENT_CASH)
+            registration.save()
+        else:
+            registration = registration[0]
+            BlockRegistration.objects.filter(registration=registration).delete()
+
+        form.save(registration)
+
         return super(NewAttendanceView, self).form_valid(form)
 
     def get_form_kwargs(self):
         result = super(NewAttendanceView, self).get_form_kwargs()
-        result['request'] = self.request
+        result['registration'] = Registration.objects.filter(user=self.request.user)
+        result['user'] = friendly_username(self.request.user)
         return result
+
+
+class NewUserView(BaseRegistrationView):
+    form_class = NewUserForm

@@ -136,6 +136,7 @@ class Registration(models.Model):
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     registration_date = models.DateTimeField()
+    last_updated = models.DateTimeField()
     payment = models.CharField(max_length=1, choices=PAYMENT_CHOICES)
 
     def __str__(self):
