@@ -7,7 +7,7 @@ from registration.backends.hmac.views import RegistrationView as BaseRegistratio
 
 from ..forms import NewUserForm, AttendanceForm
 from ..models import TimeBlock, BlockRegistration, get_choice, Registration
-from ..utils import friendly_username
+from ..utils import friendly_username, registration_open
 from .common import RegistrationOpenMixin
 
 
@@ -20,27 +20,28 @@ def get_registration(user):
 @login_required
 def show_profile(request):
     registration = []
-    item_dict = {}
-    for item in BlockRegistration.objects.filter(user=request.user):
-        item_dict[item.time_block] = item
-        if item.attendance != BlockRegistration.ATTENDANCE_NO:
-            registration.append("%s: %s" % (item.time_block.text, get_choice(item.attendance,
-                                                                             BlockRegistration.ATTENDANCE_CHOICES)))
 
-    for time_block in TimeBlock.objects.exclude(text__startswith='Not').order_by('sort_id'):
-        if time_block not in item_dict:
-            if 0 == len(registration):
-                registration.append("Not Registered")
-            else:
+    registration_object = Registration.objects.filter(user=request.user)
+    if registration_object:
+        item_dict = {}
+        for item in BlockRegistration.objects.filter(user=request.user):
+            item_dict[item.time_block] = item
+            if item.attendance != BlockRegistration.ATTENDANCE_NO:
+                registration.append("%s: %s" %
+                                    (item.time_block.text, get_choice(item.attendance,
+                                                                      BlockRegistration.ATTENDANCE_CHOICES)))
+
+        for time_block in TimeBlock.objects.exclude(text__startswith='Not').order_by('sort_id'):
+            if time_block not in item_dict:
                 registration.append("<b>Partially Registered: Please re-register</b>")
-            break
-
-    if 0 == len(registration):
-        registration.append("Not Attending")
+                break
+    else:
+        registration.append("Not Registered")
 
     context = {'title': " - Account Profile",
                'name': friendly_username(request.user),
                'registration': registration,
+               'registration_open': registration_open(),
                }
     return render(request, 'con/user_profile.html', context)
 

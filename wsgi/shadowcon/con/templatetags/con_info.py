@@ -55,7 +55,7 @@ def admin_link(user):
         return ""
 
 
-@register.inclusion_tag('con/register_links.html')
+@register.inclusion_tag('con/register_sidebar_links.html')
 def register_links():
     raw_open_date = get_con_value("registration_opens")
     local_open_date = raw_open_date.astimezone(pytz.timezone('US/Pacific'))
