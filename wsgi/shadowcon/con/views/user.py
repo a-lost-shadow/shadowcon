@@ -8,6 +8,7 @@ from registration.backends.hmac.views import RegistrationView as BaseRegistratio
 from ..forms import NewUserForm, AttendanceForm
 from ..models import TimeBlock, BlockRegistration, get_choice, Registration
 from ..utils import friendly_username
+from .common import RegistrationOpenMixin
 
 
 def get_registration(user):
@@ -44,7 +45,7 @@ def show_profile(request):
     return render(request, 'con/user_profile.html', context)
 
 
-class NewAttendanceView(LoginRequiredMixin, FormView):
+class NewAttendanceView(RegistrationOpenMixin, LoginRequiredMixin, FormView):
     template_name = 'con/register_attendance.html'
     form_class = AttendanceForm
     model = Registration

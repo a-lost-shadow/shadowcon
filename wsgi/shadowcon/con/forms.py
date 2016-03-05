@@ -1,7 +1,7 @@
 from django.forms import CharField, ChoiceField, Form
 from registration.forms import RegistrationForm as BaseRegistrationForm, get_user_model
 
-from .models import Registration, BlockRegistration, TimeBlock
+from .models import BlockRegistration, TimeBlock
 from collections import OrderedDict
 
 import pytz

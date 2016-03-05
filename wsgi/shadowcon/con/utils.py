@@ -23,4 +23,4 @@ def get_con_value(parameter):
 
 def registration_open():
     open_date = get_con_value("registration_opens")
-    return open_date <= timezone.now(),
+    return open_date <= timezone.now()

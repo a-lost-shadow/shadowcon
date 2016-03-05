@@ -6,6 +6,7 @@ from collections import OrderedDict
 
 from ..models import Game
 from ..utils import friendly_username
+from .common import RegistrationOpenMixin
 
 game_fields = ['title', 'gm', 'duration', 'number_players', 'system', 'triggers', 'description']
 
@@ -28,7 +29,7 @@ class ScheduleView(generic.ListView):
         return game_map
 
 
-class NewGameView(LoginRequiredMixin, generic.CreateView):
+class NewGameView(RegistrationOpenMixin, LoginRequiredMixin, generic.CreateView):
     model = Game
     fields = game_fields
 
@@ -46,7 +47,7 @@ class NewGameView(LoginRequiredMixin, generic.CreateView):
         return super(NewGameView, self).form_valid(form)
 
 
-class UpdateGameView(LoginRequiredMixin, generic.UpdateView):
+class UpdateGameView(RegistrationOpenMixin, LoginRequiredMixin, generic.UpdateView):
     model = Game
     fields = game_fields
 

@@ -62,3 +62,11 @@ def register_links():
 
     return {'registration_open': raw_open_date <= timezone.now(),
             'open_date': local_open_date.strftime("%B %d, %Y<br>%I:%M:%S %p %Z")}
+
+
+@register.simple_tag
+def con_registration_opens():
+    raw_open_date = get_con_value("registration_opens")
+    local_open_date = raw_open_date.astimezone(pytz.timezone('US/Pacific'))
+
+    return local_open_date.strftime("%B %d, %Y at %I:%M:%S %p %Z")
