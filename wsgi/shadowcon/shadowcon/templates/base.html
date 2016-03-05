@@ -72,8 +72,7 @@
     <div class="col-sm-3">
       <aside>
         <ul>
-          <li><a href="{% url 'con:register_attendance' %}">Register</a></li>
-          <li><a href="{% url 'con:submit_game' %}">Submit Game</a></li>
+          {% register_links %}
           <li id="deadlines">
             <h3>Deadlines:</h3>
             <ul>

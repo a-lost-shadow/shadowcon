@@ -15,12 +15,14 @@ class ConInfo(models.Model):
     location = models.CharField(max_length=1024)
     pre_reg_cost = models.FloatField()
     door_cost = models.FloatField()
+    registration_opens = models.DateTimeField()
 
     def __str__(self):
         format_str = "date: %s, location: %s, game_sub_deadline: %s, pre_reg_deadline: %s, " + \
-                     "pre_reg_cost: %s, door_cost: %s"
+                     "pre_reg_cost: %s, door_cost: %s, registration_opens: %s"
         return format_str % (self.date, self.location, self.game_sub_deadline,
-                             self.pre_reg_deadline, self.pre_reg_cost, self.door_cost)
+                             self.pre_reg_deadline, self.pre_reg_cost, self.door_cost,
+                             self.registration_opens)
 
 
 weekdays = {u'monday': True,

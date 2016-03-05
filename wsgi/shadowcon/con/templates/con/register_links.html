@@ -1,0 +1,11 @@
+{% load tz %}
+{% if registration_open %}
+          <li><a href="{% url 'con:register_attendance' %}">Register</a></li>
+          <li><a href="{% url 'con:submit_game' %}">Submit Game</a></li>
+{% else %}
+          <li id="costs"><h3>Registration opens:</h3>
+            <ul><li>{{ open_date|safe }}</li></ul>
+          </li>
+{% localtime on %}
+{% endlocaltime %}
+{% endif %}

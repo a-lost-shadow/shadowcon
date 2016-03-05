@@ -227,6 +227,17 @@ aside li#deadlines ul li {
     padding-left:10px;
 }
 
+aside li#registration_opens ul {
+    margin:0px;
+    margin-left:10px;
+    padding:0px;
+    padding-left:10px;
+}
+
+aside li#registration_opens ul li {
+    padding:0px;
+}
+
 aside li#costs h3 {
     margin-top:10px;
 }

@@ -1,7 +1,8 @@
 from django import template
-from django.utils import dateformat, html
+from django.utils import dateformat, html, timezone
 from django.core.urlresolvers import reverse
 from datetime import date
+import pytz
 
 from ..models import ConInfo
 
@@ -63,3 +64,12 @@ def admin_link(user):
                                 reverse('admin:index'))
     else:
         return ""
+
+
+@register.inclusion_tag('con/register_links.html')
+def register_links():
+    raw_open_date = get_value("registration_opens")
+    local_open_date = raw_open_date.astimezone(pytz.timezone('US/Pacific'))
+
+    return {'registration_open': raw_open_date <= timezone.now(),
+            'open_date': local_open_date.strftime("%B %d, %Y<br>%I:%M:%S %p %Z")}
