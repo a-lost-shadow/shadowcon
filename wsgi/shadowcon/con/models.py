@@ -8,6 +8,11 @@ import re
 from .fields import HourField
 
 
+def get_choice(value, choices):
+    choice = filter(lambda a: a[0] == value, choices)[0]
+    return choice[1]
+
+
 class ConInfo(models.Model):
     date = models.DateField()
     pre_reg_deadline = models.DateField()
@@ -116,6 +121,28 @@ class Game(models.Model):
             return "Not Scheduled"
 
 
+class Registration(models.Model):
+    PAYMENT_RECEIVED = 'R'
+    PAYMENT_CASH = 'C'
+    PAYMENT_QUICK_PAY = 'Q'
+    PAYMENT_PAYPAL = 'P'
+    PAYMENT_VENMO = 'V'
+    PAYMENT_CHOICES = (
+        (PAYMENT_RECEIVED, 'Payment Received'),
+        (PAYMENT_CASH, 'Paying by Cash'),
+        (PAYMENT_QUICK_PAY, 'Chase Quick Pay'),
+        (PAYMENT_PAYPAL, 'Paying by Venmo'),
+        (PAYMENT_VENMO, 'Paying by Paypal'),
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    registration_date = models.DateTimeField()
+    payment = models.CharField(max_length=1, choices=PAYMENT_CHOICES)
+
+    def __str__(self):
+        return "user: %s, registration_date: %s, payment: %s" % \
+               (self.user, self.registration_date, get_choice(self.payment, self.PAYMENT_CHOICES))
+
+
 class BlockRegistration(models.Model):
     ATTENDANCE_MAYBE = 'M'
     ATTENDANCE_YES = 'Y'
@@ -126,9 +153,11 @@ class BlockRegistration(models.Model):
         (ATTENDANCE_NO, 'No'),
     )
     time_block = models.ForeignKey(TimeBlock, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    registration = models.ForeignKey(Registration, on_delete=models.CASCADE)
     attendance = models.CharField(max_length=1, choices=ATTENDANCE_CHOICES, default=ATTENDANCE_YES)
 
     def __str__(self):
-        return "user: %s, time_block: %s, attendance: %s" % \
-               (self.user, self.time_block, self.attendance)
+        return "registration: %s, time_block: %s, attendance: %s" % \
+               (self.registration,
+                self.time_block,
+                get_choice(self.attendance, self.ATTENDANCE_CHOICES))
