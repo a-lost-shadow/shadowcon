@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% load user %}
+
+{% block content %}
+<h2>Wait List Registration Recorded</h2>
+{% user_attendance request.user %}
+<p>Thank you for submitting your registration.  Unfortunately, we have already hit the maximum number of people for our site.  You have been added to the wait list.  If a slot opens up, we will notify you.</p>
+{% endblock %}

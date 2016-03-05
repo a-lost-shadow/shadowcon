@@ -1,0 +1,7 @@
+{% load con_info %}
+{% con_year %} Registration:
+<ul>
+  {% for entry in registration %}
+  <li>{{ entry }}</li>
+  {% endfor %}
+</ul>

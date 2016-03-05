@@ -1,47 +1,37 @@
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
-from django.views.generic.edit import FormView
+from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin
+from django.shortcuts import render, redirect
+from django.views.generic.edit import FormView, UpdateView
 from django.utils import timezone
 from registration.backends.hmac.views import RegistrationView as BaseRegistrationView
 
 from ..forms import NewUserForm, AttendanceForm
-from ..models import TimeBlock, BlockRegistration, get_choice, Registration
-from ..utils import friendly_username, registration_open
+from ..models import BlockRegistration, Registration, get_choice
+from ..utils import friendly_username, registration_open, get_con_value
 from .common import RegistrationOpenMixin
 
 
 @login_required
 def show_profile(request):
-    registration = []
+    registration = Registration.objects.filter(user=request.user)
+    payment = None
+    payment_received = None
 
-    registration_object = Registration.objects.filter(user=request.user)
-    if registration_object:
-        item_dict = {}
-        for item in BlockRegistration.objects.filter(registration=registration_object):
-            item_dict[item.time_block] = item
-            if item.attendance != BlockRegistration.ATTENDANCE_NO:
-                registration.append("%s: %s" %
-                                    (item.time_block.text, get_choice(item.attendance,
-                                                                      BlockRegistration.ATTENDANCE_CHOICES)))
-
-        for time_block in TimeBlock.objects.exclude(text__startswith='Not').order_by('sort_id'):
-            if time_block not in item_dict:
-                registration.append("<b>Partially Registered: Please re-register</b>")
-                break
-    else:
-        registration.append("Not Registered")
+    if registration:
+        payment = get_choice(registration[0].payment, Registration.PAYMENT_CHOICES)
+        payment_received = registration[0].payment_received
 
     context = {'title': " - Account Profile",
                'name': friendly_username(request.user),
-               'registration': registration,
                'registration_open': registration_open(),
+               'payment': payment,
+               'payment_received': payment_received,
                }
     return render(request, 'con/user_profile.html', context)
 
 
-class NewAttendanceView(RegistrationOpenMixin, LoginRequiredMixin, FormView):
+class AttendanceView(RegistrationOpenMixin, LoginRequiredMixin, FormView):
     template_name = 'con/register_attendance.html'
     form_class = AttendanceForm
     model = Registration
@@ -61,17 +51,55 @@ class NewAttendanceView(RegistrationOpenMixin, LoginRequiredMixin, FormView):
         registration.save()
         form.save(registration)
 
-        return super(NewAttendanceView, self).form_valid(form)
+        return super(AttendanceView, self).form_valid(form)
 
     def get_form_kwargs(self):
-        result = super(NewAttendanceView, self).get_form_kwargs()
+        result = super(AttendanceView, self).get_form_kwargs()
         result['registration'] = Registration.objects.filter(user=self.request.user)
         result['user'] = friendly_username(self.request.user)
         return result
 
     def get_success_url(self):
-        return reverse('con:user_profile')
+        return reverse('con:payment')
 
 
 class NewUserView(BaseRegistrationView):
     form_class = NewUserForm
+
+
+class NotOnWaitingListMixin(AccessMixin):
+    def dispatch(self, request, *args, **kwargs):
+        entries = Registration.objects.order_by('registration_date')
+        found = False
+        for i in range(0, len(entries)):
+            entry = entries[i]
+            if request.user == entry.user:
+                found = True
+                if i >= get_con_value('max_attendees'):
+                    return render(request, 'con/registration_wait_list.html', {})
+                break
+        if not found:
+            return render(request, 'con/registration_not_found.html', {})
+
+        return super(NotOnWaitingListMixin, self).dispatch(request, args, kwargs)
+
+
+class NotAlreadyPaid(AccessMixin):
+    def dispatch(self, request, *args, **kwargs):
+        entry = Registration.objects.filter(user=request.user)[0]
+        if entry.payment_received:
+            return redirect(reverse('con:user_profile'))
+
+        return super(NotAlreadyPaid, self).dispatch(request, args, kwargs)
+
+
+class PaymentView(LoginRequiredMixin, NotOnWaitingListMixin, NotAlreadyPaid, UpdateView):
+    model = Registration
+    fields = ['payment']
+    template_name = 'con/register_payment.html'
+
+    def get_object(self, queryset=None):
+        return Registration.objects.get(user=self.request.user)
+
+    def get_success_url(self):
+        return reverse('con:user_profile')

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load user %}
+{% block title %}{% endblock %}
+
+{% block content %}
+<h2>Payment</h2>
+<p>You're registration has been recorded.</p>
+{% user_attendance request.user %}
+<br />
+<p>We offer multiple ways to pay the registration cost.  Please select the method that you would prefer to use.</p>
+<form action="." method="POST">
+  {% csrf_token %}
+  {{ form.media }}
+  {{ form.as_p }}
+  <input class="submit" type="submit" value="Submit Payment Info">
+  <input type="hidden" name="next" value="{{ next }}" />
+</form>
+{% endblock %}

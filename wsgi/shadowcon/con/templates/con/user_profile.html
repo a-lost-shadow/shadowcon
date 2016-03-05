@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load con_info %}
 {% load games %}
+{% load user %}
 {% load staticfiles %}
 {% block title %}{{ title }}{% endblock %}
 
@@ -14,20 +15,24 @@
       });
     });
   </script>
-
 {% endblock %}
 
 {% block content %}
 <h2>{{ name }} Account Profile</h2>
-{% con_year %} Registration:
-<ul>
-  {% for entry in registration %}
-  <li>{{ entry }}</li>
-  {% endfor %}
-</ul>
-{% if registration_open %}
-<a href="{% url 'con:register_attendance' %}">Change Registration</a>
+{% user_attendance request.user %}
 <br />
+{% if payment %}
+Payment Method: {{ payment }}<br />
+Payment Received: {{ payment_received|yesno }}<br /><br />
+<br />
+{% endif %}
+{% if registration_open %}
+<a href="{% url 'con:register_attendance' %}">Change Registration</a><br />
+{% if payment %}
+{% if not payment_received %}
+<a href="{% url 'con:payment' %}">Payment Options</a><br />
+{% endif %}
+{% endif %}
 <br />
 {% endif %}
 {% show_user_games request.user registration_open %}
