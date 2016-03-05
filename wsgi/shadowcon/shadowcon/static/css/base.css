@@ -4,7 +4,6 @@ hgroup, nav, section {
 }
 
 body {
-    /*background-color:#303030; /* For debugging */
     background-color: #000000;
     color:#FFFFFF;
     font-family: 'Special Elite', cursive;
@@ -166,7 +165,7 @@ nav li:hover li {
 
 nav li:hover a { 
     padding: 12px 20px 1px 20px;
-    background: #2b1d12;/*#2d2d2d; /*#4B290F; /*#3A464F; */
+    background: #2b1d12;
 }
 
 nav ul li ul li a {
@@ -243,7 +242,6 @@ aside li#costs ul li {
 
 /* Footer */
 footer {
-    /*background-color:#2C5463;  /* For debugging */
     background-color: #000000;
     clear:both;
     height:27px;

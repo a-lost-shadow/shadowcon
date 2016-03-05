@@ -1,13 +1,21 @@
-$.fn.makeChildrenSameHeight = function() {
+function makeMenu(list, submenu, stateDict) {
+  return function() {
+    stateDict[list + "_last_click"] = false;
 
-    $(this).each(function(){
-        var tallest = 0;
-
-        $(this).children().each(function(i){
-            if (tallest < $(this).height()) { tallest = $(this).height(); }
-        });
-        $(this).children().css({'height': tallest});
+    $(list).click(function() {
+      if ($(submenu).is(':visible') && stateDict[list + "_last_click"]) {
+        $(submenu).hide();
+      } else if(!$(submenu).is(':visible')) {
+        $(submenu).show();
+      }
+      stateDict[list + "_last_click"] = true;
+      return false;
     });
-
-    return this;
-};
+    $(list).hover(function() {
+      $(submenu).show();
+      stateDict[list + "_last_click"] = false;
+    }, function() {
+      stateDict[list + "_last_click"] = false;
+    });
+  }
+}
