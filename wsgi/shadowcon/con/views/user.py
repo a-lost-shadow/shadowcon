@@ -2,16 +2,12 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
+from django.views.generic.edit import FormView, UpdateView
 from registration.backends.hmac.views import RegistrationView as BaseRegistrationView
 
-from ..forms import RegistrationForm
-from ..models import TimeBlock, BlockRegistration
+from ..forms import NewUserForm, AttendenceForm
+from ..models import TimeBlock, BlockRegistration, get_choice, Registration
 from ..utils import friendly_username
-
-
-def get_choice(block_registration):
-    choice = filter(lambda a: a[0] == block_registration.attendance, BlockRegistration.ATTENDANCE_CHOICES)[0]
-    return choice[1]
 
 
 def get_registration(user):
@@ -27,7 +23,8 @@ def show_profile(request):
     for item in BlockRegistration.objects.filter(user=request.user):
         item_dict[item.time_block] = item
         if item.attendance != BlockRegistration.ATTENDANCE_NO:
-            registration.append("%s: %s" % (item.time_block.text, get_choice(item)))
+            registration.append("%s: %s" % (item.time_block.text, get_choice(item.attendance,
+                                                                             BlockRegistration.ATTENDANCE_CHOICES)))
 
     for time_block in TimeBlock.objects.exclude(text__startswith='Not').order_by('sort_id'):
         if time_block not in item_dict:
@@ -89,5 +86,16 @@ def register(request):
         return render(request, 'con/register_attendance.html', context)
 
 
-class RegistrationView(BaseRegistrationView):
-    form_class = RegistrationForm
+class NewUserView(BaseRegistrationView):
+    form_class = NewUserForm
+
+
+class NewAttendanceView(UpdateView):
+    template_name = 'con/register_attendance_form.html'
+    form_class = AttendenceForm
+    model = Registration
+    success_url = '/new_attend/'
+
+    def form_valid(self, form):
+        print "Hey I got a %s " % form
+        return super(NewAttendanceView, self).form_valid(form)
