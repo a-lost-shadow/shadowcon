@@ -14,7 +14,6 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
           integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
           crossorigin="anonymous"></script>
-  <script src="{% static 'js/base.js' %}"></script>
   {% block additional_header %}{% endblock %}
 </head>
 
@@ -32,23 +31,24 @@
         <nav>
           <ul>
             <li><a href="/">Home</a></li>
-            <li id="game_menu"><a href="#">Games</a>
+            <li><a href="#">Games</a>
               <ul>
-                <li><a class="game_submenu" href="{% url 'con:show_schedule' %}">Schedule</a></li>
-                <li><a class="game_submenu" href="{% url 'con:games_list' %}">Description</a></li>
-                <li><a class="game_submenu" href="{% url 'con:user_profile' %}">Edit Submissions</a></li>
+                <li><a href="{% url 'con:show_schedule' %}">Schedule</a></li>
+                <li><a href="{% url 'con:games_list' %}">Description</a></li>
+                <li><a href="{% url 'con:user_profile' %}">Edit Submissions</a></li>
               </ul>
             </li>
-            <li id="site_menu"><a href="#">Site</a>
+            <li><a href="#">Site</a>
               <ul>
-                <li><a class="site_submenu" href="{% url 'page:display' 'site/directions' %}">Directions</a></li>
-                <li><a class="site_submenu" href="{% url 'page:display' 'site/rules' %}">Rules</a></li>
-                <li><a class="site_submenu" href="{% url 'page:display' 'site/amenities' %}">Amenities</a></li>
+                <li><a href="{% url 'page:display' 'site/directions' %}">Directions</a></li>
+                <li><a href="{% url 'page:display' 'site/rules' %}">Rules</a></li>
+                <li><a href="{% url 'page:display' 'site/amenities' %}">Amenities</a></li>
               </ul>
             </li>
             {% if user.is_authenticated %}
-            <li><a href="{% url 'con:user_profile' %}">Account</a>
+            <li><a href="#">Account</a>
               <ul>
+                <li><a href="{% url 'con:user_profile' %}">Profile</a></li>
                 <li><a href="{% url 'logout' %}">Logout</a></li>
                 {% admin_link request.user %}
               </ul>
@@ -108,9 +108,20 @@
   </div>
 </div>
 <script>
-  var stateDict = {};
-  $(document).ready(makeMenu("#game_menu", ".game_submenu", stateDict));
-  $(document).ready(makeMenu("#site_menu", ".site_submenu", stateDict));
+  $(document).ready(function() {
+    /* Links with # represent popup menus.  Since mobile can only activate by clicking, we don't
+       want to navigate to the top of the page when they click. */
+    $("nav a[href='#']").click(function() { return false; });
+
+    /* If the user clicks on a popup menu, and then moves the mouse away the menu disappears.
+       However, the header link remains bold until the user clicks elsewhere. Blur causes
+       the headre to lose focus and return to normal. */
+    $("nav li:has(ul)").each(function() {
+      $(this).hover(function() {}, function() {
+        $(this).find("a[href='#']").blur();
+      });
+    });
+  });
 </script>
 </body>
 </html>

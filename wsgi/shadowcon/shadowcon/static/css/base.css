@@ -173,6 +173,11 @@ nav ul li ul li a {
     text-align:left;
 }
 
+nav a:focus, nav a:hover {
+    text-decoration:none;
+}
+
+
 
 /* Middle Container */
 div#container {
