@@ -6,4 +6,5 @@
 .project
 .pydevproject
 wsgi/static
+wsgi/shadowcon/.idea/workspace.xml 
 venv
