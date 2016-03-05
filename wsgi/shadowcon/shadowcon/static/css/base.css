@@ -51,6 +51,10 @@ a:focus, a:hover, h1, h2, h3 {
     padding-left:0px;
 }
 
+.errorlist {
+    color:red;
+}
+
 select, input, textarea {
     color:black;
 }

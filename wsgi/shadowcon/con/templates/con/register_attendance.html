@@ -21,6 +21,8 @@ Original Registration Date: {{ form.registration  }}
 {% endif %}
 <form action="." method="POST">
   {% csrf_token %}
+  {{ form.media }}
+  {{ form.non_field_errors }}
   <table>
     {% for k,v in form.time_block_fields.iteritems %}
     <tr class="radio">

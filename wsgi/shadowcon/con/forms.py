@@ -1,4 +1,6 @@
+from django.core.exceptions import ValidationError
 from django.forms import CharField, ChoiceField, Form
+from django.utils.translation import ugettext as _
 from registration.forms import RegistrationForm as BaseRegistrationForm, get_user_model
 
 from .models import BlockRegistration, TimeBlock
@@ -52,3 +54,16 @@ class AttendanceForm(Form):
         for key, field in self.time_block_fields().iteritems():
             time_block = TimeBlock.objects.filter(id=key.split("_")[1])[0]
             BlockRegistration(registration=registration, time_block=time_block, attendance=field.initial).save()
+
+    def clean(self):
+        result = super(AttendanceForm, self).clean()
+        found_attendance = False
+        for key, value in result.iteritems():
+            if key.startswith("block_") and value != BlockRegistration.ATTENDANCE_NO:
+                found_attendance = True
+                break
+        if not found_attendance:
+            raise ValidationError(_("You must register attendance at one or more sessions.  If you wish to  " +
+                                    "unregister, please use the contact us at the bottom of the page."),
+                                  code="invalid data")
+        return result

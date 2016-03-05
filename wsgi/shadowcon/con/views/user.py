@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
@@ -11,12 +12,6 @@ from ..utils import friendly_username, registration_open
 from .common import RegistrationOpenMixin
 
 
-def get_registration(user):
-    return BlockRegistration.objects.filter(user=user,
-                                            attendance__in=[BlockRegistration.ATTENDANCE_YES,
-                                                            BlockRegistration.ATTENDANCE_MAYBE])
-
-
 @login_required
 def show_profile(request):
     registration = []
@@ -24,7 +19,7 @@ def show_profile(request):
     registration_object = Registration.objects.filter(user=request.user)
     if registration_object:
         item_dict = {}
-        for item in BlockRegistration.objects.filter(user=request.user):
+        for item in BlockRegistration.objects.filter(registration=registration_object):
             item_dict[item.time_block] = item
             if item.attendance != BlockRegistration.ATTENDANCE_NO:
                 registration.append("%s: %s" %
@@ -58,11 +53,12 @@ class NewAttendanceView(RegistrationOpenMixin, LoginRequiredMixin, FormView):
             registration = Registration(user=self.request.user,
                                         registration_date=timezone.now(),
                                         payment=Registration.PAYMENT_CASH)
-            registration.save()
         else:
             registration = registration[0]
             BlockRegistration.objects.filter(registration=registration).delete()
 
+        registration.last_updated = timezone.now()
+        registration.save()
         form.save(registration)
 
         return super(NewAttendanceView, self).form_valid(form)
@@ -72,6 +68,9 @@ class NewAttendanceView(RegistrationOpenMixin, LoginRequiredMixin, FormView):
         result['registration'] = Registration.objects.filter(user=self.request.user)
         result['user'] = friendly_username(self.request.user)
         return result
+
+    def get_success_url(self):
+        return reverse('con:user_profile')
 
 
 class NewUserView(BaseRegistrationView):
