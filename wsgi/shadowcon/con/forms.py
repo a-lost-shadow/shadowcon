@@ -21,8 +21,11 @@ class NewUserForm(BaseRegistrationForm):
 
 
 class AttendenceForm(Form):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, request=None, *args, **kwargs):
         super(AttendenceForm, self).__init__(*args, **kwargs)
+
+        self.request = request
+        print request.user
 
         for time_block in TimeBlock.objects.exclude(text__startswith='Not').order_by('sort_id'):
             if 'data' in kwargs:
@@ -35,4 +38,5 @@ class AttendenceForm(Form):
         self.fields["Test"] = CharField(max_length=30, required=False)
 
     def time_block_fields(self):
+        # print "Request: %s " % self.request.user
         return OrderedDict((k, v) for k, v in self.fields.iteritems() if k.startswith("block_"))

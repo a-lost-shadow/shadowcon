@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
-from django.views.generic.edit import FormView, UpdateView
+from django.views.generic.edit import FormView
 from registration.backends.hmac.views import RegistrationView as BaseRegistrationView
 
 from ..forms import NewUserForm, AttendenceForm
@@ -90,7 +90,7 @@ class NewUserView(BaseRegistrationView):
     form_class = NewUserForm
 
 
-class NewAttendanceView(UpdateView):
+class NewAttendanceView(FormView):
     template_name = 'con/register_attendance_form.html'
     form_class = AttendenceForm
     model = Registration
@@ -99,3 +99,8 @@ class NewAttendanceView(UpdateView):
     def form_valid(self, form):
         print "Hey I got a %s " % form
         return super(NewAttendanceView, self).form_valid(form)
+
+    def get_form_kwargs(self):
+        result = super(NewAttendanceView, self).get_form_kwargs()
+        result['request'] = self.request
+        return result
