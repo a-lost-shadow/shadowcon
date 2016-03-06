@@ -6,7 +6,7 @@ from collections import OrderedDict
 
 from ..models import Game
 from ..utils import friendly_username
-from .common import RegistrationOpenMixin
+from .common import RegistrationOpenMixin, NotOnWaitingListMixin
 
 game_fields = ['title', 'gm', 'duration', 'number_players', 'system', 'triggers', 'description']
 
@@ -29,9 +29,10 @@ class ScheduleView(generic.ListView):
         return game_map
 
 
-class NewGameView(RegistrationOpenMixin, LoginRequiredMixin, generic.CreateView):
+class NewGameView(RegistrationOpenMixin, LoginRequiredMixin, NotOnWaitingListMixin, generic.CreateView):
     model = Game
     fields = game_fields
+    waiting_list_template = 'con/game_submission_wait_list.html'
 
     def get_success_url(self):
         return reverse('con:user_profile')
@@ -47,9 +48,10 @@ class NewGameView(RegistrationOpenMixin, LoginRequiredMixin, generic.CreateView)
         return super(NewGameView, self).form_valid(form)
 
 
-class UpdateGameView(RegistrationOpenMixin, LoginRequiredMixin, generic.UpdateView):
+class UpdateGameView(RegistrationOpenMixin, LoginRequiredMixin, NotOnWaitingListMixin, generic.UpdateView):
     model = Game
     fields = game_fields
+    waiting_list_template = 'con/game_submission_wait_list.html'
 
     def get_success_url(self):
         return reverse('con:user_profile')

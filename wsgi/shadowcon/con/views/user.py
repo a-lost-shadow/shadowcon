@@ -8,8 +8,8 @@ from registration.backends.hmac.views import RegistrationView as BaseRegistratio
 
 from ..forms import NewUserForm, AttendanceForm
 from ..models import BlockRegistration, Registration, get_choice
-from ..utils import friendly_username, registration_open, get_con_value
-from .common import RegistrationOpenMixin
+from ..utils import friendly_username, registration_open
+from .common import RegistrationOpenMixin, NotOnWaitingListMixin
 
 
 @login_required
@@ -65,23 +65,6 @@ class AttendanceView(RegistrationOpenMixin, LoginRequiredMixin, FormView):
 
 class NewUserView(BaseRegistrationView):
     form_class = NewUserForm
-
-
-class NotOnWaitingListMixin(AccessMixin):
-    def dispatch(self, request, *args, **kwargs):
-        entries = Registration.objects.order_by('registration_date')
-        found = False
-        for i in range(0, len(entries)):
-            entry = entries[i]
-            if request.user == entry.user:
-                found = True
-                if i >= get_con_value('max_attendees'):
-                    return render(request, 'con/registration_wait_list.html', {})
-                break
-        if not found:
-            return render(request, 'con/registration_not_found.html', {})
-
-        return super(NotOnWaitingListMixin, self).dispatch(request, args, kwargs)
 
 
 class NotAlreadyPaid(AccessMixin):
