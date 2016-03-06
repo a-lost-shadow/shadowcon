@@ -15,12 +15,11 @@ def user_attendance(user):
         for item in BlockRegistration.objects.filter(registration=registration_object):
             item_dict[item.time_block] = item
             if item.attendance != BlockRegistration.ATTENDANCE_NO:
-                registration.append("%s: %s" %
-                                    (item.time_block.text, get_choice(item.attendance,
-                                                                      BlockRegistration.ATTENDANCE_CHOICES)))
+                registration.append("%s: %s" % (item.time_block, get_choice(item.attendance,
+                                                                            BlockRegistration.ATTENDANCE_CHOICES)))
 
         for time_block in TimeBlock.objects.exclude(text__startswith='Not').order_by('sort_id'):
-            if time_block not in item_dict:
+            if time_block.text not in item_dict:
                 registration.append("<b>Partially Registered: Please re-register</b>")
                 break
     else:

@@ -38,7 +38,9 @@ class AttendanceForm(Form):
             if registration:
                 entries = BlockRegistration.objects.filter(registration=registration)
                 for entry in entries:
-                    kwargs['data']["block_%s" % entry.time_block.id] = entry.attendance
+                    time_block = TimeBlock.objects.filter(text__exact=entry.time_block)
+                    if time_block:
+                        kwargs['data']["block_%s" % time_block[0].id] = entry.attendance
 
         for time_block in TimeBlock.objects.exclude(text__startswith='Not').order_by('sort_id'):
             initial = kwargs['data'].get("block_%s" % time_block.id, BlockRegistration.ATTENDANCE_YES)
@@ -52,7 +54,7 @@ class AttendanceForm(Form):
 
     def save(self, registration):
         for key, field in self.time_block_fields().iteritems():
-            time_block = TimeBlock.objects.filter(id=key.split("_")[1])[0]
+            time_block = TimeBlock.objects.filter(id=key.split("_")[1])[0].text
             BlockRegistration(registration=registration, time_block=time_block, attendance=field.initial).save()
 
     def clean(self):

@@ -153,7 +153,7 @@ class BlockRegistration(models.Model):
         (ATTENDANCE_YES, 'Yes'),
         (ATTENDANCE_NO, 'No'),
     )
-    time_block = models.ForeignKey(TimeBlock, on_delete=models.CASCADE)
+    time_block = models.CharField(max_length=64)
     registration = models.ForeignKey(Registration, on_delete=models.CASCADE)
     attendance = models.CharField(max_length=1, choices=ATTENDANCE_CHOICES, default=ATTENDANCE_YES)
 
