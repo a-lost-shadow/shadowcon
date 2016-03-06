@@ -90,21 +90,23 @@ class Game(models.Model):
     gm = models.CharField(max_length=256)
     time_block = models.ForeignKey(TimeBlock, blank=True, null=True)
     time_slot = models.ForeignKey(TimeSlot, blank=True, null=True)
-    location = models.ForeignKey(Location, blank=True, null=True,)
+    location = models.ForeignKey(Location, blank=True, null=True)
     number_players = models.CharField(max_length=32)
     duration = models.CharField(max_length=64)
     system = models.CharField(max_length=256)
     triggers = models.CharField(max_length=256)
     description = RichTextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    last_modified = models.DateTimeField()
+    last_scheduled = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         format_str = "Title: %s, GM: %s, Time Block: %s, Time Slot: %s, Location: %s, " + \
                      "Duration: %s, # Players: %s, System: %s, Triggers: %s, User: %s, " + \
-                     "Description: <CLOB>"
+                     "Description: <CLOB>, Last Modified: %s, Last Scheduled: %s"
         return format_str % (self.title, self.gm, self.time_block, self.time_slot, self.location,
                              self.duration, self.number_players, self.system, self.triggers,
-                             self.user)
+                             self.user, self.last_modified, self.last_scheduled)
 
     def header_target(self):
         return re.sub('[^A-Za-z0-9]', '_', str(self.title).strip().lower())

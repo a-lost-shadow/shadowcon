@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views import generic
 from django.core.urlresolvers import reverse
+from django.views import generic
+from django.utils import timezone
 
 from collections import OrderedDict
 
@@ -43,8 +44,9 @@ class NewGameView(RegistrationOpenMixin, LoginRequiredMixin, NotOnWaitingListMix
         return initial
 
     def form_valid(self, form):
-        # since the form doesn't have the user, we need to insert it
+        # since the form doesn't have the user or time, we need to insert it
         form.instance.user = self.request.user
+        form.instance.last_modified = timezone.now()
         return super(NewGameView, self).form_valid(form)
 
 
@@ -55,6 +57,10 @@ class UpdateGameView(RegistrationOpenMixin, LoginRequiredMixin, NotOnWaitingList
 
     def get_success_url(self):
         return reverse('con:user_profile')
+
+    def form_valid(self, form):
+        form.instance.last_modified = timezone.now()
+        return super(UpdateGameView, self).form_valid(form)
 
 
 class ListGameView(generic.ListView):
