@@ -1,7 +1,7 @@
 from django.forms import Form, CharField, EmailField, ModelChoiceField, Textarea
 from django.utils.html import strip_tags
-from django.core.mail import send_mail
-from .models import ContactReason, GroupEmailEntry, UserEmailEntry
+from .models import ContactReason
+from .utils import mail_list
 
 
 class ContactForm(Form):
@@ -13,16 +13,11 @@ class ContactForm(Form):
 
     def send_email(self):
         reason = self.cleaned_data.get('reason')
-        users = map(lambda x: x.user, UserEmailEntry.objects.filter(list=reason.list))
-        groups = map(lambda x: x.group, GroupEmailEntry.objects.filter(list=reason.list))
-        for group in groups:
-            users.extend(group.user_set.all())
+        email_list = reason.list
+        subject_source = reason
+        subject_details = strip_tags(self.cleaned_data.get('summary'))
 
-        # filter out any duplicate e-mails due to users showing up multiple times in the list
-        emails = set(map(lambda x: x.email, users))
-
-        subject = "ShadowCon [%s]: %s" % (reason, strip_tags(self.cleaned_data.get('summary')))
         message = strip_tags(self.cleaned_data.get('message'))
         sender = strip_tags(self.cleaned_data.get('email'))
 
-        send_mail(subject, message, sender, emails)
+        mail_list(subject_source, subject_details, message, sender, email_list)

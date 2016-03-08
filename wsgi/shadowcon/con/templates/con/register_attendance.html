@@ -14,10 +14,10 @@
 
 {% block content %}
 {% if form.registration %}
-<h2>Updating Registration for {{ form.user }}</h2>
+<h2>Updating Registration for {{ form.user_friendly }}</h2>
 Original Registration Date: {{ form.registration  }}
 {% else %}
-<h2>Initial Registration for {{ form.user }}</h2>
+<h2>Initial Registration for {{ form.user_friendly }}</h2>
 {% endif %}
 <form action="." method="POST">
   {% csrf_token %}

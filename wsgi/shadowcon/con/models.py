@@ -2,10 +2,21 @@ from __future__ import unicode_literals
 
 from ckeditor.fields import RichTextField
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.db import models
+from django.utils.html import strip_tags
 import re
+import os
 
 from .fields import HourField
+
+
+def get_absolute_url(request, relative, args):
+    if os.environ.get('DEBUG') == 'True':
+        domain = request.get_host()
+    else:
+        domain = "www.shadowcon.net"
+    return "http://%s%s" % (domain, reverse(relative, args=args))
 
 
 def get_choice(value, choices):
@@ -107,6 +118,25 @@ class Game(models.Model):
         return format_str % (self.title, self.gm, self.time_block, self.time_slot, self.location,
                              self.duration, self.number_players, self.system, self.triggers,
                              self.user, self.last_modified, self.last_scheduled)
+
+    def email_format(self, request):
+        return "\n".join(["Title: %s",
+                          "GM: %s",
+                          "Number Players:%s",
+                          "Duration: %s",
+                          "System: %s",
+                          "Triggers: %s",
+                          "",
+                          "Raw Description:",
+                          "%s",
+                          "",
+                          "HTML Description:",
+                          "%s",
+                          "",
+                          "Admin Link:",
+                          "%s"]) % (self.title, self.gm, self.number_players, self.duration, self.system, self.triggers,
+                                    strip_tags(self.description), self.description,
+                                    get_absolute_url(request, "admin:con_game_change", args=(self.id,)))
 
     def header_target(self):
         return re.sub('[^A-Za-z0-9]', '_', str(self.title).strip().lower())

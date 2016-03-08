@@ -39,7 +39,8 @@ class AttendanceView(RegistrationOpenMixin, LoginRequiredMixin, FormView):
 
     def form_valid(self, form):
         registration = Registration.objects.filter(user=self.request.user)
-        if 0 == len(registration):
+        new_entry = 0 == len(registration)
+        if new_entry:
             registration = Registration(user=self.request.user,
                                         registration_date=timezone.now(),
                                         payment=Registration.PAYMENT_CASH)
@@ -49,14 +50,14 @@ class AttendanceView(RegistrationOpenMixin, LoginRequiredMixin, FormView):
 
         registration.last_updated = timezone.now()
         registration.save()
-        form.save(registration)
+        form.save(registration, new_entry)
 
         return super(AttendanceView, self).form_valid(form)
 
     def get_form_kwargs(self):
         result = super(AttendanceView, self).get_form_kwargs()
         result['registration'] = Registration.objects.filter(user=self.request.user)
-        result['user'] = friendly_username(self.request.user)
+        result['user'] = self.request.user
         return result
 
     def get_success_url(self):

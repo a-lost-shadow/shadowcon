@@ -4,8 +4,10 @@ from django.utils.translation import ugettext as _
 from registration.forms import RegistrationForm as BaseRegistrationForm, get_user_model
 
 from .models import BlockRegistration, TimeBlock
-from collections import OrderedDict
+from .utils import get_registration, friendly_username
+from contact.utils import mail_list
 
+from collections import OrderedDict
 import pytz
 
 
@@ -32,6 +34,7 @@ class AttendanceForm(Form):
             date = registration[0].registration_date.astimezone(pytz.timezone('US/Pacific'))
             self.registration = date.strftime("%B %d, %Y %I:%M:%S %p %Z")
         self.user = user
+        self.user_friendly = friendly_username(user)
 
         if 'data' not in kwargs:
             kwargs['data'] = {}
@@ -52,10 +55,24 @@ class AttendanceForm(Form):
     def time_block_fields(self):
         return OrderedDict((k, v) for k, v in self.fields.iteritems() if k.startswith("block_"))
 
-    def save(self, registration):
+    def send_mail(self, registration, new_entry):
+        subject_details = "%s for %s" % ("Initial Registration" if new_entry else "Updated Registration",
+                                         self.user_friendly)
+        message = self.user_friendly + " will be attending for:\n"
+        for entry in get_registration(self.user):
+            message += " - %s\n" % entry
+
+        date = registration.registration_date.astimezone(pytz.timezone('US/Pacific'))
+        message += "\nInitial registered on %s" % date.strftime("%B %d, %Y %I:%M:%S %p %Z")
+
+        mail_list("Registration", subject_details, message, "no-reply@shadowcon.net", list_name="registration")
+
+    def save(self, registration, new_entry):
         for key, field in self.time_block_fields().iteritems():
             time_block = TimeBlock.objects.filter(id=key.split("_")[1])[0].text
             BlockRegistration(registration=registration, time_block=time_block, attendance=field.initial).save()
+
+        self.send_mail(registration, new_entry)
 
     def clean(self):
         result = super(AttendanceForm, self).clean()
