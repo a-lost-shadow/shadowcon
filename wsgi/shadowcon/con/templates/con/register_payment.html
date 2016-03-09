@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load user %}
+{% load staticfiles %}
 {% block title %}{% endblock %}
 
 {% block content %}
@@ -8,11 +9,21 @@
 {% user_attendance request.user %}
 <br />
 <p>We offer multiple ways to pay the registration cost.  Please select the method that you would prefer to use.</p>
-<form action="." method="POST">
-  {% csrf_token %}
-  {{ form.media }}
-  {{ form.as_p }}
-  <input class="submit" type="submit" value="Submit Payment Info">
-  <input type="hidden" name="next" value="{{ next }}" />
-</form>
+<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+  {% for payment in payment_options %}
+  <li{% if object.payment == payment %} class="active"{% endif %}><a href="#{{ payment.slug }}" data-toggle="tab">{{ payment.name }}</a></li>
+  {% endfor %}
+</ul>
+<div id="my-tab-content" class="tab-content">
+  {% for payment in payment_options %}
+  <div class="tab-pane{% if object.payment == payment %} active{% endif %}" id="{{ payment.slug }}">
+    {{ payment.description|safe }}
+    <form action="." method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="payment" value="{{ payment.slug }}" />
+      <input class="submit" type="submit" value="Pay with {{ payment.name }}">
+    </form>
+  </div>
+  {% endfor %}
+</div>
 {% endblock %}

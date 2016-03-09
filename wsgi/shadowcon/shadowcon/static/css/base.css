@@ -273,3 +273,21 @@ footer a {
     left:15px;
     font-size:12px;
 }
+
+.nav-tabs>li.active>a, .nav-tabs>li>a:focus {
+/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#2b1d12+50,19110a+75,000000+100 */
+  background: #2b1d12; /* Old browsers */
+  background: -moz-linear-gradient(top,  #2b1d12 50%, #19110a 75%, #000000 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top,  #2b1d12 50%,#19110a 75%,#000000 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom,  #2b1d12 50%,#19110a 75%,#000000 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2b1d12', endColorstr='#000000',GradientType=0 ); /* IE6-9 */
+}
+
+.nav-tabs>li>a:hover  {
+  background-color:#A15720 !important;
+}
+
+.nav-tabs>li>a {
+  color:white !important;
+  text-decoration: none;
+}

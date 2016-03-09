@@ -7,7 +7,7 @@ from django.utils import timezone
 from registration.backends.hmac.views import RegistrationView as BaseRegistrationView
 
 from ..forms import NewUserForm, AttendanceForm
-from ..models import BlockRegistration, Registration, get_choice
+from ..models import BlockRegistration, Registration, PaymentOption
 from ..utils import friendly_username, registration_open
 from .common import RegistrationOpenMixin, NotOnWaitingListMixin
 
@@ -19,7 +19,7 @@ def show_profile(request):
     payment_received = None
 
     if registration:
-        payment = get_choice(registration[0].payment, Registration.PAYMENT_CHOICES)
+        payment = registration[0].payment
         payment_received = registration[0].payment_received
 
     context = {'title': " - Account Profile",
@@ -87,3 +87,8 @@ class PaymentView(LoginRequiredMixin, NotOnWaitingListMixin, NotAlreadyPaid, Upd
 
     def get_success_url(self):
         return reverse('con:user_profile')
+
+    def get_context_data(self, **kwargs):
+        if 'payment_options' not in kwargs:
+            kwargs['payment_options'] = PaymentOption.objects.all()
+        return super(PaymentView, self).get_context_data(**kwargs)

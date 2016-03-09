@@ -4,6 +4,7 @@ from ckeditor.fields import RichTextField
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.template.defaultfilters import slugify
 from django.utils.html import strip_tags
 import re
 import os
@@ -154,21 +155,24 @@ class Game(models.Model):
             return "Not Scheduled"
 
 
+class PaymentOption(models.Model):
+    slug = models.SlugField(primary_key=True, max_length=64)
+    name = models.CharField(max_length=64)
+    description = RichTextField()
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(PaymentOption, self).save(*args, **kwargs)
+
+
 class Registration(models.Model):
-    PAYMENT_CASH = 'C'
-    PAYMENT_QUICK_PAY = 'Q'
-    PAYMENT_PAYPAL = 'P'
-    PAYMENT_VENMO = 'V'
-    PAYMENT_CHOICES = (
-        (PAYMENT_CASH, 'Paying by Cash'),
-        (PAYMENT_QUICK_PAY, 'Chase Quick Pay'),
-        (PAYMENT_PAYPAL, 'Paying by Venmo'),
-        (PAYMENT_VENMO, 'Paying by Paypal'),
-    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     registration_date = models.DateTimeField()
     last_updated = models.DateTimeField()
-    payment = models.CharField(max_length=1, choices=PAYMENT_CHOICES)
+    payment = models.ForeignKey(PaymentOption)
     payment_received = models.BooleanField(default=False)
 
     def __str__(self):

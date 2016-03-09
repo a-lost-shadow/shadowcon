@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import TimeBlock, TimeSlot, ConInfo, Location, Game
+from .models import TimeBlock, TimeSlot, ConInfo, Location, Game, PaymentOption
 
 
 @admin.register(TimeBlock)
@@ -30,3 +30,9 @@ class LocationAdmin(admin.ModelAdmin):
 class GameAdmin(admin.ModelAdmin):
     model = Game
     list_display = ('title', 'gm', 'time_block', 'time_slot', 'location')
+
+
+@admin.register(PaymentOption)
+class PaymentOptionAdmin(admin.ModelAdmin):
+    model = PaymentOption
+    exclude = ['slug']
