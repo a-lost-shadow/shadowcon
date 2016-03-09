@@ -18,11 +18,15 @@
   {% for payment in payment_options %}
   <div class="tab-pane{% if object.payment == payment %} active{% endif %}" id="{{ payment.slug }}">
     {{ payment.description|safe }}
+    {% if payment.button %}
+    {{ payment.button | safe }}
+    {% else %}
     <form action="." method="POST">
       {% csrf_token %}
       <input type="hidden" name="payment" value="{{ payment.slug }}" />
       <input class="submit" type="submit" value="Pay with {{ payment.name }}">
     </form>
+    {% endif %}
   </div>
   {% endfor %}
 </div>

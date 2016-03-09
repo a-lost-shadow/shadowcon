@@ -159,6 +159,7 @@ class PaymentOption(models.Model):
     slug = models.SlugField(primary_key=True, max_length=64)
     name = models.CharField(max_length=64)
     description = RichTextField()
+    button = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name
