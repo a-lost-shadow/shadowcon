@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Page
+from .utils import replace_tags
 
 
 def index(request):
@@ -14,5 +15,5 @@ def display(request, url):
     if "home" == url:
         title = ""
 
-    context = {'title': title, 'content': page.content}
+    context = {'title': title, 'content': replace_tags(page.content)}
     return render(request, 'page/display.html', context)

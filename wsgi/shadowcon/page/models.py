@@ -10,3 +10,11 @@ class Page(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Tag(models.Model):
+    tag = models.SlugField(max_length=64, primary_key=True)
+    content = models.TextField()
+
+    def __str__(self):
+        return self.tag
