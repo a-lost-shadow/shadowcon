@@ -2,10 +2,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.views import generic
 from django.utils import timezone
+from django_ajax.decorators import ajax
 
 from collections import OrderedDict
 
-from ..models import Game
+from ..models import Game, Location
 from ..utils import friendly_username
 from .common import RegistrationOpenMixin, NotOnWaitingListMixin
 from contact.utils import mail_list
@@ -76,3 +77,35 @@ class ListGameView(generic.ListView):
 
     def get_queryset(self):
         return get_games()
+
+
+offsets = {u'friday': -18,
+           u'saturday': 6,
+           u'sunday': 30,
+           }
+
+
+def get_start(game):
+    return offsets.get(unicode(game.time_block.first_word().lower()), 100) + game.time_slot.start
+
+
+def get_width(game):
+    width = game.time_slot.stop - game.time_slot.start
+    if width < 0:
+        width += 24
+    return width
+
+
+@ajax
+def location_schedule_view(request):
+    locations = map(lambda x: x, Location.objects.exclude(text__startswith='Not'))
+    games = Game.objects.filter(location__in=locations).filter(time_block__isnull=False).filter(time_slot__isnull=False)
+
+    return {"locations": map(lambda x: x.text, locations),
+            "games": map(lambda x: {"title": x.title,
+                                    "location": locations.index(x.location),
+                                    "start": get_start(x),
+                                    "width": get_width(x),
+                                    },
+                         games),
+            }

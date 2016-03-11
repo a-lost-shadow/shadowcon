@@ -6,11 +6,28 @@
 
 {% block additional_header %}
 <link rel="stylesheet" href="{% static 'con/schedule.css' %}" />
+<script src="{% static 'js/jquery-svg/jquery.svg.js' %}"></script>
+<script src="{% static 'con/schedule.js' %}"></script>
+<script src="{% static 'django_ajax/js/jquery.ajax.min.js' %}"></script>
+<script>
+  $(document).ready(function() {
+    var saved_content = null;
+    $("#schedule").svg();
+    ajaxGet('{% url 'con:ajax_location_schedule_view' %}', function(content) {
+      console.log(content);
+      drawSchedule("#schedule", content);
+      saved_content = content;
+    });
+    $(window).resize(function() {
+      drawSchedule("#schedule", saved_content);
+    });
+  });
+</script>
 {% endblock %}
 
 {% block content %}
 <h2>{% con_year %} Schedule</h2>
-{% location_schedule %}
+<div id="schedule"></div>
 <br />
 <br />
 <br />
