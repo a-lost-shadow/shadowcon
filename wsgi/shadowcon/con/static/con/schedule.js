@@ -116,8 +116,13 @@ function drawSchedule(svgId, data) {
 
     if (0 === width) { continue; }
 
-    var subSvg = svg.svg(x, y, width, gameHeight)
+    var subSvg = svg.svg(x, y, width, gameHeight, {"data-toggle": "tooltip", title: data.games[i].title});
     svg.rect(subSvg, 1, 0, width - 2, gameHeight, {class: "game"});
     svg.text(subSvg, textOffset, 19, data.games[i].title, {class: "game_title", clip:"rect(0,0,10,20)"});
   }
+
+  $('[data-toggle="tooltip"]').tooltip({
+    'container': 'body',
+    'placement': 'bottom'
+  });
 }

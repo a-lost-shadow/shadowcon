@@ -26,3 +26,13 @@ fill:white;
 fill:#462F1D;
 stroke:rgb(200,200,200);
 }
+
+.tooltip.bottom .tooltip-inner {
+background-color: #2b1d12;
+font-family: 'Special Elite', cursive;
+font-size: 14px;
+}
+
+.tooltip.bottom .tooltip-arrow {
+border-bottom-color: #2b1d12;
+}
