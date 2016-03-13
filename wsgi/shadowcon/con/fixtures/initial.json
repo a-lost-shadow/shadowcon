@@ -1,86 +1,440 @@
 [
-  {"model": "con.coninfo", "pk": 1, "fields": {"date": "2016-04-01", "pre_reg_deadline": "2016-03-15", "game_sub_deadline": "2016-03-22", "location": "Behind the tardis", "pre_reg_cost": 10.0, "door_cost": 20.0}},
-  {"model": "con.timeblock", "pk": 1, "fields": {"text": "Friday Night", "sort_id": 1}},
-  {"model": "con.timeblock", "pk": 2, "fields": {"text": "Friday Midnight", "sort_id": 2}},
-  {"model": "con.timeblock", "pk": 3, "fields": {"text": "Saturday Morning", "sort_id": 3}},
-  {"model": "con.timeblock", "pk": 4, "fields": {"text": "Saturday Afternoon", "sort_id": 4}},
-  {"model": "con.timeblock", "pk": 5, "fields": {"text": "Saturday Evening", "sort_id": 5}},
-  {"model": "con.timeblock", "pk": 6, "fields": {"text": "Saturday Midnight", "sort_id": 6}},
-  {"model": "con.timeblock", "pk": 7, "fields": {"text": "Sunday Morning", "sort_id": 7}},
-
-  {"model": "con.timeslot", "pk": 1, "fields": {"start": "0", "stop": 6}},
-  {"model": "con.timeslot", "pk": 2, "fields": {"start": "0", "stop": 4}},
-  {"model": "con.timeslot", "pk": 3, "fields": {"start": "10", "stop": 17}},
-  {"model": "con.timeslot", "pk": 4, "fields": {"start": "10", "stop": 16}},
-  {"model": "con.timeslot", "pk": 5, "fields": {"start": "18", "stop": 0}},
-  {"model": "con.timeslot", "pk": 6, "fields": {"start": "18", "stop": 2}},
-  {"model": "con.timeslot", "pk": 7, "fields": {"start": "18", "stop": 23.5}},
-  {"model": "con.timeslot", "pk": 8, "fields": {"start": "19", "stop": 2}},
-  {"model": "con.timeslot", "pk": 9, "fields": {"start": "19.5", "stop": 23.5}},
-
-  {"model": "con.game", "pk": 1, "fields": {"title": "New Title", "gm": "Adrian's Friend Isaac", "time_block": 2, "time_slot": 6, "location": null, "number_players": "20", "duration": "7 hours", "system": "WoD", "triggers": "Violence", "description": "<p>I edited it.</p>", "user": 1}}, {"model": "con.game", "pk": 2, "fields": {"title": "Created with a view2", "gm": "Adrian Barnes", "time_block": null, "time_slot": null, "location": null, "number_players": "2", "duration": "4 hours", "system": "Daystar", "triggers": "Sunshine and Rainbows", "description": "<p>First attempt at submitting a game via a view.</p>", "user": 1}},
-
   {
-    "model": "con.blockregistration",
+    "model": "con.coninfo",
     "pk": 1,
     "fields": {
-      "time_block": 1,
-      "user": 1,
-      "attendance": "N"
+      "date": "2016-04-01",
+      "pre_reg_deadline": "2016-03-15",
+      "game_sub_deadline": "2016-03-22",
+      "location": "Behind the tardis",
+      "pre_reg_cost": 10.0,
+      "door_cost": 20.0,
+      "registration_opens": "2015-03-12T01:38:22Z",
+      "max_attendees": 10
     }
   },
   {
-    "model": "con.blockregistration",
+    "model": "con.timeblock",
+    "pk": 1,
+    "fields": {
+      "text": "Friday Night",
+      "sort_id": 1
+    }
+  },
+  {
+    "model": "con.timeblock",
     "pk": 2,
     "fields": {
-      "time_block": 2,
-      "user": 1,
-      "attendance": "N"
+      "text": "Friday Midnight",
+      "sort_id": 2
     }
   },
   {
-    "model": "con.blockregistration",
+    "model": "con.timeblock",
     "pk": 3,
     "fields": {
-      "time_block": 3,
-      "user": 1,
-      "attendance": "N"
+      "text": "Saturday Morning",
+      "sort_id": 3
+    }
+  },
+  {
+    "model": "con.timeblock",
+    "pk": 4,
+    "fields": {
+      "text": "Saturday Afternoon",
+      "sort_id": 4
+    }
+  },
+  {
+    "model": "con.timeblock",
+    "pk": 5,
+    "fields": {
+      "text": "Saturday Evening",
+      "sort_id": 5
+    }
+  },
+  {
+    "model": "con.timeblock",
+    "pk": 6,
+    "fields": {
+      "text": "Saturday Midnight",
+      "sort_id": 6
+    }
+  },
+  {
+    "model": "con.timeblock",
+    "pk": 7,
+    "fields": {
+      "text": "Sunday Morning",
+      "sort_id": 7
+    }
+  },
+  {
+    "model": "con.timeslot",
+    "pk": 1,
+    "fields": {
+      "start": 0.0,
+      "stop": 6.0
+    }
+  },
+  {
+    "model": "con.timeslot",
+    "pk": 2,
+    "fields": {
+      "start": 0.0,
+      "stop": 4.0
+    }
+  },
+  {
+    "model": "con.timeslot",
+    "pk": 3,
+    "fields": {
+      "start": 10.0,
+      "stop": 17.0
+    }
+  },
+  {
+    "model": "con.timeslot",
+    "pk": 4,
+    "fields": {
+      "start": 10.0,
+      "stop": 16.0
+    }
+  },
+  {
+    "model": "con.timeslot",
+    "pk": 5,
+    "fields": {
+      "start": 18.0,
+      "stop": 0.0
+    }
+  },
+  {
+    "model": "con.timeslot",
+    "pk": 6,
+    "fields": {
+      "start": 18.0,
+      "stop": 2.0
+    }
+  },
+  {
+    "model": "con.timeslot",
+    "pk": 7,
+    "fields": {
+      "start": 18.0,
+      "stop": 23.5
+    }
+  },
+  {
+    "model": "con.timeslot",
+    "pk": 8,
+    "fields": {
+      "start": 19.0,
+      "stop": 2.0
+    }
+  },
+  {
+    "model": "con.timeslot",
+    "pk": 9,
+    "fields": {
+      "start": 19.5,
+      "stop": 23.5
+    }
+  },
+  {
+    "model": "con.location",
+    "pk": 1,
+    "fields": {
+      "text": "Boiler Room"
+    }
+  },
+  {
+    "model": "con.location",
+    "pk": 2,
+    "fields": {
+      "text": "Dance Floor"
+    }
+  },
+  {
+    "model": "con.location",
+    "pk": 3,
+    "fields": {
+      "text": "Dungeon"
+    }
+  },
+  {
+    "model": "con.paymentoption",
+    "pk": "cash",
+    "fields": {
+      "name": "Cash",
+      "description": "<p>Good Hard Cash</p>",
+      "button": null
+    }
+  },
+  {
+    "model": "con.paymentoption",
+    "pk": "chase-quick-pay",
+    "fields": {
+      "name": "Chase Quick Pay",
+      "description": "<p>Free option from Chase</p>",
+      "button": null
+    }
+  },
+  {
+    "model": "con.paymentoption",
+    "pk": "paypal",
+    "fields": {
+      "name": "Paypal",
+      "description": "<p>Because they still need souls</p>",
+      "button": "<form action=\"https://www.paypal.com/cgi-bin/webscr\" method=\"post\" target=\"_top\">\r\n<input type=\"hidden\" name=\"cmd\" value=\"_s-xclick\">\r\n<input type=\"hidden\" name=\"hosted_button_id\" value=\"PS6VMUTU4QRVL\">\r\n<input type=\"image\" src=\"https://www.paypalobjects.com/en_US/i/btn/btn_buynow_LG.gif\" border=\"0\" name=\"submit\" alt=\"PayPal - The safer, easier way to pay online!\">\r\n<img alt=\"\" border=\"0\" src=\"https://www.paypalobjects.com/en_US/i/scr/pixel.gif\" width=\"1\" height=\"1\">\r\n</form>"
     }
   },
   {
     "model": "con.blockregistration",
-    "pk": 4,
+    "pk": 183,
     "fields": {
-      "time_block": 4,
-      "user": 1,
+      "time_block": "Friday Night",
+      "registration": 1,
       "attendance": "M"
     }
   },
   {
     "model": "con.blockregistration",
+    "pk": 184,
+    "fields": {
+      "time_block": "Friday Midnight",
+      "registration": 1,
+      "attendance": "M"
+    }
+  },
+  {
+    "model": "con.blockregistration",
+    "pk": 185,
+    "fields": {
+      "time_block": "Saturday Morning",
+      "registration": 1,
+      "attendance": "Y"
+    }
+  },
+  {
+    "model": "con.blockregistration",
+    "pk": 186,
+    "fields": {
+      "time_block": "Saturday Afternoon",
+      "registration": 1,
+      "attendance": "Y"
+    }
+  },
+  {
+    "model": "con.blockregistration",
+    "pk": 187,
+    "fields": {
+      "time_block": "Saturday Evening",
+      "registration": 1,
+      "attendance": "Y"
+    }
+  },
+  {
+    "model": "con.blockregistration",
+    "pk": 188,
+    "fields": {
+      "time_block": "Saturday Midnight",
+      "registration": 1,
+      "attendance": "Y"
+    }
+  },
+  {
+    "model": "con.blockregistration",
+    "pk": 189,
+    "fields": {
+      "time_block": "Sunday Morning",
+      "registration": 1,
+      "attendance": "N"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$Nvr2vkPr8uEI$RGCF0rqD9qdX39ycwsQVj3arB+qQIAU+le4tIddfpyQ=",
+      "last_login": "2016-03-12T23:53:26.685Z",
+      "is_superuser": true,
+      "username": "adrian",
+      "first_name": "Adrian",
+      "last_name": "Barnes",
+      "email": "na@na.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2016-02-22T06:41:25Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$ZdW69H3ZPg2H$cKa+9eiHEcXSJzbO9671tr6AdROxJpqRxOzTZCX/sss=",
+      "last_login": "2016-03-12T23:53:17.663Z",
+      "is_superuser": false,
+      "username": "aib",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2016-03-12T23:16:02Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "con.registration",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "registration_date": "2016-03-05T19:49:20.322Z",
+      "last_updated": "2016-03-09T06:41:54.247Z",
+      "payment": "paypal",
+      "payment_received": false
+    }
+  },
+  {
+    "model": "con.game",
+    "pk": 1,
+    "fields": {
+      "title": "New Title",
+      "gm": "Adrian's Friend Isaac",
+      "time_block": 2,
+      "time_slot": 1,
+      "location": 3,
+      "number_players": "20",
+      "duration": "7 hours",
+      "system": "WoD",
+      "triggers": "Violence",
+      "description": "<p>I edited it.</p>\r\n\r\n<p>Does a 2nd edit update the modification time?</p>",
+      "user": 1,
+      "last_modified": "2016-03-06T00:21:46Z",
+      "last_scheduled": "2016-03-12T23:45:54.481Z"
+    }
+  },
+  {
+    "model": "con.game",
+    "pk": 2,
+    "fields": {
+      "title": "Created with a view",
+      "gm": "Adrian Barnes",
+      "time_block": 3,
+      "time_slot": 3,
+      "location": 3,
+      "number_players": "2",
+      "duration": "4 hours",
+      "system": "Daystar",
+      "triggers": "Sunshine and Rainbows",
+      "description": "<p>First attempt at submitting a game via a view.</p>",
+      "user": 1,
+      "last_modified": "2016-03-06T00:09:18Z",
+      "last_scheduled": "2016-03-12T23:45:54.613Z"
+    }
+  },
+  {
+    "model": "con.game",
+    "pk": 3,
+    "fields": {
+      "title": "Down with the sun",
+      "gm": "Vampires",
+      "time_block": 5,
+      "time_slot": 6,
+      "location": 2,
+      "number_players": "20",
+      "duration": "4 hours",
+      "system": "Bonfire",
+      "triggers": "Fire, Blood",
+      "description": "<p>Vampires come out to play.</p>",
+      "user": 1,
+      "last_modified": "2016-03-06T00:09:18.412Z",
+      "last_scheduled": "2016-03-12T23:45:54.748Z"
+    }
+  },
+  {
+    "model": "con.game",
     "pk": 5,
     "fields": {
-      "time_block": 5,
+      "title": "E-mail Test",
+      "gm": "Adrian Barnes",
+      "time_block": null,
+      "time_slot": 3,
+      "location": null,
+      "number_players": "5",
+      "duration": "Long enough",
+      "system": "WWW",
+      "triggers": "Code",
+      "description": "<p>Code Monkey is&nbsp;<strong>NOT</strong>&nbsp;<span style=\"background-color:#FF0000\">Happy!</span></p>",
       "user": 1,
-      "attendance": "N"
+      "last_modified": "2016-03-08T07:20:18Z",
+      "last_scheduled": "2016-03-12T23:45:54.868Z"
     }
   },
   {
-    "model": "con.blockregistration",
+    "model": "con.game",
     "pk": 6,
     "fields": {
-      "time_block": 6,
+      "title": "E-mail Test",
+      "gm": "Adrian Barnes",
+      "time_block": 1,
+      "time_slot": null,
+      "location": null,
+      "number_players": "5",
+      "duration": "Long enough",
+      "system": "WWW",
+      "triggers": "Code",
+      "description": "<p>Code Monkey is&nbsp;<strong>NOT</strong>&nbsp;<span style=\"background-color:#FF0000\">Happy!</span></p>",
       "user": 1,
-      "attendance": "N"
+      "last_modified": "2016-03-08T07:20:54Z",
+      "last_scheduled": "2016-03-12T23:45:54.996Z"
     }
   },
   {
-    "model": "con.blockregistration",
-    "pk": 7,
+    "model": "con.game",
+    "pk": 13,
     "fields": {
-      "time_block": 7,
+      "title": "Midnight Game",
+      "gm": "Sleep Deprivation",
+      "time_block": 6,
+      "time_slot": 1,
+      "location": 1,
+      "number_players": "20",
+      "duration": "4 hours",
+      "system": "Sleep",
+      "triggers": "Sleep",
+      "description": "<p>Not sleep</p>",
       "user": 1,
-      "attendance": "N"
+      "last_modified": "2015-03-12T07:30:52Z",
+      "last_scheduled": "2016-03-12T23:45:55.133Z"
+    }
+  },
+  {
+    "model": "contact.useremailentry",
+    "pk": 1,
+    "fields": {
+      "list": 1,
+      "user": 1
+    }
+  },
+  {
+    "model": "contact.useremailentry",
+    "pk": 2,
+    "fields": {
+      "list": 2,
+      "user": 1
+    }
+  },
+  {
+    "model": "contact.useremailentry",
+    "pk": 3,
+    "fields": {
+      "list": 3,
+      "user": 1
     }
   }
 ]
