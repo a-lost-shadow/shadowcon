@@ -63,6 +63,9 @@ class TimeBlock(models.Model):
     def first_word(self):
         return str(self.text).split()[0].strip()
 
+    def second_word(self):
+        return str(self.text).split()[1].strip()
+
     def get_combined(self, time_slot):
         block_first_word = self.first_word()
         if weekdays.get(unicode(block_first_word.lower()), False):

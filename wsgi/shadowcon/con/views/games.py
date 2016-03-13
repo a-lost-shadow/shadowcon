@@ -2,13 +2,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.views import generic
 from django.utils import timezone
-from django_ajax.decorators import ajax
+from django_ajax.mixin import AJAXMixin
 
 from collections import OrderedDict
 
-from ..models import Game, Location
+from ..models import Game, Location, TimeBlock, TimeSlot
 from ..utils import friendly_username
-from .common import RegistrationOpenMixin, NotOnWaitingListMixin
+from .common import RegistrationOpenMixin, NotOnWaitingListMixin, IsStaffMixin
 from contact.utils import mail_list
 
 game_fields = ['title', 'gm', 'duration', 'number_players', 'system', 'triggers', 'description']
@@ -30,6 +30,10 @@ class ScheduleView(generic.ListView):
             game_map[time_block].append(game)
 
         return game_map
+
+
+class ScheduleEditView(LoginRequiredMixin, IsStaffMixin, generic.TemplateView):
+    template_name = 'con/game_schedule_edit.html'
 
 
 class NewGameView(RegistrationOpenMixin, LoginRequiredMixin, NotOnWaitingListMixin, generic.CreateView):
@@ -85,27 +89,86 @@ offsets = {u'friday': -18,
            }
 
 
+def get_block_offset(time_block):
+    offset = offsets.get(unicode(time_block.first_word().lower()), 100)
+    if "midnight" == time_block.second_word().lower():
+        offset += 24
+    return offset
+
+
 def get_start(game):
-    return offsets.get(unicode(game.time_block.first_word().lower()), 100) + game.time_slot.start
+    if game.time_block and game.time_slot:
+        return get_block_offset(game.time_block) + game.time_slot.start
+    else:
+        return 100
 
 
-def get_width(game):
-    width = game.time_slot.stop - game.time_slot.start
-    if width < 0:
-        width += 24
-    return width
+def get_width(time_slot):
+    if time_slot:
+        width = time_slot.stop - time_slot.start
+        if width < 0:
+            width += 24
+        return width
+    else:
+        return 0
 
 
-@ajax
-def location_schedule_view(request):
-    locations = map(lambda x: x, Location.objects.exclude(text__startswith='Not'))
-    games = Game.objects.filter(location__in=locations).filter(time_block__isnull=False).filter(time_slot__isnull=False)
+def get_index(obj, object_list):
+    if object_list.count(obj):
+        return object_list.index(obj)
+    else:
+        return -1
 
-    return {"locations": map(lambda x: x.text, locations),
-            "games": map(lambda x: {"title": x.title,
-                                    "location": locations.index(x.location),
-                                    "start": get_start(x),
-                                    "width": get_width(x),
-                                    },
-                         games),
-            }
+
+class SchedulerHandler(AJAXMixin, generic.base.View):
+    def get(self, request, *args, **kwargs):
+        locations = map(lambda x: x, Location.objects.all())
+        blocks = map(lambda x: x, TimeBlock.objects.all().order_by('sort_id'))
+        slots = map(lambda x: x, TimeSlot.objects.all().order_by('start'))
+        games = Game.objects.all()
+
+        return {"locations": map(lambda x: {"text": x.text, "id": x.id}, locations),
+                "games": map(lambda x: {"title": x.title,
+                                        "id": x.id,
+                                        "gm": x.gm,
+                                        "location": get_index(x.location, locations),
+                                        "time_block": get_index(x.time_block, blocks),
+                                        "time_slot": get_index(x.time_slot, slots),
+                                        "start": get_start(x),
+                                        "width": get_width(x.time_slot),
+                                        },
+                             games),
+                "blocks": map(lambda x: {"text": x.text, "id": x.id, "offset": get_block_offset(x)}, blocks),
+                "slots": map(lambda x: {"text": str(x), "id": x.id, "start": x.start, "width": get_width(x)}, slots),
+                }
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            raise Exception("Not logged in!  Only staff have access to this function")
+
+        if not request.user.is_staff and not request.user.is_superuser:
+            raise Exception("Only staff have access to this function")
+
+        game_id = request.POST.get('id')
+        location_id = request.POST.get('location')
+        time_block_id = request.POST.get('time_block')
+        time_slot_id = request.POST.get('time_slot')
+
+        game = Game.objects.get(id=game_id)
+        if location_id:
+            game.location = Location.objects.get(id=location_id)
+        else:
+            game.location = None
+
+        if time_block_id:
+            game.time_block = TimeBlock.objects.get(id=time_block_id)
+        else:
+            game.time_block = None
+
+        if time_slot_id:
+            game.time_slot = TimeSlot.objects.get(id=time_slot_id)
+        else:
+            game.time_slot = None
+
+        game.last_scheduled = timezone.now()
+        game.save()

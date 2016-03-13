@@ -42,7 +42,7 @@ function drawSchedule(svgId, data) {
   // draw the locations first so we can determine how much space they need
   var maxLocationWidth = 0;
   for (i = 0; i < data.locations.length; i++) {
-    var text = svg.text(textOffset, locationY(i), data.locations[i], {class:"location"});
+    var text = svg.text(textOffset, locationY(i), data.locations[i].text, {class:"location"});
     maxLocationWidth = Math.max(maxLocationWidth, text.clientWidth);
   }
 
@@ -114,7 +114,7 @@ function drawSchedule(svgId, data) {
     y = locationY(data.games[i].location) - 19
     width = data.games[i].width * hour.width
 
-    if (0 === width) { continue; }
+    if (0 === width || data.games[i].start > 99 || data.games[i].location < 0) { continue; }
 
     var subSvg = svg.svg(x, y, width, gameHeight, {"data-toggle": "tooltip", title: data.games[i].title});
     svg.rect(subSvg, 1, 0, width - 2, gameHeight, {class: "game"});
@@ -125,4 +125,138 @@ function drawSchedule(svgId, data) {
     'container': 'body',
     'placement': 'bottom'
   });
+}
+
+function registerSchedule(svgId, dataLoc, tableId) {
+  $(svgId).svg()
+  ajaxGet(dataLoc, function(content) {
+    drawSchedule("#schedule", content);
+
+    if (typeof tableId != 'undefined') {
+      constructEditTable(svgId, tableId, content);
+    }
+
+    $(window).resize(function() {
+      drawSchedule("#schedule", content);
+    });
+
+    $("#save").click(function() {
+      save(content, 0, dataLoc);
+    });
+  });
+}
+
+function save(content, i, dataLoc) {
+  if (i >= content.games.length) {
+      $("#save").prop('disabled', true)
+      return;
+  }
+
+  game = content.games[i]
+  var data = {"id": game.id}
+  if (game.location >= 0) {
+    data["location"] = content.locations[game.location].id;
+  }
+  if (game.time_block >= 0) {
+    data["time_block"] = content.blocks[game.time_block].id;
+  }
+  if (game.time_slot >= 0) {
+    data["time_slot"] = content.slots[game.time_slot].id;
+  }
+  ajaxPost(dataLoc, data, function() {
+    save(content, i + 1, dataLoc);
+  });
+}
+
+function constructEditTable(svgId, tableId, data) {
+  rows = "";
+  for (i = 0; i < data.games.length; i++) {
+    rows += "<tr><td>" + data.games[i].title + "</td><td>" + data.games[i].gm + "</td>"
+
+    // time block
+    rows += "<td><select class='block_edit form-control' name='" + i + "'><option value='-1'>Not Selected</option>";
+    for (j = 0; j < data.blocks.length; j++) {
+      rows += "<option value='" + j + "'";
+      if (j == data.games[i].time_block) {
+        rows += " selected";
+      }
+      rows += ">" + data.blocks[j].text + "</option>"
+    }
+    rows += "</select></td>";
+
+    // time slot
+    rows += "<td><select class='slot_edit form-control' name='" + i + "'><option value='-1'>Not Selected</option>";
+    for (j = 0; j < data.slots.length; j++) {
+      rows += "<option value='" + j + "'";
+      if (j == data.games[i].time_slot) {
+        rows += " selected";
+      }
+      rows += ">" + data.slots[j].text + "</option>";
+    }
+    rows += "</select></td>";
+
+    // location
+    rows += "<td><select class='location_edit form-control' name='" + i + "'><option value='-1'>Not Selected</option>";
+    for (j = 0; j < data.locations.length; j++) {
+      rows += "<option value='" + j + "'";
+      if (j == data.games[i].location) {
+        rows += " selected";
+      }
+      rows += ">" + data.locations[j].text + "</option>";
+    }
+    rows += "</select></td>";
+
+    rows += "</tr>\n";
+  }
+
+  $(tableId).find("tbody").append(rows);
+
+  $(".block_edit").change(function() {
+    $("#save").prop('disabled', false);
+    var game = data.games[$(this).prop("name")];
+    game.time_block = parseInt($(this).prop("value"), 10);
+
+    updateStart(game, data) ;
+
+    drawSchedule(svgId, data);
+  });
+
+  $(".slot_edit").change(function() {
+    $("#save").prop('disabled', false);
+    var game = data.games[$(this).prop("name")];
+    game.time_slot = parseInt($(this).prop("value"), 10);
+
+    updateStart(game, data) ;
+
+    drawSchedule(svgId, data);
+  });
+
+  $(".location_edit").change(function() {
+    $("#save").prop('disabled', false);
+    var game = data.games[$(this).prop("name")];
+    game.location = parseInt($(this).prop("value"), 10);
+
+    updateStart(game, data) ;
+
+    drawSchedule(svgId, data);
+  });
+
+  window.onbeforeunload = function() {
+    if (!$("#save").prop('disabled')) {
+      return "Changes to games have not been saved, are you sure you want to leave?";
+    }
+  }
+}
+
+function updateStart(game, data) {
+  if (-1 != game.time_block && -1 != game.time_slot) {
+    time_block = data.blocks[game.time_block];
+    time_slot = data.slots[game.time_slot];
+
+    game.start = time_block.offset + time_slot.start;
+    game.width = time_slot.width;
+  } else {
+    game.start = 100;
+    game.width = 0;
+  }
 }

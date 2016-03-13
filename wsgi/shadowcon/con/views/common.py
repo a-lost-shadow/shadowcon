@@ -12,6 +12,13 @@ class RegistrationOpenMixin(AccessMixin):
         return super(RegistrationOpenMixin, self).dispatch(request, args, kwargs)
 
 
+class IsStaffMixin(AccessMixin):
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_staff and not request.user.is_superuser:
+            return render(request, 'con/not_staff.html', {})
+        return super(IsStaffMixin, self).dispatch(request, args, kwargs)
+
+
 class NotOnWaitingListMixin(AccessMixin):
     waiting_list_template = 'con/registration_wait_list.html'
 

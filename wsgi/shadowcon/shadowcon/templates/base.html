@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 {% load staticfiles %}
 {% load con_info %}
+{% load user %}
 <html>
 <head>
   <!--<meta http-equiv="refresh" content="3" /> <!-- For Debugging -->
@@ -36,6 +37,7 @@
                 <li><a href="{% url 'con:show_schedule' %}">Schedule</a></li>
                 <li><a href="{% url 'con:games_list' %}">Description</a></li>
                 <li><a href="{% url 'con:user_profile' %}">Edit Submissions</a></li>
+                {% edit_schedule_link request.user %}
               </ul>
             </li>
             <li><a href="#">Site</a>

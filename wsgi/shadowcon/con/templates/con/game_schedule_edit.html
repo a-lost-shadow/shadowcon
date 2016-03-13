@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load con_info %}
+{% load games %}
+{% load staticfiles %}
+{% block title %}- Edit Schedule{% endblock %}
+
+{% block additional_header %}
+<link rel="stylesheet" href="{% static 'con/schedule.css' %}" />
+<script src="{% static 'js/jquery-svg/jquery.svg.js' %}"></script>
+<script src="{% static 'con/schedule.js' %}"></script>
+<script src="{% static 'django_ajax/js/jquery.ajax.min.js' %}"></script>
+<script>
+  $(document).ready(function() {
+    registerSchedule("#schedule",
+                     '{% url 'con:ajax_location_schedule_view' %}',
+                     "#schedule_edit");
+  });
+</script>
+{% endblock %}
+
+{% block content %}
+<table border="0" width="100%">
+  <tr>
+    <td><h2>Edit {% con_year %} Schedule</h2></td>
+    <td align="right">
+      <button type="button" class="btn btn-default" id="save" disabled>
+        <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>&nbsp;Save
+      </button>
+    </td>
+  </tr>
+</table>
+<div id="schedule"></div>
+<hr>
+<table id="schedule_edit" width="100%" border="1">
+  <tr>
+    <th>Game</th>
+    <th>GM</th>
+    <th>Block</th>
+    <th>Slot</th>
+    <th>Location</th>
+  </tr>
+</table>
+{% endblock %}

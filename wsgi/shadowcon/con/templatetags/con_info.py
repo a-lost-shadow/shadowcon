@@ -1,6 +1,5 @@
 from django import template
-from django.utils import dateformat, html, timezone
-from django.core.urlresolvers import reverse
+from django.utils import dateformat, timezone
 from datetime import date
 import pytz
 
@@ -44,15 +43,6 @@ def con_door_cost():
 @register.simple_tag
 def con_pre_reg_cost():
     return "$%.2f" % get_con_value("pre_reg_cost")
-
-
-@register.simple_tag
-def admin_link(user):
-    if (user.is_staff or user.is_admin) and user.is_active:
-        return html.format_html("<li><a href='{}'>Admin</a></li>",
-                                reverse('admin:index'))
-    else:
-        return ""
 
 
 @register.inclusion_tag('con/register_sidebar_links.html')
