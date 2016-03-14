@@ -22,12 +22,9 @@ class PageTest(SectionCheckMixIn, TestCase):
     def run_initial_test(self, url, name, expected_title=None):
         data = None
         for entry in self.initial:
-            try:
-                if name == entry['fields']['name']:
-                    data = entry['fields']['content']
-                    break
-            except KeyError:
-                pass
+            if name == entry['fields']['name']:
+                data = entry['fields']['content']
+                break
 
         self.assertIsNotNone(data, "Couldn't find '%s' in initial data" % name)
 
@@ -104,3 +101,9 @@ class PageTest(SectionCheckMixIn, TestCase):
     def test_nonexistent(self):
         response = self.client.get(reverse("page:display", args=["does_not_exist"]))
         self.assertEquals(response.status_code, 404)
+
+    def test_page_string(self):
+        self.assertEquals(str(Page.objects.get(name="Tag test")),"Tag test")
+
+    def test_tag_string(self):
+        self.assertEquals(str(Tag(tag="a-123", content="123")), "a-123")
