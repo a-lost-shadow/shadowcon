@@ -1,41 +1,19 @@
 from django.core.urlresolvers import reverse
-from django.test import TestCase, RequestFactory, Client
+from django.test import TestCase, Client
 from django.utils import timezone
 from con.models import ConInfo
 from datetime import date, datetime
 import pytz
 
-import re
+from .utils import SectionCheckMixIn
 
 
-class BaseTemplateTest(TestCase):
+class BaseTemplateTest(SectionCheckMixIn, TestCase):
     fixtures = ['auth', 'initial']
     url = '/'
 
     def setUp(self):
-        # Every test needs access to the request factory.
-        self.factory = RequestFactory()
         self.client = Client()
-
-    def assertSectionContains(self, response, pattern, section, section_terminator=None, expected=True):
-        if section_terminator is None:
-            section_terminator = "/" + section
-
-        section = "<%s>" % section
-        section_terminator = "<%s>" % section_terminator
-
-        response_str = str(response)
-        start = response_str.index(section)
-        stop = response_str.index(section_terminator, start)
-
-        sub_str = response_str[start:stop]
-        fail_msg = "to find '%s' between %s and %s\n%s" % (pattern, section, section_terminator, sub_str)
-
-        self.assertEqual(response.status_code, 200)
-        if expected:
-            self.assertIsNotNone(re.search(pattern, sub_str), "Expected %s" % fail_msg)
-        else:
-            self.assertIsNone(re.search(pattern, sub_str), "Didn't expect %s" % fail_msg)
 
     def test_header_contains_date(self):
         response = self.client.get(self.url)

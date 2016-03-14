@@ -10,7 +10,7 @@ def index(request):
 def display(request, url):
     url = url.replace("/", "_")
     page = get_object_or_404(Page, url=url)
-    title = " - " + page.name
+    title = "- " + page.name
 
     if "home" == url:
         title = ""
