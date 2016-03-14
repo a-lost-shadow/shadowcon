@@ -3,7 +3,7 @@
           <li><a href="{% url 'con:register_attendance' %}">Register</a></li>
           <li><a href="{% url 'con:submit_game' %}">Submit Game</a></li>
 {% else %}
-          <li><h3>Registration opens:</h3>
+          <li id="registration_opens"><h3>Registration opens:</h3>
             <ul><li>{{ open_date|safe }}</li></ul>
           </li>
 {% localtime on %}
