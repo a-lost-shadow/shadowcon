@@ -17,7 +17,7 @@ class SimpleTest(TestCase):
         game = Game.objects.filter(user=user)[0]
         url = reverse('con:edit_game', args=[game.id])
 
-        self.client.login(username='adrian', password='123')
+        self.client.login(username='admin', password='123')
         response = self.client.get(url)
         self.assertContains(response, "<h2>Cannot edit another's game</h2>")
 
@@ -26,7 +26,7 @@ class SimpleTest(TestCase):
         game = Game.objects.filter(user=user)[0]
         url = reverse('con:edit_game', args=[game.id])
 
-        self.client.login(username='adrian', password='123')
+        self.client.login(username='admin', password='123')
         original_title = game.title
         game.title = 'Changed Via Unit Test'
 
