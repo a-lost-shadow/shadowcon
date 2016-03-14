@@ -1,8 +1,9 @@
+from django_ajax.mixin import AJAXMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
-from django.views import generic
+from django.shortcuts import render
 from django.utils import timezone
-from django_ajax.mixin import AJAXMixin
+from django.views import generic
 
 from collections import OrderedDict
 
@@ -72,8 +73,17 @@ class UpdateGameView(RegistrationOpenMixin, LoginRequiredMixin, NotOnWaitingList
         return reverse('con:user_profile')
 
     def form_valid(self, form):
+        if self.request.user != self.object.user:
+            return render(self.request, 'con/not_game_owner.html', {})
+
         form.instance.last_modified = timezone.now()
         return super(UpdateGameView, self).form_valid(form)
+
+    def get(self, request, *args, **kwargs):
+        if request.user == self.get_object().user:
+            return super(UpdateGameView, self).get(self, request, *args, **kwargs)
+        else:
+            return render(request, 'con/not_game_owner.html', {})
 
 
 class ListGameView(generic.ListView):

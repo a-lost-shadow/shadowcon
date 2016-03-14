@@ -43,7 +43,7 @@ class AttendanceView(RegistrationOpenMixin, LoginRequiredMixin, FormView):
         if new_entry:
             registration = Registration(user=self.request.user,
                                         registration_date=timezone.now(),
-                                        payment=Registration.PAYMENT_CASH)
+                                        payment=PaymentOption.objects.all()[0])
         else:
             registration = registration[0]
             BlockRegistration.objects.filter(registration=registration).delete()
