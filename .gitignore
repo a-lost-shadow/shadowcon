@@ -8,3 +8,6 @@
 wsgi/static
 wsgi/shadowcon/.idea/workspace.xml 
 venv
+.coverage
+generate_coverage.sh
+htmlcov
