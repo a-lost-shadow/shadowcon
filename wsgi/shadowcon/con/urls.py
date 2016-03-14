@@ -6,7 +6,6 @@ app_name = 'con'
 urlpatterns = [
     url(r'^games/description/$', games.ListGameView.as_view(), name='games_list'),
     url(r'^games/edit/(?P<pk>[0-9]+)/$', games.UpdateGameView.as_view(), name='edit_game'),
-    url(r'^games/edit/schedule/$', games.ScheduleView.as_view(), name='schedule_games'),
     url(r'^games/register/$', games.NewGameView.as_view(), name='submit_game'),
     url(r'^games/schedule/$', games.ScheduleView.as_view(), name='show_schedule'),
     url(r'^games/schedule/edit/$', games.ScheduleEditView.as_view(), name='edit_schedule'),
