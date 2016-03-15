@@ -6,7 +6,7 @@ from .models import EmailList, UserEmailEntry, GroupEmailEntry
 def mail_list(subject_source, subject_details, message, sender, email_list=None, list_name=None):
     if email_list is None:
         if list_name is None:
-            raise ValueError("Both list and list_name are None", coding="coding error")
+            raise ValueError("Both email_list and list_name are None")
         email_list = EmailList.objects.get(name=list_name)
 
     users = map(lambda x: x.user, UserEmailEntry.objects.filter(list=email_list))

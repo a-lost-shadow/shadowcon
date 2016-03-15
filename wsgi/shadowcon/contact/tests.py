@@ -155,3 +155,11 @@ class ContactTest(SectionCheckMixIn, TestCase):
         self.assertEquals(email.to, ['staff@na.com', 'admin@na.com'])
         self.assertEquals(email.from_email, sender)
         self.assertEquals(email.subject, 'ShadowCon [%s]: %s' % (subject_source, subject_details))
+
+    def test_util_no_list(self):
+        with self.assertRaises(ValueError) as e:
+            mail_list("subject_source", "subject_details", "message", "sender")
+        self.assertEquals(e.exception.message, "Both email_list and list_name are None")
+
+    def test_email_list_name(self):
+        self.assertEquals(str(EmailList.objects.get(name="Admin")), "Admin")
