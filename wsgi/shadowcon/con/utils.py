@@ -5,7 +5,8 @@ from .models import ConInfo, Registration, BlockRegistration, TimeBlock, get_cho
 
 def friendly_username(user):
     name = user.first_name + " " + user.last_name
-    if "" == name.strip():
+    name = name.strip()
+    if "" == name:
         name = user.username
     return name
 
@@ -13,9 +14,9 @@ def friendly_username(user):
 def get_con_value(parameter):
     con_objects = ConInfo.objects.all()
     if len(con_objects) == 0:
-        return "No con object found"
+        raise ValueError("No con object found")
     elif len(con_objects) > 1:
-        return "Multiple con objects found"
+        raise ValueError("Multiple con objects found")
 
     info = con_objects[0]
     return getattr(info, parameter)
