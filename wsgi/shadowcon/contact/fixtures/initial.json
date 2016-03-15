@@ -21,11 +21,81 @@
     }
   },
   {
+    "model": "contact.emaillist",
+    "pk": 4,
+    "fields": {
+      "name": "Website"
+    }
+  },
+  {
+    "model": "contact.emaillist",
+    "pk": 5,
+    "fields": {
+      "name": "Admin"
+    }
+  },
+  {
+    "model": "contact.groupemailentry",
+    "pk": 1,
+    "fields": {
+      "list": 4,
+      "group": 1
+    }
+  },
+  {
+    "model": "contact.useremailentry",
+    "pk": 1,
+    "fields": {
+      "list": 1,
+      "user": 1
+    }
+  },
+  {
+    "model": "contact.useremailentry",
+    "pk": 2,
+    "fields": {
+      "list": 2,
+      "user": 1
+    }
+  },
+  {
+    "model": "contact.useremailentry",
+    "pk": 3,
+    "fields": {
+      "list": 3,
+      "user": 1
+    }
+  },
+  {
+    "model": "contact.useremailentry",
+    "pk": 4,
+    "fields": {
+      "list": 4,
+      "user": 1
+    }
+  },
+  {
+    "model": "contact.useremailentry",
+    "pk": 5,
+    "fields": {
+      "list": 5,
+      "user": 2
+    }
+  },
+  {
     "model": "contact.contactreason",
     "pk": 1,
     "fields": {
       "name": "Something Broke",
-      "list": 1
+      "list": 4
+    }
+  },
+  {
+    "model": "contact.contactreason",
+    "pk": 2,
+    "fields": {
+      "name": "Admins make things better",
+      "list": 5
     }
   }
 ]

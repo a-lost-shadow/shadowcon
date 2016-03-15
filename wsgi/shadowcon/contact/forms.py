@@ -18,6 +18,6 @@ class ContactForm(Form):
         subject_details = strip_tags(self.cleaned_data.get('summary'))
 
         message = strip_tags(self.cleaned_data.get('message'))
-        sender = strip_tags(self.cleaned_data.get('email'))
+        sender = "%s <%s>" % (strip_tags(self.cleaned_data.get('name')), strip_tags(self.cleaned_data.get('email')))
 
         mail_list(subject_source, subject_details, message, sender, email_list)
