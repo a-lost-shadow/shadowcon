@@ -6,7 +6,8 @@
 <h2>Create New Account</h2>
   <form action="." method="POST">
     {% csrf_token %}
-    {{ form.as_p }}
+    {{ form.media }}
+    <table>{{ form.as_table }}</table>
     <input class="submit" type="submit" value="Create Account">
     <input type="hidden" name="next" value="{{ next }}" />
   </form>
