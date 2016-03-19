@@ -6,14 +6,14 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils.html import strip_tags
+from django.conf import settings
 import re
-import os
 
 from .fields import HourField
 
 
 def get_absolute_url(request, relative, args):
-    if os.environ.get('DEBUG') == 'True':
+    if settings.DEBUG:
         domain = request.get_host()
     else:
         domain = "www.shadowcon.net"
@@ -21,8 +21,11 @@ def get_absolute_url(request, relative, args):
 
 
 def get_choice(value, choices):
-    choice = filter(lambda a: a[0] == value, choices)[0]
-    return choice[1]
+    choice = filter(lambda a: a[0] == value, choices)
+    if len(choice) > 0:
+        return choice[0][1]
+    else:
+        raise ValueError("No choice found for: %s" % value)
 
 
 class ConInfo(models.Model):
@@ -36,8 +39,8 @@ class ConInfo(models.Model):
     max_attendees = models.PositiveIntegerField()
 
     def __str__(self):
-        format_str = "date: %s, location: %s, game_sub_deadline: %s, pre_reg_deadline: %s, " + \
-                     "pre_reg_cost: %s, door_cost: %s, registration_opens: %s, max_attendees: %s"
+        format_str = "Date: %s, Location: %s, Game Submission Deadline: %s, PreReg Deadline: %s, " + \
+                     "PreReg Cost: %s, Door Cost: %s, Registration Opens: %s, Max Attendees: %s"
         return format_str % (self.date, self.location, self.game_sub_deadline,
                              self.pre_reg_deadline, self.pre_reg_cost, self.door_cost,
                              self.registration_opens, self.max_attendees)
@@ -117,7 +120,7 @@ class Game(models.Model):
 
     def __str__(self):
         format_str = "Title: %s, GM: %s, Time Block: %s, Time Slot: %s, Location: %s, " + \
-                     "Duration: %s, # Players: %s, System: %s, Triggers: %s, User: %s, " + \
+                     "Duration: %s, Number Players: %s, System: %s, Triggers: %s, User: %s, " + \
                      "Description: <CLOB>, Last Modified: %s, Last Scheduled: %s"
         return format_str % (self.title, self.gm, self.time_block, self.time_slot, self.location,
                              self.duration, self.number_players, self.system, self.triggers,
@@ -180,8 +183,8 @@ class Registration(models.Model):
     payment_received = models.BooleanField(default=False)
 
     def __str__(self):
-        return "user: %s, registration_date: %s, payment: %s" % \
-               (self.user, self.registration_date, get_choice(self.payment, self.PAYMENT_CHOICES))
+        return "User: %s, Registration Date: %s, Payment: %s, Payment Received: %s, Last Updated: %s" % \
+               (self.user, self.registration_date, self.payment, self.payment_received, self.last_updated)
 
 
 class BlockRegistration(models.Model):
@@ -198,7 +201,7 @@ class BlockRegistration(models.Model):
     attendance = models.CharField(max_length=1, choices=ATTENDANCE_CHOICES, default=ATTENDANCE_YES)
 
     def __str__(self):
-        return "registration: %s, time_block: %s, attendance: %s" % \
+        return "Registration: %s, Time Block: %s, Attendance: %s" % \
                (self.registration,
                 self.time_block,
                 get_choice(self.attendance, self.ATTENDANCE_CHOICES))
