@@ -166,7 +166,8 @@ CKEDITOR_CONFIGS = {
             {'name': 'others', 'groups': [ 'others' ] },
             {'name': 'about', 'groups': [ 'about' ] }
         ],
-        'removeButtons': 'Source,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,Flash,Iframe,CreateDiv,Language',
+        'removeButtons': 'Source,Form,Checkbox,Radio,TextField,Textarea,Select,'
+                         'Button,ImageButton,HiddenField,Flash,Iframe,CreateDiv,Language',
         'width': "685px",
     },
 }

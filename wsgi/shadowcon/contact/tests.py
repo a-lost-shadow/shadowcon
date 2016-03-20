@@ -1,4 +1,3 @@
-from django.core import mail
 from django.core.urlresolvers import reverse
 from django.test import Client
 from shadowcon.tests.utils import ShadowConTestCase
@@ -70,8 +69,7 @@ class ContactTest(ShadowConTestCase):
     def test_success_email(self):
         self.client.post(self.url, self.test_data)
 
-        self.assertEquals(len(mail.outbox), 1)
-        email = mail.outbox[0]
+        email = self.get_email()
 
         self.assertEquals(email.body, self.test_data['message'])
         self.assertEquals(email.to, ['staff@na.com', 'admin@na.com'])
@@ -84,8 +82,7 @@ class ContactTest(ShadowConTestCase):
 
         self.client.post(self.url, new_data)
 
-        self.assertEquals(len(mail.outbox), 1)
-        email = mail.outbox[0]
+        email = self.get_email()
 
         self.assertEquals(email.body, self.test_data['message'])
         self.assertEquals(email.to, ['staff@na.com', 'admin@na.com'])
@@ -117,8 +114,7 @@ class ContactTest(ShadowConTestCase):
                      }
         self.client.post(self.url, test_data)
 
-        self.assertEquals(len(mail.outbox), 1)
-        email = mail.outbox[0]
+        email = self.get_email()
 
         self.assertEquals(email.body, 'My precious')
         self.assertEquals(email.to, ['user@na.com'])
@@ -132,8 +128,7 @@ class ContactTest(ShadowConTestCase):
         sender = "Crazy It <i.am.crazy@gmail.com"
         mail_list(subject_source, subject_details, message, sender, EmailList.objects.get(name="Admin"))
 
-        self.assertEquals(len(mail.outbox), 1)
-        email = mail.outbox[0]
+        email = self.get_email()
 
         self.assertEquals(email.body, message)
         self.assertEquals(email.to, ['user@na.com'])
@@ -147,8 +142,7 @@ class ContactTest(ShadowConTestCase):
         sender = "Russia with Love <007@mi6.co.uk>"
         mail_list(subject_source, subject_details, message, sender, list_name="Website")
 
-        self.assertEquals(len(mail.outbox), 1)
-        email = mail.outbox[0]
+        email = self.get_email()
 
         self.assertEquals(email.body, message)
         self.assertEquals(email.to, ['staff@na.com', 'admin@na.com'])

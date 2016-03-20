@@ -102,7 +102,7 @@ class PageTest(ShadowConTestCase):
         self.assertEquals(response.status_code, 404)
 
     def test_page_string(self):
-        self.assertEquals(str(Page.objects.get(name="Tag test")),"Tag test")
+        self.assertEquals(str(Page.objects.get(name="Tag test")), "Tag test")
 
     def test_tag_string(self):
         self.assertEquals(str(Tag(tag="a-123", content="123")), "a-123")
