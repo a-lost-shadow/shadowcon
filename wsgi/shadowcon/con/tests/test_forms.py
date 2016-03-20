@@ -209,3 +209,17 @@ class FormsTest(TestCase):
         self.assertEquals(e.exception.message,
                           "You must register attendance at one or more sessions.  If you wish to  " +
                           "unregister, please use the contact us at the bottom of the page.")
+
+    def test_clean_passes_with_one_attendance_entry(self):
+        user = User(username="username")
+        user.save()
+
+        form = AttendanceForm(user=user)
+        form.cleaned_data = {}
+        last = None
+        for k in form.time_block_fields().keys():
+            form.cleaned_data[k] = BlockRegistration.ATTENDANCE_NO
+            last = k
+        form.cleaned_data[last] = BlockRegistration.ATTENDANCE_YES
+
+        form.clean()
