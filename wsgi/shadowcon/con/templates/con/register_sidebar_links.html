@@ -1,5 +1,5 @@
 {% load tz %}
-{% if registration_open %}
+{% if is_registration_open %}
           <li><a href="{% url 'con:register_attendance' %}">Register</a></li>
           <li><a href="{% url 'con:submit_game' %}">Submit Game</a></li>
 {% else %}

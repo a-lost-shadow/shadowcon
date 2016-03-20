@@ -1,18 +1,16 @@
-from django.http.request import HttpRequest
-from django.test import TestCase, Client
-from django.test.utils import override_settings
-from shadowcon.tests.utils import SectionCheckMixIn
-from ..models import *
-
 from ddt import data, ddt
+from django.http.request import HttpRequest
+from django.test import TestCase
+from django.test.utils import override_settings
+from django.utils.html import strip_tags
+from ..models import ConInfo, Game, BlockRegistration, TimeBlock, TimeSlot, PaymentOption, Registration, Location
+from ..models import get_absolute_url, am_pm_print
+from ..utils import get_choice
 
 
 @ddt
-class UtilsTest(SectionCheckMixIn, TestCase):
+class ModelsTest(TestCase):
     fixtures = ['auth', 'initial']
-
-    def setUp(self):
-        self.client = Client()
 
     @override_settings(DEBUG=False)
     def test_abs_url_no_debug(self):

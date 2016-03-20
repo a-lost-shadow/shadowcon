@@ -11,6 +11,7 @@ from collections import OrderedDict
 import pytz
 
 
+# Test code for NewUserForm is in shadowcon/tests/test_registration
 class NewUserForm(BaseRegistrationForm):
     first_name = CharField(max_length=30, required=False)
     last_name = CharField(max_length=30, required=False)
@@ -50,27 +51,37 @@ class AttendanceForm(Form):
             self.fields["block_%s" % time_block.id] = ChoiceField(choices=BlockRegistration.ATTENDANCE_CHOICES,
                                                                   label=time_block.text,
                                                                   initial=initial)
-        self.fields["Test"] = CharField(max_length=30, required=False)
 
     def time_block_fields(self):
         return OrderedDict((k, v) for k, v in self.fields.iteritems() if k.startswith("block_"))
 
     def send_mail(self, registration, new_entry):
-        subject_details = "%s for %s" % ("Initial Registration" if new_entry else "Updated Registration",
-                                         self.user_friendly)
+        subject_details = "%s Registration for %s" % ("Initial" if new_entry else "Updated", self.user_friendly)
         message = self.user_friendly + " will be attending for:\n"
         for entry in get_registration(self.user):
             message += " - %s\n" % entry
 
         date = registration.registration_date.astimezone(pytz.timezone('US/Pacific'))
-        message += "\nInitial registered on %s" % date.strftime("%B %d, %Y %I:%M:%S %p %Z")
+        message += "\nInitially registered on %s" % date.strftime("%B %d, %Y %I:%M:%S %p %Z")
 
         mail_list("Registration", subject_details, message, "no-reply@shadowcon.net", list_name="registration")
 
     def save(self, registration, new_entry):
+        old_regs = {}
+        for reg in BlockRegistration.objects.filter(registration=registration):
+            old_regs[reg.time_block] = reg
+
         for key, field in self.time_block_fields().iteritems():
             time_block = TimeBlock.objects.filter(id=key.split("_")[1])[0].text
-            BlockRegistration(registration=registration, time_block=time_block, attendance=field.initial).save()
+            if time_block in old_regs:
+                old_regs[time_block].attendance = field.initial
+                old_regs[time_block].save()
+                del old_regs[time_block]
+            else:
+                BlockRegistration(registration=registration, time_block=time_block, attendance=field.initial).save()
+
+        for obsolete in old_regs.values():
+            obsolete.delete()
 
         self.send_mail(registration, new_entry)
 

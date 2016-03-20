@@ -1,3 +1,4 @@
+import ddt
 import re
 
 
@@ -29,3 +30,14 @@ class SectionCheckMixIn(object):
         else:
             self.assertIsNone(re.search(pattern, sub_str), "Didn't expect %s" % fail_msg)
 
+
+def data_func(*values):
+    """
+    Method decorator to add to your test methods.
+    Should be added to methods of instances of ``unittest.TestCase``.
+    """
+
+    def wrapper(func):
+        setattr(func, ddt.DATA_ATTR, values[0])
+        return func
+    return wrapper

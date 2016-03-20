@@ -27,7 +27,7 @@ Payment Received: {{ payment_received|yesno }}<br />
 <br />
 <br />
 {% endif %}
-{% if registration_open %}
+{% if is_registration_open %}
 <a href="{% url 'con:register_attendance' %}">Change Registration</a><br />
 {% if payment %}
 {% if not payment_received %}
@@ -36,5 +36,5 @@ Payment Received: {{ payment_received|yesno }}<br />
 {% endif %}
 <br />
 {% endif %}
-{% show_user_games request.user registration_open %}
+{% show_user_games request.user is_registration_open %}
 {% endblock %}

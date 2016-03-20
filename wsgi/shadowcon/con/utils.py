@@ -22,7 +22,7 @@ def get_con_value(parameter):
     return getattr(info, parameter)
 
 
-def registration_open():
+def is_registration_open():
     open_date = get_con_value("registration_opens")
     return open_date <= timezone.now()
 

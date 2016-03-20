@@ -54,7 +54,7 @@ def get_registration_open_string(raw_open_date, date_time_sep):
 def register_links():
     raw_open_date = get_con_value("registration_opens")
 
-    return {'registration_open': raw_open_date <= timezone.now(),
+    return {'is_registration_open': raw_open_date <= timezone.now(),
             'open_date': get_registration_open_string(raw_open_date, "<br>")}
 
 

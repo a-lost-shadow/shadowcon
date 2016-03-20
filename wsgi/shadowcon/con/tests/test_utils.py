@@ -1,16 +1,13 @@
 from django.contrib.auth.models import User
-from django.test import TestCase, Client
-from shadowcon.tests.utils import SectionCheckMixIn
-from ..utils import *
+from django.test import TestCase
+from ..utils import friendly_username, get_registration, get_con_value, is_registration_open
+from ..models import ConInfo, Registration, BlockRegistration
 from datetime import timedelta
 from django.utils import timezone
 
 
-class UtilsTest(SectionCheckMixIn, TestCase):
+class UtilsTest(TestCase):
     fixtures = ['auth', 'initial']
-
-    def setUp(self):
-        self.client = Client()
 
     def test_friendly_username_no_first_last(self):
         user = User(username="username")
@@ -63,13 +60,13 @@ class UtilsTest(SectionCheckMixIn, TestCase):
         con = ConInfo.objects.all()[0]
         con.registration_open = timezone.now() + timedelta(minutes=1)
         con.save()
-        self.assertEquals(registration_open(), True)
+        self.assertEquals(is_registration_open(), True)
 
     def test_registration_open(self):
         con = ConInfo.objects.all()[0]
         con.registration_open = timezone.now() - timedelta(minutes=1)
         con.save()
-        self.assertEquals(registration_open(), True)
+        self.assertEquals(is_registration_open(), True)
 
     def test_get_registration_null(self):
         self.assertEquals(get_registration(None), ["Not Registered"])

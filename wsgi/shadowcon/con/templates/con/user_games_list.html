@@ -15,7 +15,7 @@
     <br />
     <b>Description:</b><br>
     {{ game.description | safe }}<br>
-    {% if registration_open %}
+    {% if is_registration_open %}
     <a href="{% url 'con:edit_game' game.id %}">Edit</a>
     {% endif %}
   </div>

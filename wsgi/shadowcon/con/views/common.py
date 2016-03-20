@@ -2,12 +2,12 @@ from django.contrib.auth.mixins import AccessMixin
 from django.shortcuts import render
 
 from ..models import Registration
-from ..utils import registration_open, get_con_value
+from ..utils import is_registration_open, get_con_value
 
 
 class RegistrationOpenMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
-        if not registration_open():
+        if not is_registration_open():
             return render(request, 'con/registration_not_open.html', {})
         return super(RegistrationOpenMixin, self).dispatch(request, args, kwargs)
 
