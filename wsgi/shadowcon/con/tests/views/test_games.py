@@ -424,7 +424,10 @@ class GameScheduleAjaxTest(ShadowConTestCase):
         self.assertEquals(json_data["content"], "An error occured while processing an AJAX request.")
         self.assertEquals(json_data["status"], 500)
 
-    def run_post_test(self, username):
+    def run_post_test(self, username,
+                      location=Location.objects.all()[0],
+                      time_block=TimeBlock.objects.all()[0],
+                      time_slot=TimeSlot.objects.all()[0]):
         self.client.login(username=username, password="123")
 
         game = Game()
@@ -435,19 +438,32 @@ class GameScheduleAjaxTest(ShadowConTestCase):
         modified_date = timezone.now()
 
         game = Game.objects.get(title="Unit Test Title")
-        self.client.post(self.url, {"id": game.id,
-                                    "location": Location.objects.all()[0].id,
-                                    "time_block": TimeBlock.objects.all()[0].id,
-                                    "time_slot": TimeSlot.objects.all()[0].id})
+        post_data = {"id": game.id}
+        if location:
+            post_data["location"] = location.id
+        if time_block:
+            post_data["time_block"] = time_block.id
+        if time_slot:
+            post_data["time_slot"] = time_slot.id
+        self.client.post(self.url, post_data)
 
         game = Game.objects.get(title="Unit Test Title")
         self.assertGreater(game.last_scheduled, modified_date)
-        self.assertEquals(game.time_block, TimeBlock.objects.all()[0])
-        self.assertEquals(game.time_slot, TimeSlot.objects.all()[0])
-        self.assertEquals(game.location, Location.objects.all()[0])
+        self.assertEquals(game.time_block, time_block)
+        self.assertEquals(game.time_slot, time_slot)
+        self.assertEquals(game.location, location)
 
     def test_post_staff(self):
         self.run_post_test("staff")
 
     def test_post_admin(self):
         self.run_post_test("admin")
+
+    def test_post_no_location(self):
+        self.run_post_test("staff", location=None)
+
+    def test_post_no_time_block(self):
+        self.run_post_test("staff", time_block=None)
+
+    def test_post_no_time_slot(self):
+        self.run_post_test("staff", time_slot=None)
