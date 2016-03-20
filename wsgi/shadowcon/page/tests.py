@@ -57,7 +57,7 @@ class PageTest(SectionCheckMixIn, TestCase):
 
     def run_tag_test(self, expected):
         response = self.client.get(reverse("page:display", args=["tag_test"]))
-        section = self.get_section(response, 'section id="main" role="main"', '/section')[31:].strip()
+        section = self.get_section(response, 'section id="main" role="main"', '/section')[31:-10].strip()
         self.assertEquals(section, expected)
 
     def test_no_tags(self):
