@@ -2,7 +2,7 @@
 {% load con_info %}
 {% load games %}
 {% load staticfiles %}
-{% block title %}- {{ con_year }} Schedule{% endblock %}
+{% block title %}- Schedule{% endblock %}
 
 {% block additional_header %}
 <link rel="stylesheet" href="{% static 'con/schedule.css' %}" />
@@ -23,7 +23,7 @@
 <br />
 <br />
 {% for time_block, games in object_list.items %}
-<table class="schedule" border="1" width="100%">
+<table id="{{ time_block }}" class="schedule" border="1">
   <tr><th colspan="4" align="left">{{ time_block }}</th></tr>
   {% for game in games %}
   <tr>

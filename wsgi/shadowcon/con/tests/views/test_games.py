@@ -212,6 +212,87 @@ class GameListTest(ShadowConTestCase):
 
 
 @ddt
+class GameShowScheduleTest(ShadowConTestCase):
+    def setUp(self):
+        self.client = Client()
+        self.response = self.client.get(reverse('con:show_schedule'))
+
+    def test_game_list_title(self):
+        self.assertSectionContains(self.response, "ShadowCon 2016 - Schedule", "title")
+
+    def test_game_list_list_header(self):
+        self.assertSectionContains(self.response, "2016 Schedule", "h2")
+
+    @data_func(get_games())
+    def test_game_list_game_entries(self, game_id):
+        game = Game.objects.get(id=game_id)
+        time_block = game.time_block.text if game.time_block else "Not Scheduled"
+        section = self.get_section(self.response, 'table id="%s" class="schedule" border="1"' % time_block, '/table')
+        self.assertStringContains(section, time_block, 'th colspan="4" align="left"', "/th")
+        pattern = '%s</a></td>\\s+<td>%s</td>\\s+<td>%s</td>\\s+<td>%s</td>' % \
+                  (game.title, game.combined_time(), game.number_players, game.gm)
+        self.assertStringContains(section, pattern,
+                                  'a href="%s#%s"' % (reverse('con:games_list'), game.header_target()), "/tr")
+
+    def test_javascript_schedule(self):
+        self.assertSectionContains(self.response, '<div id="schedule"></div>', 'h2', '/div')
+
+    def test_ajax_hookup(self):
+        self.assertSectionContains(self.response, 'registerSchedule\\("#schedule", \'%s\'\\);' %
+                                   reverse('con:ajax_location_schedule_view'), 'head')
+
+
+@ddt
+class GameEditScheduleTest(ShadowConTestCase):
+    def setUp(self):
+        self.client = Client()
+        self.client.login(username='staff', password='123')
+        self.url = reverse('con:edit_schedule')
+        self.response = self.client.get(self.url)
+
+    def test_game_list_title(self):
+        self.assertSectionContains(self.response, "ShadowCon 2016 - Edit Schedule", "title")
+
+    def test_javascript_schedule(self):
+        self.assertSectionContains(self.response, "", 'div id="schedule"', '/div')
+
+    def test_javascript_schedule_table(self):
+        pattern = "<tr>\\s+\\s+<th>Game</th>\\s+<th>GM</th>\\s+" \
+                  "<th>Block</th>\\s+<th>Slot</th>\\s+<th>Location</th>\\s+</tr>"
+        self.assertSectionContains(self.response, pattern, 'table id="schedule_edit" width="100%" border="1"', '/table')
+
+    def test_ajax_hookup(self):
+        self.assertSectionContains(self.response, 'registerSchedule\\("#schedule",\\s+\'%s\',\\s+"#schedule_edit"\\);' %
+                                   reverse('con:ajax_location_schedule_view'), 'head')
+
+    def test_save_button(self):
+        pattern = '<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>&nbsp;Save'
+        self.assertSectionContains(self.response, pattern,
+                                   'button type="button" class="btn btn-default" id="save" disabled', '/button')
+
+    def test_not_logged_in(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertRedirects(response, reverse('login') + "?next=" + self.url)
+
+    def test_logged_in_user(self):
+        self.client.logout()
+        self.client.login(username="user", password="123")
+        response = self.client.get(self.url)
+        self.assertSectionContains(response, "Staff Permissions Required", "h2")
+
+    def test_logged_in_staff(self):
+        # login credentials inherited
+        self.assertSectionContains(self.response, "Edit 2016 Schedule", "h2")
+
+    def test_logged_in_admin(self):
+        self.client.logout()
+        self.client.login(username="admin", password="123")
+        response = self.client.get(self.url)
+        self.assertSectionContains(response, "Edit 2016 Schedule", "h2")
+
+
+@ddt
 class GameScheduleAjaxTest(ShadowConTestCase):
     url = reverse('con:ajax_location_schedule_view')
 

@@ -36,3 +36,7 @@ font-size: 14px;
 .tooltip.bottom .tooltip-arrow {
 border-bottom-color: #2b1d12;
 }
+
+.schedule {
+width: 100%;
+}
