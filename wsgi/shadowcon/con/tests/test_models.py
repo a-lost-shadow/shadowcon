@@ -1,17 +1,15 @@
 from ddt import data, ddt
 from django.http.request import HttpRequest
-from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.html import strip_tags
+from shadowcon.tests.utils import ShadowConTestCase
 from ..models import ConInfo, Game, BlockRegistration, TimeBlock, TimeSlot, PaymentOption, Registration, Location
 from ..models import get_absolute_url, am_pm_print
 from ..utils import get_choice
 
 
 @ddt
-class ModelsTest(TestCase):
-    fixtures = ['auth', 'initial']
-
+class ModelsTest(ShadowConTestCase):
     @override_settings(DEBUG=False)
     def test_abs_url_no_debug(self):
         request = HttpRequest()

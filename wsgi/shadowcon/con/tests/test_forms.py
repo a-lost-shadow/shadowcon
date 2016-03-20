@@ -1,21 +1,30 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core import mail
-from django.test import TestCase
 from ..forms import AttendanceForm
 from ..models import Registration, BlockRegistration, TimeBlock, PaymentOption
 from ..utils import friendly_username
 from datetime import timedelta
 from django.utils import timezone
-from shadowcon.tests.utils import data_func
+from shadowcon.tests.utils import ShadowConTestCase, data_func
 from ddt import ddt
 import pytz
+import json
+import os
 
 
 def get_user_registration(user_id):
-    user = User(id=user_id)
-    reg = Registration.objects.get(user=user)
-    return BlockRegistration.objects.filter(registration=reg)
+    with open(os.path.dirname(os.path.realpath(__file__)) + "/../fixtures/initial.json") as f:
+        data = json.load(f)
+
+    reg_data = filter(lambda x: "con.registration" == x["model"] and user_id == x["fields"]["user"], data)
+    result = []
+    if len(reg_data) > 0:
+        reg_id = reg_data[0]["pk"]
+        blocks = filter(lambda x: "con.blockregistration" == x["model"] and reg_id == x["fields"]["registration"], data)
+        result = map(lambda x: x["pk"], blocks)
+
+    return result
 
 
 def set_registration(registration, time_block, attendance):
@@ -25,9 +34,7 @@ def set_registration(registration, time_block, attendance):
 
 
 @ddt
-class FormsTest(TestCase):
-    fixtures = ['auth', 'initial']
-
+class FormsTest(ShadowConTestCase):
     # Test code for NewUserForm is in shadowcon/tests/test_registration
 
     def run_attendance_order_test(self, user):
@@ -64,7 +71,9 @@ class FormsTest(TestCase):
             self.assertEquals(BlockRegistration.ATTENDANCE_YES, form.fields["block_%d" % time_block.id].initial)
 
     @data_func(get_user_registration(1))
-    def test_attendance_form_with_registration_initial(self, block_reg):
+    def test_attendance_form_with_registration_initial(self, block_id):
+        block_reg = BlockRegistration.objects.get(id=block_id)
+
         user = User.objects.get(id=1)
         form = AttendanceForm(user=user, registration=Registration.objects.filter(user=user))
         time_block = TimeBlock.objects.get(text=block_reg.time_block)

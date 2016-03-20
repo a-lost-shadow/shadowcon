@@ -1,11 +1,9 @@
 from django.core.exceptions import ValidationError
-from django.test import TestCase
 from ..fields import HourField
+from shadowcon.tests.utils import ShadowConTestCase
 
 
-class FieldsTest(TestCase):
-    fixtures = ['auth', 'initial']
-
+class FieldsTest(ShadowConTestCase):
     def test_hour_field_valid(self):
         field = HourField()
         field.run_validators(5)

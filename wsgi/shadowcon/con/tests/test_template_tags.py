@@ -1,12 +1,11 @@
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.test import TestCase
 from ..models import ConInfo, Game
 from ..utils import get_registration
 from datetime import date, datetime
 from django.template import Context, Template
 import pytz
-from shadowcon.tests.utils import SectionCheckMixIn
+from shadowcon.tests.utils import ShadowConTestCase
 
 
 def render_template_tag(load, tag, context=Context({})):
@@ -22,9 +21,7 @@ def expected_attendance(user):
     return result
 
 
-class TemplateTagsTest(SectionCheckMixIn, TestCase):
-    fixtures = ['auth', 'initial']
-
+class TemplateTagsTest(ShadowConTestCase):
     def check_tag(self, load, tag, expected, context=Context({})):
         self.assertEquals(render_template_tag(load, tag, context), expected)
 

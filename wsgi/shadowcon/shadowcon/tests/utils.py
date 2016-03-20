@@ -1,3 +1,4 @@
+from django.test import TestCase
 import ddt
 import re
 
@@ -25,6 +26,9 @@ class SectionCheckMixIn(object):
         self.assertStringContains(response, pattern, section, section_terminator, expected)
 
     def assertStringContains(self, string, pattern, section, section_terminator=None, expected=True):
+        if section_terminator is None:
+            section_terminator = "/" + section
+
         sub_str = self.get_section(string, section, section_terminator)
         fail_msg = "to find '%s' between %s and %s\n%s" % (pattern, section, section_terminator, sub_str)
 
@@ -44,3 +48,7 @@ def data_func(*values):
         setattr(func, ddt.DATA_ATTR, values[0])
         return func
     return wrapper
+
+
+class ShadowConTestCase(SectionCheckMixIn, TestCase):
+    fixtures = ['auth', 'initial', 'games']

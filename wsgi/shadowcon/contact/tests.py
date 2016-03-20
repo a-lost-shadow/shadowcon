@@ -1,14 +1,13 @@
 from django.core import mail
 from django.core.urlresolvers import reverse
-from django.test import TestCase, Client
-from shadowcon.tests.utils import SectionCheckMixIn
+from django.test import Client
+from shadowcon.tests.utils import ShadowConTestCase
 
 from .utils import mail_list
 from .models import EmailList
 
 
-class ContactTest(SectionCheckMixIn, TestCase):
-    fixtures = ['auth', 'initial']
+class ContactTest(ShadowConTestCase):
     url = reverse("contact:contact")
     field_required = '<ul class="errorlist"><li>This field is required.</li></ul>'
 

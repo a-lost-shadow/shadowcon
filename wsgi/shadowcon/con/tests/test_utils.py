@@ -1,14 +1,12 @@
 from django.contrib.auth.models import User
-from django.test import TestCase
 from ..utils import friendly_username, get_registration, get_con_value, is_registration_open
 from ..models import ConInfo, Registration, BlockRegistration
 from datetime import timedelta
 from django.utils import timezone
+from shadowcon.tests.utils import ShadowConTestCase
 
 
-class UtilsTest(TestCase):
-    fixtures = ['auth', 'initial']
-
+class UtilsTest(ShadowConTestCase):
     def test_friendly_username_no_first_last(self):
         user = User(username="username")
         self.assertEquals(friendly_username(user), "username")

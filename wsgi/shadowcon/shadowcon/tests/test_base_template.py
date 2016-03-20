@@ -1,15 +1,13 @@
 from django.core.urlresolvers import reverse
-from django.test import TestCase, Client
+from django.test import Client
 from django.utils import timezone
 from con.models import ConInfo
 from datetime import date, datetime
 import pytz
+from shadowcon.tests.utils import ShadowConTestCase
 
-from .utils import SectionCheckMixIn
 
-
-class BaseTemplateTest(SectionCheckMixIn, TestCase):
-    fixtures = ['auth', 'initial']
+class BaseTemplateTest(ShadowConTestCase):
     url = '/'
 
     def setUp(self):

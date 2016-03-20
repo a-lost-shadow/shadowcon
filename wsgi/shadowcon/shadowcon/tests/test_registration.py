@@ -2,13 +2,11 @@ from django.contrib.auth.models import User
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.template.exceptions import TemplateDoesNotExist
-from django.test import TestCase, Client
-from shadowcon.tests.utils import SectionCheckMixIn
+from django.test import Client
+from shadowcon.tests.utils import ShadowConTestCase
 
 
-class NewUserRegistrationTest(SectionCheckMixIn, TestCase):
-    fixtures = ['auth', 'initial']
-
+class NewUserRegistrationTest(ShadowConTestCase):
     def setUp(self):
         self.client = Client()
         self.registration_data = {"username": "username",
@@ -97,9 +95,7 @@ class NewUserRegistrationTest(SectionCheckMixIn, TestCase):
 
 
 # Mainly just want to test that our templates are being loaded
-class PasswordResetChangeTest(SectionCheckMixIn, TestCase):
-    fixtures = ['auth', 'initial']
-
+class PasswordResetChangeTest(ShadowConTestCase):
     def setUp(self):
         self.client = Client()
 
