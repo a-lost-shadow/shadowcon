@@ -1,8 +1,7 @@
-import unittest
-from .utils import SectionCheckMixIn
+from .utils import ShadowConTestCase
 
 
-class Tests(SectionCheckMixIn, unittest.TestCase):
+class Tests(ShadowConTestCase):
     data = "<a><b>Test Data</b></a>"
 
     def test_outer_section_parsing(self):

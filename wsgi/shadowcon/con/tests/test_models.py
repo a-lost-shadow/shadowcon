@@ -86,6 +86,14 @@ class ModelsTest(ShadowConTestCase):
         item = TimeBlock(text="Alternate Word Separation Test", sort_id=1)
         self.assertEquals("Word", item.second_word())
 
+    def test_time_block_has_second_word(self):
+        item = TimeBlock(text="Word Separation Test", sort_id=1)
+        self.assertEquals(True, item.has_second_word())
+
+    def test_time_block_no_second_word(self):
+        item = TimeBlock(text="Alternate", sort_id=1)
+        self.assertEquals(False, item.has_second_word())
+
     def test_time_bock_string(self):
         item = TimeBlock(text="Word Separation Test", sort_id=1)
         self.assertEquals("Word Separation Test[1]", str(item))

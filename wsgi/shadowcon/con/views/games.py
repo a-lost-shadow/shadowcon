@@ -101,7 +101,7 @@ offsets = {u'friday': -18,
 
 def get_block_offset(time_block):
     offset = offsets.get(unicode(time_block.first_word().lower()), 100)
-    if "midnight" == time_block.second_word().lower():
+    if time_block.has_second_word() and "midnight" == time_block.second_word().lower():
         offset += 24
     return offset
 

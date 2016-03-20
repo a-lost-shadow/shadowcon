@@ -1,20 +1,23 @@
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import Client
+from django.test.utils import override_settings
 from django.utils.html import escape
 from django.utils import timezone
 from con.models import Game, TimeBlock, TimeSlot, Location
+from con.views.games import get_block_offset, get_start, get_width, get_index
 from shadowcon.tests.utils import ShadowConTestCase, data_func
-from ddt import ddt
+from ddt import ddt, data, unpack
+from datetime import timedelta
 import os
 import json
 
 
 def get_games():
     with open(os.path.dirname(os.path.realpath(__file__)) + "/../../fixtures/games.json") as f:
-        data = json.load(f)
+        json_data = json.load(f)
 
-    game_data = filter(lambda x: "con.game" == x["model"], data)
+    game_data = filter(lambda x: "con.game" == x["model"], json_data)
     return map(lambda x: int(x["pk"]), game_data)
 
 
@@ -48,7 +51,6 @@ def check_game(test_class, actual, modified_date):
 
 class GameEditTest(ShadowConTestCase):
     def setUp(self):
-        # Every test needs access to the request factory.
         self.client = Client()
 
     def test_cannot_modify_other_games_get(self):
@@ -131,7 +133,6 @@ class NewGameTest(ShadowConTestCase):
     login_url = reverse('login') + "?next=" + url
 
     def setUp(self):
-        # Every test needs access to the request factory.
         self.client = Client()
 
     def test_create_without_login_redirects_get(self):
@@ -187,7 +188,6 @@ class NewGameTest(ShadowConTestCase):
 @ddt
 class GameListTest(ShadowConTestCase):
     def setUp(self):
-        # Every test needs access to the request factory.
         self.client = Client()
         self.response = self.client.get(reverse('con:games_list'))
 
@@ -209,3 +209,164 @@ class GameListTest(ShadowConTestCase):
         self.assertStringContains(section, "Potential Triggers: %s<br />" % game.triggers, "p")
         self.assertStringContains(section, "Description:<br />\\s+%s<br />" % game.description,
                                   'div id="%s"' % game.header_target(), '/div')
+
+
+@ddt
+class GameScheduleAjaxTest(ShadowConTestCase):
+    url = reverse('con:ajax_location_schedule_view')
+
+    def setUp(self):
+        self.client = Client(HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+
+    def test_ajax_schedule_get(self):
+        response = self.client.get(self.url)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response._headers["content-type"], ('Content-Type', 'application/json'))
+
+    def test_ajax_schedule_get_locations(self):
+        response = self.client.get(self.url)
+        json_data = json.loads(response.content)["content"]["locations"]
+        items = map(lambda x: {"text": x.text, "id": x.id}, Location.objects.all())
+        self.assertEquals(json_data, items)
+
+    def test_ajax_schedule_get_blocks(self):
+        response = self.client.get(self.url)
+        json_data = json.loads(response.content)["content"]["blocks"]
+        items = map(lambda x: {"text": x.text, "id": x.id, "offset": get_block_offset(x)}, TimeBlock.objects.all())
+        self.assertEquals(json_data, items)
+
+    def test_ajax_schedule_get_slots(self):
+        response = self.client.get(self.url)
+        json_data = json.loads(response.content)["content"]["slots"]
+        items = map(lambda x: {"text": str(x), "id": x.id, "start": x.start, "width": get_width(x)},
+                    TimeSlot.objects.all())
+        self.assertEquals(json_data, items)
+
+    def lookup(self, clazz, json_data, index):
+        if -1 == index:
+            return None
+        return clazz.objects.get(id=json_data[index]["id"])
+
+    def test_ajax_schedule_get_games(self):
+        response = self.client.get(self.url)
+        json_data = json.loads(response.content)["content"]
+        for game_data in json_data["games"]:
+            game = Game.objects.get(id=game_data["id"])
+            self.assertEquals(game.title, game_data["title"])
+            self.assertEquals(game.gm, game_data["gm"])
+            self.assertEquals(game.location, self.lookup(Location, json_data["locations"], game_data["location"]))
+            self.assertEquals(game.time_block, self.lookup(TimeBlock, json_data["blocks"], game_data["time_block"]))
+            self.assertEquals(game.time_slot, self.lookup(TimeSlot, json_data["slots"], game_data["time_slot"]))
+            self.assertEquals(get_start(game), game_data["start"])
+            self.assertEquals(get_width(game.time_slot), game_data["width"])
+
+    @data(("Friday Night", -18), ("Friday MidniGHT", 6), ("Saturday day", 6), ("Saturday midnight", 30),
+          ("Sunday Too early", 30), ("Unknown With Words", 100), ("Unknown", 100))
+    @unpack
+    def test_get_block_offset(self, text, expected):
+        block = TimeBlock(text=text, sort_id=0)
+        self.assertEquals(get_block_offset(block), expected)
+
+    @data(("Friday Night", 18, 0), ("Friday MidniGHT", 2, 8), ("Saturday day", 10, 16), ("Saturday midnight", 0, 30),
+          ("Sunday Too early", 10, 40), ("Unknown With Words", 10, 110), ("Unknown", 20, 120))
+    @unpack
+    def test_get_start(self, block, start, expected):
+        game = Game()
+        game.time_block = TimeBlock(text=block, sort_id=0)
+        game.time_slot = TimeSlot(start=start, stop=23)
+        self.assertEquals(get_start(game), expected)
+
+    def test_get_start_no_block(self):
+        game = Game()
+        game.time_block = None
+        game.time_slot = TimeSlot(start=5, stop=23)
+        self.assertEquals(get_start(game), 100)
+
+    def test_get_start_no_slot(self):
+        game = Game()
+        game.time_block = TimeBlock(text="Friday Night", sort_id=0)
+        game.time_slot = None
+        self.assertEquals(get_start(game), 100)
+
+    def test_get_start_no_block_no_slot(self):
+        game = Game()
+        self.assertEquals(get_start(game), 100)
+
+    @data((0, 10, 10), (5, 4, 23), (18.5, 23.75, 5.25), (12, 12, 0))
+    @unpack
+    def test_get_width(self, start, stop, expected):
+        self.assertEquals(get_width(TimeSlot(start=start, stop=stop)), expected)
+
+    def test_get_width_none(self):
+        self.assertEquals(get_width(None), 0)
+
+    @data(([1, 2, 3], 1, 0), ([1, 2, 3], 2, 1), ([1, 2, 3], 3, 2), ([1, 2, 3], 4, -1))
+    @unpack
+    def test_get_index(self, object_list, obj, expected):
+        self.assertEquals(get_index(obj, object_list), expected)
+
+    @override_settings(DEBUG=True)
+    def test_post_not_logged_in_debug(self):
+        response = self.client.post(self.url)
+        json_data = json.loads(response.content)
+
+        self.assertEquals(json_data["statusText"], "INTERNAL SERVER ERROR")
+        self.assertTrue(json_data["content"].startswith("Exception\nNot logged in!  Only staff have access to this"))
+        self.assertEquals(json_data["status"], 500)
+
+    @override_settings(DEBUG=False)
+    def test_post_not_logged_in(self):
+        response = self.client.post(self.url)
+        json_data = json.loads(response.content)
+
+        self.assertEquals(json_data["statusText"], "INTERNAL SERVER ERROR")
+        self.assertEquals(json_data["content"], "An error occured while processing an AJAX request.")
+        self.assertEquals(json_data["status"], 500)
+
+    @override_settings(DEBUG=True)
+    def test_post_not_staff_debug(self):
+        self.client.login(username="user", password="123")
+        response = self.client.post(self.url)
+        json_data = json.loads(response.content)
+
+        self.assertEquals(json_data["statusText"], "INTERNAL SERVER ERROR")
+        self.assertTrue(json_data["content"].startswith("Exception\nOnly staff have access to this function"))
+        self.assertEquals(json_data["status"], 500)
+
+    @override_settings(DEBUG=False)
+    def test_post_not_staff(self):
+        self.client.login(username="user", password="123")
+        response = self.client.post(self.url)
+        json_data = json.loads(response.content)
+
+        self.assertEquals(json_data["statusText"], "INTERNAL SERVER ERROR")
+        self.assertEquals(json_data["content"], "An error occured while processing an AJAX request.")
+        self.assertEquals(json_data["status"], 500)
+
+    def run_post_test(self, username):
+        self.client.login(username=username, password="123")
+
+        game = Game()
+        modify_game(game)
+        game.user = User.objects.get(username=username)
+        game.last_modified = timezone.now() - timedelta(days=-1)
+        game.save()
+        modified_date = timezone.now()
+
+        game = Game.objects.get(title="Unit Test Title")
+        self.client.post(self.url, {"id": game.id,
+                                    "location": Location.objects.all()[0].id,
+                                    "time_block": TimeBlock.objects.all()[0].id,
+                                    "time_slot": TimeSlot.objects.all()[0].id})
+
+        game = Game.objects.get(title="Unit Test Title")
+        self.assertGreater(game.last_scheduled, modified_date)
+        self.assertEquals(game.time_block, TimeBlock.objects.all()[0])
+        self.assertEquals(game.time_slot, TimeSlot.objects.all()[0])
+        self.assertEquals(game.location, Location.objects.all()[0])
+
+    def test_post_staff(self):
+        self.run_post_test("staff")
+
+    def test_post_admin(self):
+        self.run_post_test("admin")
