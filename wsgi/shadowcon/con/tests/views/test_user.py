@@ -1,13 +1,10 @@
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import Client
-from django.test.utils import override_settings
-from django.utils.html import escape
 from django.utils import timezone
-from con.models import Game, TimeBlock, TimeSlot, Location, Registration, PaymentOption, ConInfo, BlockRegistration, get_choice
-from con.views.games import get_block_offset, get_start, get_width, get_index
+from con.models import TimeBlock, Registration, PaymentOption, ConInfo, BlockRegistration, get_choice
 from shadowcon.tests.utils import ShadowConTestCase, data_func
-from ddt import ddt, data, unpack
+from ddt import ddt
 from datetime import timedelta
 import os
 import json
@@ -20,6 +17,14 @@ def get_time_blocks():
 
     block_data = filter(lambda x: "con.timeblock" == x["model"], json_data)
     return map(lambda x: int(x["pk"]), block_data)
+
+
+def get_payment_options():
+    with open(os.path.dirname(os.path.realpath(__file__)) + "/../../fixtures/initial.json") as f:
+        json_data = json.load(f)
+
+    item_data = filter(lambda x: "con.paymentoption" == x["model"], json_data)
+    return map(lambda x: x["pk"], item_data)
 
 
 class UserProfileTest(ShadowConTestCase):
@@ -219,4 +224,94 @@ class AttendanceViewTest(ShadowConTestCase):
         self.client.post(self.url, self.create_block_dict())
         for block_reg in BlockRegistration.objects.filter(registration=registration):
             self.assertEquals(block_reg.attendance, BlockRegistration.ATTENDANCE_MAYBE)
+
+    def test_registration_closed(self):
+        con = ConInfo.objects.all()[0]
+        con.registration_opens = timezone.now() + timedelta(days=1)
+        con.save()
+        response = self.client.get(self.url)
+        self.assertSectionContains(response, "Registration has not opened", "h2")
+
+
+@ddt
+class PaymentViewTest(ShadowConTestCase):
+    url = reverse('con:payment')
+
+    def setUp(self):
+        self.client = Client()
+        self.client.login(username="admin", password="123")
+        self.response = self.client.get(self.url)
+
+    def test_get_not_logged_in(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertRedirects(response, reverse('login') + "?next=" + self.url)
+
+    def test_get_on_waiting_list(self):
+        con = ConInfo.objects.all()[0]
+        con.max_attendees = 0
+        con.save()
+        response = self.client.get(self.url)
+        self.assertSectionContains(response, "Wait List Registration Recorded", "h2")
+
+    def test_get_already_paid(self):
+        registration = Registration.objects.get(user=User.objects.get(username="admin"))
+        registration.payment_received = True
+        registration.save()
+        response = self.client.get(self.url)
+        self.assertRedirects(response, reverse('con:user_profile'))
+
+    def test_get_not_registered(self):
+        self.client.login(username="user", password="123")
+        response = self.client.get(self.url)
+        self.assertSectionContains(response, "Registration Entry Not Found", "h2")
+
+    def test_get_header(self):
+        self.assertSectionContains(self.response, "Payment", "h2")
+
+    def test_get_attendance(self):
+        self.assertSectionContains(self.response, "2016 Registration:\\s+<ul>\\s+<li>Friday Night: Maybe", "h2", "br /")
+
+    @data_func(get_payment_options())
+    def test_payment_tab_headers(self, option_slug):
+        option = PaymentOption.objects.get(pk=option_slug)
+        pattern = '<li%s><a href="#%s" data-toggle="tab">%s</a></li>' % \
+                  (' class="active"' if option.name == "Paypal" else "", option.slug, option.name)
+        self.assertSectionContains(self.response, pattern, 'ul id="tabs" class="nav nav-tabs" data-tabs="tabs"', "/ul")
+
+    @data_func(get_payment_options())
+    def test_payment_tab_content(self, option_slug):
+        option = PaymentOption.objects.get(pk=option_slug)
+        start = 'div class="tab-pane%s" id="%s"' % (' active' if option.name == "Paypal" else "", option.slug)
+        self.assertSectionContains(self.response, option.description, start, '/div')
+        self.assertSectionContains(self.response, '<form action="." method="POST">', start, '/div',
+                                   option.button is None)
+        if option.button is not None:
+            self.assertSectionContains(self.response, option.button, start, '/div')
+
+    def test_post_not_logged_in(self):
+        self.client.logout()
+        response = self.client.post(self.url, {"payment": "cash"})
+        self.assertRedirects(response, reverse('login') + "?next=" + self.url)
+
+    def test_post_on_waiting_list(self):
+        con = ConInfo.objects.all()[0]
+        con.max_attendees = 0
+        con.save()
+        response = self.client.post(self.url, {"payment": "cash"})
+        self.assertSectionContains(response, "Wait List Registration Recorded", "h2")
+        self.assertEquals(Registration.objects.get(user=User.objects.get(username="admin")).payment.slug, 'paypal')
+
+    def test_post_redirect(self):
+        response = self.client.post(self.url, {"payment": "cash"})
+        self.assertRedirects(response, reverse('con:user_profile'))
+
+    def test_post_model(self):
+        self.client.post(self.url, {"payment": "cash"})
+        self.assertEquals(Registration.objects.get(user=User.objects.get(username="admin")).payment.slug, 'cash')
+
+    def test_post_not_registered(self):
+        self.client.login(username="user", password="123")
+        response = self.client.post(self.url, {"payment": "cash"})
+        self.assertSectionContains(response, "Registration Entry Not Found", "h2")
 
