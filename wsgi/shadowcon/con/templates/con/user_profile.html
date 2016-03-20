@@ -36,5 +36,5 @@ Payment Received: {{ payment_received|yesno }}<br />
 {% endif %}
 <br />
 {% endif %}
-{% show_user_games request.user is_registration_open %}
+{% show_user_games request.user %}
 {% endblock %}

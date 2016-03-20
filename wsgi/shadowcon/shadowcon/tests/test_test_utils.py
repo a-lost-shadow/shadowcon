@@ -6,13 +6,13 @@ class Tests(SectionCheckMixIn, unittest.TestCase):
     data = "<a><b>Test Data</b></a>"
 
     def test_outer_section_parsing(self):
-        self.assertEquals(self.get_section(self.data, 'a'), '<a><b>Test Data</b>')
+        self.assertEquals(self.get_section(self.data, 'a'), '<a><b>Test Data</b></a>')
 
     def test_inner_section_parsing(self):
-        self.assertEquals(self.get_section(self.data, 'b'), '<b>Test Data')
+        self.assertEquals(self.get_section(self.data, 'b'), '<b>Test Data</b>')
 
     def test_custom_section_parsing(self):
-        self.assertEquals(self.get_section(self.data, 'b', '/a'), '<b>Test Data</b>')
+        self.assertEquals(self.get_section(self.data, 'b', '/a'), '<b>Test Data</b></a>')
 
     def test_invalid_section_start(self):
         with self.assertRaises(AssertionError) as e:

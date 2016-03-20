@@ -1,7 +1,7 @@
 <h3>Submitted Games</h3>
 <div id="accordion">
   {% for game in games %}
-  <h3>
+  <h3 id="{{ game.header_target }}">
     <svg>
       <polygon id="selected" points="6,4.5 10,8 6,11.5"></polygon>
       <polygon id="unselected" points="4,6 12,6 8,10"></polygon>
@@ -15,9 +15,7 @@
     <br />
     <b>Description:</b><br>
     {{ game.description | safe }}<br>
-    {% if is_registration_open %}
     <a href="{% url 'con:edit_game' game.id %}">Edit</a>
-    {% endif %}
   </div>
   {% endfor %}
 </div>
