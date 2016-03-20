@@ -1,9 +1,10 @@
 from django.core.exceptions import ValidationError
 from django.forms import CharField, ChoiceField, Form
+from django.utils import timezone
 from django.utils.translation import ugettext as _
 from registration.forms import RegistrationForm as BaseRegistrationForm, get_user_model
 
-from .models import BlockRegistration, TimeBlock
+from .models import BlockRegistration, TimeBlock, Registration, PaymentOption
 from .utils import get_registration, friendly_username
 from contact.utils import mail_list
 
@@ -28,19 +29,21 @@ class NewUserForm(BaseRegistrationForm):
 
 
 class AttendanceForm(Form):
-    def __init__(self, registration=None, user=None, *args, **kwargs):
+    def __init__(self, user=None, *args, **kwargs):
         super(AttendanceForm, self).__init__(*args, **kwargs)
 
+        registration = Registration.objects.filter(user=user)
         if registration:
-            date = registration[0].registration_date.astimezone(pytz.timezone('US/Pacific'))
-            self.registration = date.strftime("%B %d, %Y %I:%M:%S %p %Z")
+            self.registration = registration[0]
+            date = self.registration.registration_date.astimezone(pytz.timezone('US/Pacific'))
+            self.registration_str = date.strftime("%B %d, %Y %I:%M:%S %p %Z")
         self.user = user
         self.user_friendly = friendly_username(user)
 
         if 'data' not in kwargs:
             kwargs['data'] = {}
             if registration:
-                entries = BlockRegistration.objects.filter(registration=registration)
+                entries = BlockRegistration.objects.filter(registration=self.registration)
                 for entry in entries:
                     time_block = TimeBlock.objects.filter(text__exact=entry.time_block)
                     if time_block:
@@ -66,9 +69,18 @@ class AttendanceForm(Form):
 
         mail_list("Registration", subject_details, message, "no-reply@shadowcon.net", list_name="registration")
 
-    def save(self, registration, new_entry):
+    def save(self):
+        new_entry = not hasattr(self, "registration")
+        if new_entry:
+            self.registration = Registration(user=self.user,
+                                             registration_date=timezone.now(),
+                                             payment=PaymentOption.objects.all()[0])
+
+        self.registration.last_updated = timezone.now()
+        self.registration.save()
+
         old_regs = {}
-        for reg in BlockRegistration.objects.filter(registration=registration):
+        for reg in BlockRegistration.objects.filter(registration=self.registration):
             old_regs[reg.time_block] = reg
 
         for key, field in self.time_block_fields().iteritems():
@@ -78,12 +90,13 @@ class AttendanceForm(Form):
                 old_regs[time_block].save()
                 del old_regs[time_block]
             else:
-                BlockRegistration(registration=registration, time_block=time_block, attendance=field.initial).save()
+                BlockRegistration(registration=self.registration, time_block=time_block,
+                                  attendance=field.initial).save()
 
         for obsolete in old_regs.values():
             obsolete.delete()
 
-        self.send_mail(registration, new_entry)
+        self.send_mail(self.registration, new_entry)
 
     def clean(self):
         result = super(AttendanceForm, self).clean()

@@ -15,7 +15,7 @@
 {% block content %}
 {% if form.registration %}
 <h2>Updating Registration for {{ form.user_friendly }}</h2>
-Original Registration Date: {{ form.registration  }}
+Original Registration Date: {{ form.registration_str  }}
 {% else %}
 <h2>Initial Registration for {{ form.user_friendly }}</h2>
 {% endif %}
@@ -41,6 +41,5 @@ Original Registration Date: {{ form.registration  }}
     {% endfor %}
   </table>
   <input class="submit" type="submit" value="Submit Registration">
-  <input type="hidden" name="next" value="{{ next }}" />
 </form>
 {% endblock %}

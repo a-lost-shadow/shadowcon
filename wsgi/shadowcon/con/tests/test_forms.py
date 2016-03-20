@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.core import mail
 from ..forms import AttendanceForm
 from ..models import Registration, BlockRegistration, TimeBlock, PaymentOption
 from ..utils import friendly_username
@@ -65,17 +64,32 @@ class FormsTest(ShadowConTestCase):
         user.save()
         self.assertEquals(0, len(Registration.objects.filter(user=user)))
 
-        form = AttendanceForm(user=user, registration=Registration.objects.filter(user=user))
+        form = AttendanceForm(user=user)
         time_blocks = TimeBlock.objects.all()
         for time_block in time_blocks:
             self.assertEquals(BlockRegistration.ATTENDANCE_YES, form.fields["block_%d" % time_block.id].initial)
+
+    def test_attendance_form_registration_string_not_registered(self):
+        user = User(username="username")
+        user.save()
+        form = AttendanceForm(user=user)
+        self.assertFalse(hasattr(form, "registration_str"))
+
+    def test_attendance_form_registration_string_registered(self):
+        user = User.objects.get(username="admin")
+        form = AttendanceForm(user=user)
+
+        registration = Registration.objects.get(user=user)
+        date = registration.registration_date.astimezone(pytz.timezone('US/Pacific'))
+
+        self.assertEquals(form.registration_str, date.strftime("%B %d, %Y %I:%M:%S %p %Z"))
 
     @data_func(get_user_registration(1))
     def test_attendance_form_with_registration_initial(self, block_id):
         block_reg = BlockRegistration.objects.get(id=block_id)
 
         user = User.objects.get(id=1)
-        form = AttendanceForm(user=user, registration=Registration.objects.filter(user=user))
+        form = AttendanceForm(user=user)
         time_block = TimeBlock.objects.get(text=block_reg.time_block)
         self.assertEquals(form.fields["block_%d" % time_block.id].initial, block_reg.attendance)
 
@@ -91,22 +105,17 @@ class FormsTest(ShadowConTestCase):
             self.assertEquals(v.label, time_blocks[index].text)
 
     def check_attendance_email(self, initial, registration, expected_message):
-        self.assertEquals(len(mail.outbox), 1)
-        email = mail.outbox[0]
-
         username = friendly_username(registration.user)
 
         if initial:
-            self.assertEquals(email.subject, 'ShadowCon [Registration]: Initial Registration for %s' % username)
+            subject = 'ShadowCon [Registration]: Initial Registration for %s' % username
         else:
-            self.assertEquals(email.subject, 'ShadowCon [Registration]: Updated Registration for %s' % username)
+            subject = 'ShadowCon [Registration]: Updated Registration for %s' % username
 
         date = registration.registration_date.astimezone(pytz.timezone('US/Pacific'))
         expected_message += "\nInitially registered on %s" % date.strftime("%B %d, %Y %I:%M:%S %p %Z")
 
-        self.assertEquals(email.body, expected_message)
-        self.assertEquals(email.from_email, "no-reply@shadowcon.net")
-        self.assertEquals(email.to, ['admin@na.com'])
+        self.assertEmail(['admin@na.com'], "no-reply@shadowcon.net", expected_message, subject=subject)
 
     def test_attendance_form_save_email_initial(self):
         user = User(username="username")
@@ -114,16 +123,13 @@ class FormsTest(ShadowConTestCase):
 
         form = AttendanceForm(user=user)
 
-        registration = Registration(user=user, registration_date=timezone.now(), last_updated=timezone.now(),
-                                    payment=PaymentOption.objects.all()[0], payment_received=True)
-        registration.save()
-        form.save(registration, True)
+        form.save()
 
         expected_message = "username will be attending for:\n"
         for time_block in TimeBlock.objects.all().order_by('sort_id'):
             expected_message += " - %s: Yes\n" % time_block.text
 
-        self.check_attendance_email(True, registration, expected_message)
+        self.check_attendance_email(True, Registration.objects.get(user=user), expected_message)
 
     def test_attendance_form_save_email_update(self):
         user = User(username="username", first_name="First", last_name="Last")
@@ -138,12 +144,12 @@ class FormsTest(ShadowConTestCase):
         set_registration(registration, "Friday Midnight", BlockRegistration.ATTENDANCE_MAYBE)
         set_registration(registration, "Sunday Morning", BlockRegistration.ATTENDANCE_NO)
 
-        form = AttendanceForm(user=user, registration=Registration.objects.filter(user=user))
+        form = AttendanceForm(user=user)
 
         for block_reg in BlockRegistration.objects.filter(registration=registration):
             block_reg.delete()
 
-        form.save(registration, False)
+        form.save()
 
         expected_message = """First Last will be attending for:
  - Friday Night: Maybe
@@ -162,13 +168,12 @@ class FormsTest(ShadowConTestCase):
 
         form = AttendanceForm(user=user)
 
-        registration = Registration(user=user, registration_date=timezone.now(), last_updated=timezone.now(),
-                                    payment=PaymentOption.objects.all()[0], payment_received=True)
-        registration.save()
+        self.assertEquals(len(Registration.objects.filter(user=user)), 0)
 
-        self.assertEquals(len(BlockRegistration.objects.filter(registration=registration)), 0)
+        form.save()
 
-        form.save(registration, True)
+        self.assertEquals(len(Registration.objects.filter(user=user)), 1)
+        registration = Registration.objects.get(user=user)
 
         self.assertEquals(len(BlockRegistration.objects.filter(registration=registration)), 7)
         for block_reg in BlockRegistration.objects.filter(registration=registration):
@@ -178,11 +183,11 @@ class FormsTest(ShadowConTestCase):
         user = User(username="username")
         user.save()
 
-        form = AttendanceForm(user=user)
-
-        registration = Registration(user=user, registration_date=timezone.now(), last_updated=timezone.now(),
+        first_registered = timezone.now() - timedelta(days=1)
+        registration = Registration(user=user, registration_date=first_registered, last_updated=first_registered,
                                     payment=PaymentOption.objects.all()[0], payment_received=True)
         registration.save()
+        form = AttendanceForm(user=user)
 
         init_sat_night = set_registration(registration, "Saturday Evening", BlockRegistration.ATTENDANCE_NO)
         init_sat_mid = set_registration(registration, "Saturday Midnight", BlockRegistration.ATTENDANCE_NO)
@@ -190,9 +195,14 @@ class FormsTest(ShadowConTestCase):
 
         self.assertEquals(len(BlockRegistration.objects.filter(registration=registration)), 3)
 
+        modified_date = timezone.now()
         for k in form.time_block_fields().keys():
             form.fields[k].initial = BlockRegistration.ATTENDANCE_MAYBE
-        form.save(registration, True)
+        form.save()
+
+        updated_registration = Registration.objects.get(id=registration.id)
+        self.assertEquals(updated_registration.registration_date, first_registered)
+        self.assertGreater(updated_registration.last_updated, modified_date)
 
         self.assertEquals(len(BlockRegistration.objects.filter(registration=registration)), 7)
         for block_reg in BlockRegistration.objects.filter(registration=registration):

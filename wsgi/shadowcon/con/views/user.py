@@ -3,11 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.views.generic.edit import FormView, UpdateView
-from django.utils import timezone
 from registration.backends.hmac.views import RegistrationView as BaseRegistrationView
 
 from ..forms import NewUserForm, AttendanceForm
-from ..models import BlockRegistration, Registration, PaymentOption
+from ..models import Registration, PaymentOption
 from ..utils import friendly_username, is_registration_open
 from .common import RegistrationOpenMixin, NotOnWaitingListMixin
 
@@ -22,8 +21,7 @@ def show_profile(request):
         payment = registration[0].payment
         payment_received = registration[0].payment_received
 
-    context = {'title': " - Account Profile",
-               'name': friendly_username(request.user),
+    context = {'name': friendly_username(request.user),
                'is_registration_open': is_registration_open(),
                'payment': payment,
                'payment_received': payment_received,
@@ -34,29 +32,13 @@ def show_profile(request):
 class AttendanceView(RegistrationOpenMixin, LoginRequiredMixin, FormView):
     template_name = 'con/register_attendance.html'
     form_class = AttendanceForm
-    model = Registration
-    success_url = '/new_attend/'
 
     def form_valid(self, form):
-        registration = Registration.objects.filter(user=self.request.user)
-        new_entry = 0 == len(registration)
-        if new_entry:
-            registration = Registration(user=self.request.user,
-                                        registration_date=timezone.now(),
-                                        payment=PaymentOption.objects.all()[0])
-        else:
-            registration = registration[0]
-            BlockRegistration.objects.filter(registration=registration).delete()
-
-        registration.last_updated = timezone.now()
-        registration.save()
-        form.save(registration, new_entry)
-
+        form.save()
         return super(AttendanceView, self).form_valid(form)
 
     def get_form_kwargs(self):
         result = super(AttendanceView, self).get_form_kwargs()
-        result['registration'] = Registration.objects.filter(user=self.request.user)
         result['user'] = self.request.user
         return result
 
