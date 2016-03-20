@@ -1,23 +1,25 @@
 {% extends "base.html" %}
 {% load con_info %}
 
-{% block title %} - Game Descriptions{% endblock %}
+{% block title %}- Game Descriptions{% endblock %}
 
 {% block content %}
 <h2>{% con_year %} Games</h2>
 
 {% for game in object_list %}
-<h3 id="{{ game.header_target }}">{{ game.title }}</h3>
-<p>
-  {{ game.gm }}<br />
-  {{ game.combined_time }}<br />
-  Players: {{ game.number_players }}<br />
-  System: {{ game.system }}<br />
-  Potential Triggers: {{ game.triggers }}<br />
-</p>
-<p>
-  Description:<br>
-  {{ game.description | safe }}<br>
-</p>
+<div id="{{ game.header_target }}">
+  <h3>{{ game.title }}</h3>
+  <p>
+    GM: {{ game.gm }}<br />
+    Time Slot: {{ game.combined_time }}<br />
+    Players: {{ game.number_players }}<br />
+    System: {{ game.system }}<br />
+    Potential Triggers: {{ game.triggers }}<br />
+  </p>
+  <p>
+    Description:<br />
+    {{ game.description | safe }}<br />
+  </p>
+</div>
 {% endfor %}
 {% endblock %}

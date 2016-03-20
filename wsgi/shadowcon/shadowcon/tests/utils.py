@@ -1,9 +1,12 @@
+from django.core import mail
 from django.test import TestCase
 import ddt
 import re
 
 
-class SectionCheckMixIn(object):
+class ShadowConTestCase(TestCase):
+    fixtures = ['auth', 'initial', 'games']
+
     def get_section(self, response, section, section_terminator=None):
         if section_terminator is None:
             section_terminator = "/" + section
@@ -11,15 +14,17 @@ class SectionCheckMixIn(object):
         section = "<%s>" % section
         section_terminator = "<%s>" % section_terminator
 
-        response_str = str(response)
+        return self.extract_between(str(response), section, section_terminator)
+
+    def extract_between(self, string, section, section_terminator):
         try:
-            start = response_str.index(section)
-            stop = response_str.index(section_terminator, start) + len(section_terminator)
+            start = string.index(section)
+            stop = string.index(section_terminator, start) + len(section_terminator)
         except ValueError:
             self.fail("Couldn't find subsection defined by '%s' & '%s' in %s" %
-                      (section, section_terminator, response_str))
+                      (section, section_terminator, string))
 
-        return response_str[start:stop]
+        return string[start:stop]
 
     def assertSectionContains(self, response, pattern, section, section_terminator=None, expected=True):
         self.assertEqual(response.status_code, 200)
@@ -37,6 +42,20 @@ class SectionCheckMixIn(object):
         else:
             self.assertIsNone(re.search(pattern, sub_str), "Didn't expect %s" % fail_msg)
 
+    def get_email(self):
+        self.assertEquals(len(mail.outbox), 1)
+        return mail.outbox[0]
+
+    def assertEmail(self, to, from_email, body, subject_source=None, subject_details=None, subject=None):
+        if subject is None:
+            subject = "ShadowCon [%s]: %s" % (subject_source, subject_details)
+
+        email = self.get_email()
+        self.assertEquals(email.subject, subject)
+        self.assertEquals(email.to, to)
+        self.assertEquals(email.from_email, from_email)
+        self.assertEquals(email.body, body)
+
 
 def data_func(*values):
     """
@@ -48,7 +67,3 @@ def data_func(*values):
         setattr(func, ddt.DATA_ATTR, values[0])
         return func
     return wrapper
-
-
-class ShadowConTestCase(SectionCheckMixIn, TestCase):
-    fixtures = ['auth', 'initial', 'games']

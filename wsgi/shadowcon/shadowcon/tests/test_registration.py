@@ -1,5 +1,4 @@
 from django.contrib.auth.models import User
-from django.core import mail
 from django.core.urlresolvers import reverse
 from django.template.exceptions import TemplateDoesNotExist
 from django.test import Client
@@ -30,8 +29,7 @@ class NewUserRegistrationTest(ShadowConTestCase):
     def test_new_user_email(self):
         self.client.post(reverse('con:new_user'), self.registration_data)
 
-        self.assertEquals(len(mail.outbox), 1)
-        email = mail.outbox[0]
+        email = self.get_email()
 
         self.assertEquals(email.subject, "Verify your account with ShadowCon")
         self.assertEquals(email.from_email, "webmaster@localhost")
@@ -57,8 +55,7 @@ class NewUserRegistrationTest(ShadowConTestCase):
     def get_activate_link(self):
         self.client.post(reverse('con:new_user'), self.registration_data)
 
-        self.assertEquals(len(mail.outbox), 1)
-        email = mail.outbox[0]
+        email = self.get_email()
         start = str(email.body).index('/accounts/activate')
         stop = str(email.body).index('This link will expire')
         return str(email.body)[start:stop].strip()
@@ -146,8 +143,7 @@ class PasswordResetChangeTest(ShadowConTestCase):
     def test_password_reset_confirm_valid_link(self):
         self.client.post(reverse('password_reset'), {"email": "user@na.com"})
 
-        self.assertEquals(len(mail.outbox), 1)
-        email = mail.outbox[0]
+        email = self.get_email()
         start = str(email.body).index('/reset')
         stop = str(email.body).index('Your username, in case you\'ve forgotten: user')
         link = str(email.body)[start:stop].strip()
