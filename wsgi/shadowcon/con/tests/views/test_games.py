@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase, RequestFactory, Client
-from ..models import Game
+from con.models import Game
 
 
 class SimpleTest(TestCase):
