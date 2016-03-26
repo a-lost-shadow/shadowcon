@@ -1,8 +1,10 @@
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.forms import CharField, ChoiceField, Form
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from registration.forms import RegistrationForm as BaseRegistrationForm, get_user_model
+from reversion import revisions as reversion
 
 from .models import BlockRegistration, TimeBlock, Registration, PaymentOption
 from .utils import get_registration, friendly_username
@@ -76,25 +78,29 @@ class AttendanceForm(Form):
                                              registration_date=timezone.now(),
                                              payment=PaymentOption.objects.all()[0])
 
-        self.registration.last_updated = timezone.now()
-        self.registration.save()
+        with transaction.atomic(), reversion.create_revision():
+            reversion.set_user(self.user)
+            reversion.set_comment("Form Submission - %s" % ("Initial" if new_entry else "Update"))
 
-        old_regs = {}
-        for reg in BlockRegistration.objects.filter(registration=self.registration):
-            old_regs[reg.time_block] = reg
+            self.registration.last_updated = timezone.now()
+            self.registration.save()
 
-        for key, field in self.time_block_fields().iteritems():
-            time_block = TimeBlock.objects.filter(id=key.split("_")[1])[0].text
-            if time_block in old_regs:
-                old_regs[time_block].attendance = field.initial
-                old_regs[time_block].save()
-                del old_regs[time_block]
-            else:
-                BlockRegistration(registration=self.registration, time_block=time_block,
-                                  attendance=field.initial).save()
+            old_regs = {}
+            for reg in BlockRegistration.objects.filter(registration=self.registration):
+                old_regs[reg.time_block] = reg
 
-        for obsolete in old_regs.values():
-            obsolete.delete()
+            for key, field in self.time_block_fields().iteritems():
+                time_block = TimeBlock.objects.filter(id=key.split("_")[1])[0].text
+                if time_block in old_regs:
+                    old_regs[time_block].attendance = field.initial
+                    old_regs[time_block].save()
+                    del old_regs[time_block]
+                else:
+                    BlockRegistration(registration=self.registration, time_block=time_block,
+                                      attendance=field.initial).save()
+
+            for obsolete in old_regs.values():
+                obsolete.delete()
 
         self.send_mail(self.registration, new_entry)
 

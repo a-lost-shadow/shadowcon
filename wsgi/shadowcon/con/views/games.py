@@ -4,12 +4,13 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.utils import timezone
 from django.views import generic
+from reversion import revisions as reversion
 
 from collections import OrderedDict
 
 from ..models import Game, Location, TimeBlock, TimeSlot
 from ..utils import friendly_username
-from .common import RegistrationOpenMixin, NotOnWaitingListMixin, IsStaffMixin
+from .common import RegistrationOpenMixin, NotOnWaitingListMixin, IsStaffMixin, RevisionMixin
 from contact.utils import mail_list
 
 game_fields = ['title', 'gm', 'duration', 'number_players', 'system', 'triggers', 'description']
@@ -59,15 +60,23 @@ class NewGameView(RegistrationOpenMixin, LoginRequiredMixin, NotOnWaitingListMix
         # since the form doesn't have the user or time, we need to insert it
         form.instance.user = self.request.user
         form.instance.last_modified = timezone.now()
-        result = super(NewGameView, self).form_valid(form)
+
+        with reversion.create_revision():
+            reversion.set_user(self.request.user)
+            reversion.set_comment("Form Submission - New")
+
+            result = super(NewGameView, self).form_valid(form)
         self.send_email()
         return result
 
 
-class UpdateGameView(RegistrationOpenMixin, LoginRequiredMixin, NotOnWaitingListMixin, generic.UpdateView):
+class UpdateGameView(RegistrationOpenMixin, LoginRequiredMixin, NotOnWaitingListMixin, RevisionMixin,
+                     generic.UpdateView):
     model = Game
     fields = game_fields
     waiting_list_template = 'con/game_submission_wait_list.html'
+    revision_log_prefix = "Form Submission"
+    changed_ignore_list = ["last_modified"]
 
     def get_success_url(self):
         return reverse('con:user_profile')
@@ -159,26 +168,29 @@ class SchedulerHandler(AJAXMixin, generic.base.View):
         if not request.user.is_staff and not request.user.is_superuser:
             raise Exception("Only staff have access to this function")
 
+        keys = [('location', Location), ('time_block', TimeBlock), ('time_slot', TimeSlot)]
+        key_text = 0
+        key_db_object = 1
+
         game_id = request.POST.get('id')
-        location_id = request.POST.get('location')
-        time_block_id = request.POST.get('time_block')
-        time_slot_id = request.POST.get('time_slot')
-
         game = Game.objects.get(id=game_id)
-        if location_id:
-            game.location = Location.objects.get(id=location_id)
-        else:
-            game.location = None
 
-        if time_block_id:
-            game.time_block = TimeBlock.objects.get(id=time_block_id)
-        else:
-            game.time_block = None
+        changed = []
 
-        if time_slot_id:
-            game.time_slot = TimeSlot.objects.get(id=time_slot_id)
-        else:
-            game.time_slot = None
+        for key in keys:
+            incoming_id = request.POST.get(key[key_text])
+            old = getattr(game, key[key_text])
+            new = key[key_db_object].objects.get(id=incoming_id) if incoming_id else None
 
+            setattr(game, key[key_text], new)
+            if old != new:
+                changed.append(key[key_text])
+
+        changed.sort()
         game.last_scheduled = timezone.now()
-        game.save()
+
+        with reversion.create_revision():
+            reversion.set_user(request.user)
+            reversion.set_comment("AJAX Schedule Submission - %s Changed" % ", ".join(changed))
+
+            game.save()

@@ -7,6 +7,7 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils.html import strip_tags
 from django.conf import settings
+from reversion import revisions as reversion
 import re
 
 from .fields import HourField
@@ -106,6 +107,7 @@ class Location(models.Model):
         return self.text
 
 
+@reversion.register()
 class Game(models.Model):
     title = models.CharField(max_length=256)
     gm = models.CharField(max_length=256)
@@ -178,6 +180,7 @@ class PaymentOption(models.Model):
         super(PaymentOption, self).save(*args, **kwargs)
 
 
+@reversion.register()
 class Registration(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     registration_date = models.DateTimeField()
@@ -190,6 +193,7 @@ class Registration(models.Model):
                (self.user, self.registration_date, self.payment, self.payment_received, self.last_updated)
 
 
+@reversion.register()
 class BlockRegistration(models.Model):
     ATTENDANCE_MAYBE = 'M'
     ATTENDANCE_YES = 'Y'

@@ -6,6 +6,7 @@ from con.models import TimeBlock, Registration, PaymentOption, ConInfo, BlockReg
 from shadowcon.tests.utils import ShadowConTestCase, data_func
 from ddt import ddt
 from datetime import timedelta
+from reversion import revisions as reversion
 import os
 import json
 import pytz
@@ -208,8 +209,21 @@ class AttendanceViewTest(ShadowConTestCase):
         self.client.login(username="user", password="123")
         self.client.post(self.url, self.create_block_dict())
         registration = Registration.objects.get(user=User.objects.get(username="user"))
+
         for block_reg in BlockRegistration.objects.filter(registration=registration):
             self.assertEquals(block_reg.attendance, BlockRegistration.ATTENDANCE_MAYBE)
+
+    def test_attendance_post_not_registered_revision(self):
+        self.client.login(username="user", password="123")
+        self.client.post(self.url, self.create_block_dict())
+        registration = Registration.objects.get(user=User.objects.get(username="user"))
+        reg_versions = reversion.get_for_object(registration)
+        self.assertEquals(len(reg_versions), 1)
+        self.assertEquals(reg_versions[0].revision.comment, "Form Submission - Initial")
+        for block_reg in BlockRegistration.objects.filter(registration=registration):
+            block_versions = reversion.get_for_object(block_reg)
+            self.assertEquals(len(block_versions), 1)
+            self.assertEquals(block_versions[0].revision, reg_versions[0].revision)
 
     def test_attendance_post_registered_redirect(self):
         response = self.client.post(self.url, self.create_block_dict())
@@ -224,6 +238,21 @@ class AttendanceViewTest(ShadowConTestCase):
         self.client.post(self.url, self.create_block_dict())
         for block_reg in BlockRegistration.objects.filter(registration=registration):
             self.assertEquals(block_reg.attendance, BlockRegistration.ATTENDANCE_MAYBE)
+
+    def test_attendance_post_registered_revision(self):
+        registration = Registration.objects.get(user=User.objects.get(username="admin"))
+        for block_reg in BlockRegistration.objects.filter(registration=registration):
+            block_reg.attendance = BlockRegistration.ATTENDANCE_YES
+            block_reg.save()
+
+        self.client.post(self.url, self.create_block_dict())
+        reg_versions = map(lambda x: x, reversion.get_for_object(registration))
+        self.assertEquals(len(reg_versions), 1)
+        self.assertEquals(reg_versions[0].revision.comment, "Form Submission - Update")
+
+        for block_reg in BlockRegistration.objects.filter(registration=registration):
+            block_versions = map(lambda x: x, reversion.get_for_object(block_reg))
+            self.assertEquals(block_versions[0].revision, reg_versions[0].revision)
 
     def test_registration_closed(self):
         con = ConInfo.objects.all()[0]

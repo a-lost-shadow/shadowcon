@@ -1,4 +1,5 @@
 from django.contrib import admin
+from reversion_compare.admin import CompareVersionAdmin
 
 from .models import EmailList, GroupEmailEntry, UserEmailEntry, ContactReason
 
@@ -14,11 +15,11 @@ class UserInline(admin.TabularInline):
 
 
 @admin.register(EmailList)
-class EmailListAdmin(admin.ModelAdmin):
+class EmailListAdmin(CompareVersionAdmin):
     inlines = [GroupInline, UserInline]
     list_display = ['name']
 
 
 @admin.register(ContactReason)
-class ContactReasonAdmin(admin.ModelAdmin):
+class ContactReasonAdmin(CompareVersionAdmin):
     list_display = ['name', 'list']

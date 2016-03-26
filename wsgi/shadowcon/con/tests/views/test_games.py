@@ -9,6 +9,7 @@ from con.views.games import get_block_offset, get_start, get_width, get_index
 from shadowcon.tests.utils import ShadowConTestCase, data_func
 from ddt import ddt, data, unpack
 from datetime import timedelta
+from reversion import revisions as reversion
 import os
 import json
 
@@ -49,6 +50,7 @@ def check_game(test_class, actual, modified_date):
     test_class.assertIsNone(actual.location)
 
 
+@ddt
 class GameEditTest(ShadowConTestCase):
     def setUp(self):
         self.client = Client()
@@ -127,6 +129,29 @@ class GameEditTest(ShadowConTestCase):
 
         check_game(self, Game.objects.get(id=modified_game.id), modified_date)
 
+    @data(("", {}),
+          ("title", {"title": "New Title"}),
+          ("gm", {"gm": "New GM"}),
+          ("gm, title", {"gm": "New GM", "title": "New Title"}),
+          ("description, gm, title", {"gm": "New GM", "title": "New Title", "description": "<b>HA!</b>"}),
+          )
+    @unpack
+    def test_modify_revision(self, expected, updates):
+        self.client.login(username='staff', password='123')
+        user = User.objects.get(username='staff')
+        game = Game.objects.filter(user=user)[0]
+
+        post = game.__dict__
+        post.update(updates)
+
+        url = reverse('con:edit_game', args=[game.id])
+        self.client.post(url, game.__dict__)
+
+        versions = map(lambda x: x, reversion.get_for_object(game))
+
+        self.assertEquals(len(versions), 1)
+        self.assertEquals(versions[0].revision.comment, "Form Submission - %s Changed" % expected)
+
 
 class NewGameTest(ShadowConTestCase):
     url = reverse('con:submit_game')
@@ -183,6 +208,20 @@ class NewGameTest(ShadowConTestCase):
         game = Game.objects.get(title=game.title)
         self.assertEmail(['admin@na.com'], "no-reply@shadowcon.net", game.email_format(None),
                          "Game Submission", "staff submitted '%s'" % game.title)
+
+    def test_create_revision(self):
+        self.client.login(username='staff', password='123')
+        game = Game()
+        modify_game(game)
+
+        response = self.client.post(self.url, game.__dict__)
+        self.assertRedirects(response, reverse("con:user_profile"))
+
+        actual = Game.objects.get(title="Unit Test Title")
+
+        versions = reversion.get_for_object(actual)
+        self.assertEquals(len(versions), 1)
+        self.assertEquals(versions[0].revision.comment, "Form Submission - New")
 
 
 @ddt
@@ -467,3 +506,37 @@ class GameScheduleAjaxTest(ShadowConTestCase):
 
     def test_post_no_time_slot(self):
         self.run_post_test("staff", time_slot=None)
+
+    @data(("", {}),
+          ("location", {"location": 2}),
+          ("time_block", {"time_block": 2}),
+          ("time_slot", {"time_slot": 2}),
+          ("location, time_block", {"time_block": 2, "location": 2}),
+          ("location, time_slot", {"time_slot": 2, "location": 2}),
+          ("location, time_block, time_slot", {"time_slot": 2, "location": 2, "time_block": 2}),
+          )
+    @unpack
+    def test_post_revision(self, expected, updates):
+        self.client.login(username="staff", password="123")
+
+        post_data = {"location": 1, "time_block": 1, "time_slot": 1}
+
+        game = Game()
+        modify_game(game)
+        game.user = User.objects.get(username="staff")
+        game.location = Location.objects.get(id=post_data["location"])
+        game.time_block = TimeBlock.objects.get(id=post_data["time_block"])
+        game.time_slot = TimeSlot.objects.get(id=post_data["time_slot"])
+        game.last_modified = timezone.now()
+        game.save()
+
+        post_data["id"] = game.id
+
+        self.assertEquals(len(reversion.get_for_object(game)), 0)
+
+        post_data.update(updates)
+        self.client.post(self.url, post_data)
+
+        versions = reversion.get_for_object(game)
+        self.assertEquals(len(versions), 1)
+        self.assertEquals(versions[0].revision.comment, "AJAX Schedule Submission - %s Changed" % expected)

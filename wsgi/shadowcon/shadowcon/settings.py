@@ -55,6 +55,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_ajax',
+    'reversion',
+    'reversion_compare',
 )
 
 MIDDLEWARE_CLASSES = (

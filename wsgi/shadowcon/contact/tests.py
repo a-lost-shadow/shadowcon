@@ -1,9 +1,13 @@
+from ddt import ddt, data
 from django.core.urlresolvers import reverse
 from django.test import Client
+from reversion_compare.admin import CompareVersionAdmin
 from shadowcon.tests.utils import ShadowConTestCase
+from unittest import TestCase
 
-from .utils import mail_list
+from .admin import EmailListAdmin, ContactReasonAdmin
 from .models import EmailList
+from .utils import mail_list
 
 
 class ContactTest(ShadowConTestCase):
@@ -156,3 +160,10 @@ class ContactTest(ShadowConTestCase):
 
     def test_email_list_name(self):
         self.assertEquals(str(EmailList.objects.get(name="Admin")), "Admin")
+
+
+@ddt
+class AdminVersionTest(TestCase):
+    @data(EmailListAdmin, ContactReasonAdmin)
+    def test_has_versions(self, clazz):
+        self.assertTrue(CompareVersionAdmin.__subclasscheck__(clazz))

@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import AccessMixin
 from django.shortcuts import render
+from reversion import revisions as reversion
 
 from ..models import Registration
 from ..utils import is_registration_open, get_con_value
@@ -36,3 +37,33 @@ class NotOnWaitingListMixin(AccessMixin):
             return render(request, 'con/registration_not_found.html', {})
 
         return super(NotOnWaitingListMixin, self).dispatch(request, args, kwargs)
+
+
+class RevisionMixin(object):
+    orig_dict = {}
+    changed = []
+    revision_log_prefix = "Source Not Specified"
+    changed_ignore_list = []
+
+    def form_valid(self, form):
+        changed = []
+        for k, v in self.object.__dict__.iteritems():
+            if k.startswith("_") or k in self.changed_ignore_list:
+                continue
+
+            if self.orig_dict.get(k) != v:
+                changed.append(k)
+
+        changed.sort()
+
+        with reversion.create_revision():
+            reversion.set_user(self.request.user)
+            reversion.set_comment("Form Submission - %s Changed" % ", ".join(changed))
+
+            return super(RevisionMixin, self).form_valid(form)
+
+    def get_object(self, queryset=None):
+        result = super(RevisionMixin, self).get_object(queryset)
+        self.orig_dict.update(result.__dict__)
+        return result
+

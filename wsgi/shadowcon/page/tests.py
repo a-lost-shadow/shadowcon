@@ -1,10 +1,14 @@
+from ddt import ddt, data
 from django.core.urlresolvers import reverse
 from django.test import Client
+from reversion import revisions as reversion
+from reversion_compare.admin import CompareVersionAdmin
 from shadowcon.tests.utils import ShadowConTestCase
 
 import json
 import os
 
+from .admin import PageAdmin, TagAdmin
 from .models import Page, Tag
 
 
@@ -106,3 +110,42 @@ class PageTest(ShadowConTestCase):
 
     def test_tag_string(self):
         self.assertEquals(str(Tag(tag="a-123", content="123")), "a-123")
+
+
+@ddt
+class AdminVersionTest(ShadowConTestCase):
+    @data(PageAdmin, TagAdmin)
+    def test_has_versions(self, clazz):
+        self.assertTrue(CompareVersionAdmin.__subclasscheck__(clazz))
+
+    def test_page_versions(self):
+        self.client.login(username="admin", password="123")
+        page = Page(name="Test Name", url="test-url", content="Content goes here")
+        with reversion.create_revision():
+            reversion.set_comment("initial")
+            page.save()
+
+        versions = reversion.get_for_object(page)
+        self.assertEquals(len(versions), 1)
+        self.assertEquals(versions[0].revision.comment, "initial")
+
+        url = reverse("admin:page_page_change", args=[page.id])
+        self.client.post(url, {"name": "2nd name", "url": "test-url", "content": "New content"})
+        page = Page.objects.get(id=page.id)
+
+        self.assertEquals(page.name, "2nd name")
+        self.assertEquals(page.content, "New content")
+
+        versions = map(lambda x: x, reversion.get_for_object(page))
+        self.assertEquals(len(versions), 2)
+        self.assertEquals(versions[0].revision.comment, "Changed name and content.")
+
+        actual_initial = json.loads(versions[1].serialized_data)[0]
+        self.assertEquals(actual_initial["fields"]["name"], "Test Name")
+        self.assertEquals(actual_initial["fields"]["url"], "test-url")
+        self.assertEquals(actual_initial["fields"]["content"], "Content goes here")
+
+        actual_final = json.loads(versions[0].serialized_data)[0]
+        self.assertEquals(actual_final["fields"]["name"], "2nd name")
+        self.assertEquals(actual_final["fields"]["url"], "test-url")
+        self.assertEquals(actual_final["fields"]["content"], "New content")
