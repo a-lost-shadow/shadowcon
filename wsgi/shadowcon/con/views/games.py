@@ -38,7 +38,7 @@ class ScheduleEditView(LoginRequiredMixin, IsStaffMixin, generic.TemplateView):
     template_name = 'con/game_schedule_edit.html'
 
 
-class NewGameView(RegistrationOpenMixin, LoginRequiredMixin, NotOnWaitingListMixin, generic.CreateView):
+class NewGameView(LoginRequiredMixin, NotOnWaitingListMixin, generic.CreateView):
     model = Game
     fields = game_fields
     waiting_list_template = 'con/game_submission_wait_list.html'

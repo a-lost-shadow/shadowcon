@@ -4,7 +4,7 @@ from django.test import Client
 from django.test.utils import override_settings
 from django.utils.html import escape
 from django.utils import timezone
-from con.models import Game, TimeBlock, TimeSlot, Location
+from con.models import Game, TimeBlock, TimeSlot, Location, ConInfo
 from con.views.games import get_block_offset, get_start, get_width, get_index
 from shadowcon.tests.utils import ShadowConTestCase, data_func
 from ddt import ddt, data, unpack
@@ -185,6 +185,18 @@ class NewGameTest(ShadowConTestCase):
                                     'ckeditortype">', '</textarea>')[14:-11]
         self.assertEquals(desc, "")
 
+    def test_create_logged_in_before_con_open_get(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() + timedelta(days=1)
+        info.save()
+        self.test_create_logged_in_get()
+
+    def test_create_logged_in_after_con_open_get(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() - timedelta(days=1)
+        info.save()
+        self.test_create_logged_in_get()
+
     def test_create_logged_in_post(self):
         self.client.login(username='staff', password='123')
         game = Game()
@@ -198,6 +210,18 @@ class NewGameTest(ShadowConTestCase):
 
         check_game(self, actual, modified_date)
         self.assertEquals(actual.user, User.objects.get(username="staff"))
+
+    def test_create_logged_in_before_con_open_post(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() + timedelta(days=1)
+        info.save()
+        self.test_create_logged_in_post()
+
+    def test_create_logged_in_after_con_open_post(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() - timedelta(days=1)
+        info.save()
+        self.test_create_logged_in_post()
 
     def test_create_email(self):
         self.client.login(username='staff', password='123')
