@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from ..utils import friendly_username, get_registration, get_con_value, is_registration_open
+from ..utils import friendly_username, get_registration, get_con_value, is_registration_open, is_pre_reg_open
 from ..models import ConInfo, Registration, BlockRegistration
 from datetime import timedelta
 from django.utils import timezone
@@ -65,6 +65,12 @@ class UtilsTest(ShadowConTestCase):
         con.registration_open = timezone.now() - timedelta(minutes=1)
         con.save()
         self.assertEquals(is_registration_open(), True)
+
+    def test_pre_reg_open(self):
+        self.assertTrue(is_pre_reg_open(User.objects.get(username="admin")))
+
+    def test_pre_reg_closed(self):
+        self.assertFalse(is_pre_reg_open(User.objects.get(username="user")))
 
     def test_get_registration_null(self):
         self.assertEquals(get_registration(None), ["Not Registered"])

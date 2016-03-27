@@ -92,7 +92,7 @@ class UserProfileTest(ShadowConTestCase):
         response = self.client.get(self.url)
         self.assertEquals(str(response).find("Payment Received:"), -1)
 
-    def test_registration_links_open(self):
+    def test_registration_links_con_open(self):
         con = ConInfo.objects.all()[0]
         con.registration_opens = timezone.now() - timedelta(minutes=1)
         con.save()
@@ -100,13 +100,24 @@ class UserProfileTest(ShadowConTestCase):
         pattern = '<a href="%s">Change Registration</a>' % reverse('con:register_attendance')
         self.assertGreater(str(response).find(pattern), -1)
 
-    def test_registration_links_closed(self):
+    def test_registration_links_con_closed_no_games_submitted(self):
+        con = ConInfo.objects.all()[0]
+        con.registration_opens = timezone.now() + timedelta(days=1)
+        con.save()
+        self.client.login(username="user", password="123")
+        response = self.client.get(self.url)
+        pattern = '<a href="%s">Change Registration</a>' % reverse('con:register_attendance')
+        self.assertEquals(str(response).find(pattern), -1)
+        pattern = '<a href="%s">Change Pre-registration</a>' % reverse('con:register_attendance')
+        self.assertEquals(str(response).find(pattern), -1)
+
+    def test_registration_links_con_closed_games_submitted(self):
         con = ConInfo.objects.all()[0]
         con.registration_opens = timezone.now() + timedelta(days=1)
         con.save()
         response = self.client.get(self.url)
-        pattern = '<a href="%s">Change Registration</a>' % reverse('con:register_attendance')
-        self.assertEquals(str(response).find(pattern), -1)
+        pattern = '<a href="%s">Change Pre-registration</a>' % reverse('con:register_attendance')
+        self.assertGreater(str(response).find(pattern), -1)
 
     def test_payment_link_not_paid(self):
         self.assertGreater(str(self.response).find('<a href="%s">Payment Options</a>' % reverse('con:payment')), -1)

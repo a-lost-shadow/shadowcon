@@ -1,6 +1,6 @@
 from django.utils import timezone
 
-from .models import ConInfo, Registration, BlockRegistration, TimeBlock, get_choice
+from .models import ConInfo, Registration, BlockRegistration, TimeBlock, get_choice, Game
 
 
 def friendly_username(user):
@@ -25,6 +25,13 @@ def get_con_value(parameter):
 def is_registration_open():
     open_date = get_con_value("registration_opens")
     return open_date <= timezone.now()
+
+
+def is_pre_reg_open(user):
+    if user and user.id is not None:
+        return len(Game.objects.filter(user=user)) > 0
+    else:
+        return False
 
 
 def get_registration(user):

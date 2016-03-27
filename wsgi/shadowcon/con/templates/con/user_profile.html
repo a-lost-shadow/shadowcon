@@ -29,10 +29,12 @@ Payment Received: {{ payment_received|yesno }}<br />
 {% endif %}
 {% if is_registration_open %}
 <a href="{% url 'con:register_attendance' %}">Change Registration</a><br />
-{% if payment %}
-{% if not payment_received %}
-<a href="{% url 'con:payment' %}">Payment Options</a><br />
+{% elif is_pre_reg_open %}
+<a href="{% url 'con:register_attendance' %}">Change Pre-registration</a><br />
 {% endif %}
+{% if is_registration_open or is_pre_reg_open %}
+{% if payment and not payment_received %}
+<a href="{% url 'con:payment' %}">Payment Options</a><br />
 {% endif %}
 <br />
 {% endif %}

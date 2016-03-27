@@ -7,7 +7,7 @@ from registration.backends.hmac.views import RegistrationView as BaseRegistratio
 
 from ..forms import NewUserForm, AttendanceForm
 from ..models import Registration, PaymentOption
-from ..utils import friendly_username, is_registration_open
+from ..utils import friendly_username, is_registration_open, is_pre_reg_open
 from .common import RegistrationOpenMixin, NotOnWaitingListMixin
 
 
@@ -23,6 +23,7 @@ def show_profile(request):
 
     context = {'name': friendly_username(request.user),
                'is_registration_open': is_registration_open(),
+               'is_pre_reg_open': is_pre_reg_open(request.user),
                'payment': payment,
                'payment_received': payment_received,
                }

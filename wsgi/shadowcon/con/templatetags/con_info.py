@@ -1,10 +1,9 @@
 from django import template
-from django.utils import dateformat, timezone
+from django.utils import dateformat
 from datetime import date
 import pytz
 
-from ..models import Game
-from ..utils import get_con_value
+from ..utils import get_con_value, is_pre_reg_open, is_registration_open
 
 register = template.Library()
 
@@ -54,14 +53,9 @@ def get_registration_open_string(raw_open_date, date_time_sep):
 @register.inclusion_tag('con/register_sidebar_links.html')
 def register_links(user):
     raw_open_date = get_con_value("registration_opens")
-    is_registration_open = raw_open_date <= timezone.now()
-    if user and user.id is not None:
-        is_pre_reg_open = len(Game.objects.filter(user=user)) > 0
-    else:
-        is_pre_reg_open = False
 
-    return {'is_registration_open': is_registration_open,
-            'is_pre_reg_open': is_pre_reg_open,
+    return {'is_registration_open': is_registration_open(),
+            'is_pre_reg_open': is_pre_reg_open(user),
             'open_date': get_registration_open_string(raw_open_date, "<br>")}
 
 
