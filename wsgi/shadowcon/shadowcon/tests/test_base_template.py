@@ -232,7 +232,7 @@ class BaseTemplateTest(ShadowConTestCase):
         info = ConInfo.objects.all()[0]
         info.registration_opens = pytz.timezone("US/Pacific").localize(datetime(3000, 1, 10, 02, 59, 58))
         info.save()
-        pattern = "<h3>Registration opens:</h3>\\s+<ul><li>January 10th, 3000<br>2:59:58 AM PST</li></ul>"
+        pattern = "<h3>Registration Opens:</h3>\\s+<ul><li>January 10th, 3000<br>2:59:58 AM PST</li></ul>"
         response = self.client.get(self.url)
         self.assertSectionContains(response, pattern, "aside", 'li id="deadlines"')
 
@@ -240,7 +240,7 @@ class BaseTemplateTest(ShadowConTestCase):
         info = ConInfo.objects.all()[0]
         info.registration_opens = pytz.timezone("US/Pacific").localize(datetime(2037, 6, 3, 22, 27, 42))
         info.save()
-        pattern = "<h3>Registration opens:</h3>\\s+<ul><li>June 3rd, 2037<br>10:27:42 PM PDT</li></ul>"
+        pattern = "<h3>Registration Opens:</h3>\\s+<ul><li>June 3rd, 2037<br>10:27:42 PM PDT</li></ul>"
         response = self.client.get(self.url)
         self.assertSectionContains(response, pattern, "aside", 'li id="deadlines"')
 

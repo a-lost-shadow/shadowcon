@@ -97,24 +97,43 @@ class TemplateTagsTest(ShadowConTestCase):
     def test_con_registration_opens_after(self):
         self.check_tag("con_info", "con_registration_opens", "March 11th, 2015 at 6:38:22 PM PDT")
 
-    def test_con_registration_links_before(self):
+    def test_con_registration_links_before_no_games_submitted(self):
         info = ConInfo.objects.all()[0]
         info.registration_opens = pytz.timezone("US/Pacific").localize(datetime(2037, 6, 3, 22, 27, 42))
         info.save()
-        self.check_tag("con_info", "register_links", """
+        self.check_tag("con_info", "register_links user", """
 
-          <li id="registration_opens"><h3>Registration opens:</h3>
+          <li><a href="/games/register/">Submit Game</a></li>
+
+          <li id="registration_opens"><h3>Registration Opens:</h3>
             <ul><li>June 3rd, 2037<br>10:27:42 PM PDT</li></ul>
           </li>
 
-
 """)
 
+    def test_con_registration_links_before_games_submitted(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = pytz.timezone("US/Pacific").localize(datetime(2037, 6, 3, 22, 27, 42))
+        info.save()
+        self.check_tag("con_info", "register_links user", """
+
+          <li><a href="/user/attendance/">Pre-register</a></li>
+
+          <li><a href="/games/register/">Submit Game</a></li>
+
+          <li id="registration_opens"><h3>Registration Opens:</h3>
+            <ul><li>June 3rd, 2037<br>10:27:42 PM PDT</li></ul>
+          </li>
+
+""", context=Context({"user": User.objects.get(username="admin")}))
+
     def test_con_registration_links_after(self):
-        self.check_tag("con_info", "register_links", """
+        self.check_tag("con_info", "register_links user", """
 
           <li><a href="/user/attendance/">Register</a></li>
+
           <li><a href="/games/register/">Submit Game</a></li>
+
 """)
 
     def test_user_attendance_with_user(self):
