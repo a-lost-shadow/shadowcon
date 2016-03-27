@@ -8,7 +8,8 @@
 <p>You're registration has been recorded.</p>
 {% user_attendance request.user %}
 <br />
-<p>We offer multiple ways to pay the registration cost.  Please select the method that you would prefer to use.</p>
+<p>We offer multiple ways to pay the registration cost.  Please select the method that you would prefer to use. As a
+  note, the fee to reserve your spot is non-refundable.</p>
 <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
   {% for payment in payment_options %}
   <li{% if object.payment == payment %} class="active"{% endif %}><a href="#{{ payment.slug }}" data-toggle="tab">{{ payment.name }}</a></li>
