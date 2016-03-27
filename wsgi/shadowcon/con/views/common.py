@@ -20,23 +20,45 @@ class IsStaffMixin(AccessMixin):
         return super(IsStaffMixin, self).dispatch(request, args, kwargs)
 
 
-class NotOnWaitingListMixin(AccessMixin):
-    waiting_list_template = 'con/registration_wait_list.html'
+def is_on_wait_list(entries, request):
+    found = False
+    for i in range(0, len(entries)):
+        entry = entries[i]
+        if request.user == entry.user:
+            found = True
+            if i >= get_con_value('max_attendees'):
+                return True
+            break
+    if not found:
+        raise ValueError('User registration not found')
 
+    return False
+
+
+class NotOnWaitingListMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
-        entries = Registration.objects.order_by('registration_date')
-        found = False
-        for i in range(0, len(entries)):
-            entry = entries[i]
-            if request.user == entry.user:
-                found = True
-                if i >= get_con_value('max_attendees'):
-                    return render(request, self.waiting_list_template, {})
-                break
-        if not found:
+        try:
+            if is_on_wait_list(Registration.objects.order_by('registration_date'), request):
+                return render(request, 'con/registration_wait_list.html', {})
+        except ValueError:
             return render(request, 'con/registration_not_found.html', {})
 
         return super(NotOnWaitingListMixin, self).dispatch(request, args, kwargs)
+
+
+class ConHasSpaceOrAlreadyRegisteredMixin(AccessMixin):
+    def dispatch(self, request, *args, **kwargs):
+        entries = Registration.objects.order_by('registration_date')
+        if len(entries) >= get_con_value('max_attendees'):
+            try:
+                if is_on_wait_list(entries, request):
+                    return render(request, 'con/game_submission_wait_list.html',
+                                  {"is_registration_open": is_registration_open()})
+            except ValueError:
+                return render(request, 'con/game_submission_con_full.html',
+                              {"is_registration_open": is_registration_open()})
+
+        return super(ConHasSpaceOrAlreadyRegisteredMixin, self).dispatch(request, args, kwargs)
 
 
 class RevisionMixin(object):

@@ -4,7 +4,8 @@ from django.test import Client
 from django.test.utils import override_settings
 from django.utils.html import escape
 from django.utils import timezone
-from con.models import Game, TimeBlock, TimeSlot, Location, ConInfo
+from con.models import Game, TimeBlock, TimeSlot, Location, ConInfo, Registration
+from con.utils import friendly_username
 from con.views.games import get_block_offset, get_start, get_width, get_index
 from shadowcon.tests.utils import ShadowConTestCase, data_func
 from ddt import ddt, data, unpack
@@ -194,13 +195,14 @@ class NewGameTest(ShadowConTestCase):
         response = self.client.post(self.url, game.__dict__)
         self.assertRedirects(response, self.login_url)
 
-    def test_create_logged_in_get(self):
-        self.client.login(username='staff', password='123')
+    def run_create_get_test(self, username):
+        self.client.login(username=username, password='123')
+        expected_username = friendly_username(User.objects.get(username=username))
 
         response = self.client.get(self.url)
         self.assertEquals(response.status_code, 200)
         self.assertSectionContains(response, 'value=', 'label for="id_title"', '/p', False)
-        self.assertSectionContains(response, 'value="staff"', 'label for="id_gm"', '/p')
+        self.assertSectionContains(response, 'value="%s"' % expected_username, 'label for="id_gm"', '/p')
         self.assertSectionContains(response, 'value=', 'label for="id_duration"', '/p', False)
         self.assertSectionContains(response, 'value=', 'label for="id_number_players"', '/p', False)
         self.assertSectionContains(response, 'value=', 'label for="id_system"', '/p', False)
@@ -209,20 +211,112 @@ class NewGameTest(ShadowConTestCase):
                                     'ckeditortype">', '</textarea>')[14:-11]
         self.assertEquals(desc, "")
 
-    def test_create_logged_in_before_con_open_get(self):
+    def test_create_logged_in_get(self):
+        self.run_create_get_test('staff')
+
+    def test_create_before_con_open_get(self):
         info = ConInfo.objects.all()[0]
         info.registration_opens = timezone.now() + timedelta(days=1)
         info.save()
-        self.test_create_logged_in_get()
+        self.run_create_get_test('staff')
 
-    def test_create_logged_in_after_con_open_get(self):
+    def test_create_before_con_open_new_user_get(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() + timedelta(days=1)
+        info.save()
+        user = User(username='new-user')
+        user.set_password('123')
+        user.save()
+        self.run_create_get_test('new-user')
+
+    def test_create_before_con_open_con_full_registered_get(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() + timedelta(days=1)
+        info.max_attendees = len(Registration.objects.all())
+        info.save()
+        self.run_create_get_test('admin')
+
+    def test_create_before_con_open_con_full_wait_list_get(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() + timedelta(days=1)
+        info.max_attendees = 0
+        info.save()
+        self.client.login(username='admin', password='123')
+
+        response = self.client.get(self.url)
+        self.assertEquals(response.status_code, 200)
+        self.assertSectionContains(response, 'On Wait List', 'h2')
+        self.assertSectionContains(response, 'we cannot accept game submissions from people on the wait ', 'h2', '/p')
+
+    def test_create_before_con_open_con_full_not_registered_get(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() + timedelta(days=1)
+        info.max_attendees = 0
+        info.save()
+        user = User(username='new-user')
+        user.set_password('123')
+        user.save()
+        self.client.login(username='new-user', password='123')
+
+        response = self.client.get(self.url)
+        self.assertEquals(response.status_code, 200)
+        self.assertSectionContains(response, 'Con Full', 'h2')
+        self.assertSectionContains(response, 'a href', 'section id="main" role="main"', '/section', False)
+        self.assertSectionContains(response, 'Once registration opens', 'section id="main" role="main"', '/section')
+
+    def test_create_after_con_open_get(self):
         info = ConInfo.objects.all()[0]
         info.registration_opens = timezone.now() - timedelta(days=1)
         info.save()
-        self.test_create_logged_in_get()
+        self.run_create_get_test('staff')
 
-    def test_create_logged_in_post(self):
-        self.client.login(username='staff', password='123')
+    def test_create_after_con_open_new_user_get(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() - timedelta(days=1)
+        info.save()
+        user = User(username='new-user')
+        user.set_password('123')
+        user.save()
+        self.run_create_get_test('new-user')
+
+    def test_create_after_con_open_con_full_registered_get(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() - timedelta(days=1)
+        info.max_attendees = len(Registration.objects.all())
+        info.save()
+        self.run_create_get_test('admin')
+
+    def test_create_after_con_open_con_full_games_wait_list_get(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() - timedelta(days=1)
+        info.max_attendees = 0
+        info.save()
+        self.client.login(username='admin', password='123')
+
+        response = self.client.get(self.url)
+        self.assertEquals(response.status_code, 200)
+        self.assertSectionContains(response, 'On Wait List', 'h2')
+        self.assertSectionContains(response, 'we cannot accept game submissions from people on the wait ', 'h2', '/p')
+
+    def test_create_after_con_open_con_full_not_registered_get(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() - timedelta(days=1)
+        info.max_attendees = 0
+        info.save()
+        user = User(username='new-user')
+        user.set_password('123')
+        user.save()
+        self.client.login(username='new-user', password='123')
+
+        response = self.client.get(self.url)
+        self.assertEquals(response.status_code, 200)
+        self.assertSectionContains(response, 'Con Full', 'h2')
+        self.assertSectionContains(response, 'a href', 'section id="main" role="main"', '/section')
+        self.assertSectionContains(response, 'Once registration opens', 'section id="main" role="main"', '/section',
+                                   False)
+
+    def run_create_post_test(self, username):
+        self.client.login(username=username, password='123')
         game = Game()
         modify_game(game)
         modified_date = timezone.now()
@@ -233,19 +327,119 @@ class NewGameTest(ShadowConTestCase):
         actual = Game.objects.get(title="Unit Test Title")
 
         check_game(self, actual, modified_date)
-        self.assertEquals(actual.user, User.objects.get(username="staff"))
+        self.assertEquals(actual.user, User.objects.get(username=username))
 
-    def test_create_logged_in_before_con_open_post(self):
+    def test_create_logged_in_post(self):
+        self.run_create_post_test('staff')
+
+    def test_create_before_con_open_post(self):
         info = ConInfo.objects.all()[0]
         info.registration_opens = timezone.now() + timedelta(days=1)
         info.save()
-        self.test_create_logged_in_post()
+        self.run_create_post_test('staff')
 
-    def test_create_logged_in_after_con_open_post(self):
+    def test_create_before_con_open_new_user_post(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() + timedelta(days=1)
+        info.save()
+        user = User(username='new-user')
+        user.set_password('123')
+        user.save()
+        self.run_create_post_test('new-user')
+
+    def test_create_before_con_open_con_full_registered_post(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() + timedelta(days=1)
+        info.max_attendees = len(Registration.objects.all())
+        info.save()
+        self.run_create_post_test('admin')
+
+    def test_create_before_con_open_con_full_wait_list_post(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() + timedelta(days=1)
+        info.max_attendees = 0
+        info.save()
+        self.client.login(username='admin', password='123')
+        game = Game()
+        modify_game(game)
+
+        response = self.client.post(self.url, game.__dict__)
+        self.assertEquals(response.status_code, 200)
+        self.assertSectionContains(response, 'On Wait List', 'h2')
+        self.assertSectionContains(response, 'we cannot accept game submissions from people on the wait ', 'h2', '/p')
+
+    def test_create_before_con_open_con_full_not_registered_post(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() + timedelta(days=1)
+        info.max_attendees = 0
+        info.save()
+        user = User(username='new-user')
+        user.set_password('123')
+        user.save()
+        self.client.login(username='new-user', password='123')
+        game = Game()
+        modify_game(game)
+
+        response = self.client.post(self.url, game.__dict__)
+        self.assertEquals(response.status_code, 200)
+        self.assertSectionContains(response, 'Con Full', 'h2')
+        self.assertSectionContains(response, 'a href', 'section id="main" role="main"', '/section', False)
+        self.assertSectionContains(response, 'Once registration opens', 'section id="main" role="main"', '/section')
+
+    def test_create_after_con_open_post(self):
         info = ConInfo.objects.all()[0]
         info.registration_opens = timezone.now() - timedelta(days=1)
         info.save()
-        self.test_create_logged_in_post()
+        self.run_create_post_test('staff')
+
+    def test_create_after_con_open_new_user_post(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() - timedelta(days=1)
+        info.save()
+        user = User(username='new-user')
+        user.set_password('123')
+        user.save()
+        self.run_create_post_test('new-user')
+
+    def test_create_after_con_open_con_full_registered_post(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() - timedelta(days=1)
+        info.max_attendees = len(Registration.objects.all())
+        info.save()
+        self.run_create_post_test('admin')
+
+    def test_create_after_con_open_con_full_wait_list_post(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() - timedelta(days=1)
+        info.max_attendees = 0
+        info.save()
+        self.client.login(username='admin', password='123')
+        game = Game()
+        modify_game(game)
+
+        response = self.client.post(self.url, game.__dict__)
+        self.assertEquals(response.status_code, 200)
+        self.assertSectionContains(response, 'On Wait List', 'h2')
+        self.assertSectionContains(response, 'we cannot accept game submissions from people on the wait ', 'h2', '/p')
+
+    def test_create_after_con_open_con_full_not_registered_post(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() - timedelta(days=1)
+        info.max_attendees = 0
+        info.save()
+        user = User(username='new-user')
+        user.set_password('123')
+        user.save()
+        self.client.login(username='new-user', password='123')
+        game = Game()
+        modify_game(game)
+
+        response = self.client.post(self.url, game.__dict__)
+        self.assertEquals(response.status_code, 200)
+        self.assertSectionContains(response, 'Con Full', 'h2')
+        self.assertSectionContains(response, 'a href', 'section id="main" role="main"', '/section')
+        self.assertSectionContains(response, 'Once registration opens', 'section id="main" role="main"', '/section',
+                                   False)
 
     def test_create_email(self):
         self.client.login(username='staff', password='123')
