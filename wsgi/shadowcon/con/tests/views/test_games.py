@@ -152,6 +152,30 @@ class GameEditTest(ShadowConTestCase):
         self.assertEquals(len(versions), 1)
         self.assertEquals(versions[0].revision.comment, "Form Submission - %s Changed" % expected)
 
+    def test_modify_before_con_open_get(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() + timedelta(days=1)
+        info.save()
+        self.test_can_modify_own_game_get()
+
+    def test_modify_after_con_open_get(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() - timedelta(days=1)
+        info.save()
+        self.test_can_modify_own_game_get()
+
+    def test_modify_before_con_open_post(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() + timedelta(days=1)
+        info.save()
+        self.test_can_modify_own_game_post()
+
+    def test_modify_after_con_open_post(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = timezone.now() - timedelta(days=1)
+        info.save()
+        self.test_can_modify_own_game_post()
+
 
 class NewGameTest(ShadowConTestCase):
     url = reverse('con:submit_game')

@@ -10,7 +10,7 @@ from collections import OrderedDict
 
 from ..models import Game, Location, TimeBlock, TimeSlot
 from ..utils import friendly_username
-from .common import RegistrationOpenMixin, NotOnWaitingListMixin, IsStaffMixin, RevisionMixin
+from .common import NotOnWaitingListMixin, IsStaffMixin, RevisionMixin
 from contact.utils import mail_list
 
 game_fields = ['title', 'gm', 'duration', 'number_players', 'system', 'triggers', 'description']
@@ -70,8 +70,7 @@ class NewGameView(LoginRequiredMixin, NotOnWaitingListMixin, generic.CreateView)
         return result
 
 
-class UpdateGameView(RegistrationOpenMixin, LoginRequiredMixin, NotOnWaitingListMixin, RevisionMixin,
-                     generic.UpdateView):
+class UpdateGameView(LoginRequiredMixin, NotOnWaitingListMixin, RevisionMixin, generic.UpdateView):
     model = Game
     fields = game_fields
     waiting_list_template = 'con/game_submission_wait_list.html'
