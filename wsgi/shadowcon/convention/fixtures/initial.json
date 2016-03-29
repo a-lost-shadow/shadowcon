@@ -1,0 +1,340 @@
+[
+  {
+    "model": "convention.coninfo",
+    "pk": 1,
+    "fields": {
+      "date": "2016-04-01",
+      "pre_reg_deadline": "2016-03-15",
+      "game_sub_deadline": "2016-03-22",
+      "location": "Behind the tardis",
+      "pre_reg_cost": 10.0,
+      "door_cost": 20.0,
+      "registration_opens": "2015-03-12T01:38:22Z",
+      "max_attendees": 10
+    }
+  },
+  {
+    "model": "convention.timeblock",
+    "pk": 1,
+    "fields": {
+      "text": "Friday Night",
+      "sort_id": 1
+    }
+  },
+  {
+    "model": "convention.timeblock",
+    "pk": 2,
+    "fields": {
+      "text": "Friday Midnight",
+      "sort_id": 2
+    }
+  },
+  {
+    "model": "convention.timeblock",
+    "pk": 3,
+    "fields": {
+      "text": "Saturday Morning",
+      "sort_id": 3
+    }
+  },
+  {
+    "model": "convention.timeblock",
+    "pk": 4,
+    "fields": {
+      "text": "Saturday Afternoon",
+      "sort_id": 4
+    }
+  },
+  {
+    "model": "convention.timeblock",
+    "pk": 5,
+    "fields": {
+      "text": "Saturday Evening",
+      "sort_id": 5
+    }
+  },
+  {
+    "model": "convention.timeblock",
+    "pk": 6,
+    "fields": {
+      "text": "Saturday Midnight",
+      "sort_id": 6
+    }
+  },
+  {
+    "model": "convention.timeblock",
+    "pk": 7,
+    "fields": {
+      "text": "Sunday Morning",
+      "sort_id": 7
+    }
+  },
+  {
+    "model": "convention.timeslot",
+    "pk": 1,
+    "fields": {
+      "start": 0.0,
+      "stop": 6.0
+    }
+  },
+  {
+    "model": "convention.timeslot",
+    "pk": 2,
+    "fields": {
+      "start": 0.0,
+      "stop": 4.0
+    }
+  },
+  {
+    "model": "convention.timeslot",
+    "pk": 3,
+    "fields": {
+      "start": 10.0,
+      "stop": 17.0
+    }
+  },
+  {
+    "model": "convention.timeslot",
+    "pk": 4,
+    "fields": {
+      "start": 10.0,
+      "stop": 16.0
+    }
+  },
+  {
+    "model": "convention.timeslot",
+    "pk": 5,
+    "fields": {
+      "start": 18.0,
+      "stop": 0.0
+    }
+  },
+  {
+    "model": "convention.timeslot",
+    "pk": 6,
+    "fields": {
+      "start": 18.0,
+      "stop": 2.0
+    }
+  },
+  {
+    "model": "convention.timeslot",
+    "pk": 7,
+    "fields": {
+      "start": 18.0,
+      "stop": 23.5
+    }
+  },
+  {
+    "model": "convention.timeslot",
+    "pk": 8,
+    "fields": {
+      "start": 19.0,
+      "stop": 2.0
+    }
+  },
+  {
+    "model": "convention.timeslot",
+    "pk": 9,
+    "fields": {
+      "start": 19.5,
+      "stop": 23.5
+    }
+  },
+  {
+    "model": "convention.location",
+    "pk": 1,
+    "fields": {
+      "text": "Boiler Room"
+    }
+  },
+  {
+    "model": "convention.location",
+    "pk": 2,
+    "fields": {
+      "text": "Dance Floor"
+    }
+  },
+  {
+    "model": "convention.location",
+    "pk": 3,
+    "fields": {
+      "text": "Dungeon"
+    }
+  },
+  {
+    "model": "convention.paymentoption",
+    "pk": "cash",
+    "fields": {
+      "name": "Cash",
+      "description": "<p>Good Hard Cash</p>",
+      "button": null
+    }
+  },
+  {
+    "model": "convention.paymentoption",
+    "pk": "chase-quick-pay",
+    "fields": {
+      "name": "Chase Quick Pay",
+      "description": "<p>Free option from Chase</p>",
+      "button": null
+    }
+  },
+  {
+    "model": "convention.paymentoption",
+    "pk": "paypal",
+    "fields": {
+      "name": "Paypal",
+      "description": "<p>Because they still need souls</p>",
+      "button": "<form action=\"https://www.paypal.com/cgi-bin/webscr\" method=\"post\" target=\"_top\">\r\n<input type=\"hidden\" name=\"cmd\" value=\"_s-xclick\">\r\n<input type=\"hidden\" name=\"hosted_button_id\" value=\"PS6VMUTU4QRVL\">\r\n<input type=\"image\" src=\"https://www.paypalobjects.com/en_US/i/btn/btn_buynow_LG.gif\" border=\"0\" name=\"submit\" alt=\"PayPal - The safer, easier way to pay online!\">\r\n<img alt=\"\" border=\"0\" src=\"https://www.paypalobjects.com/en_US/i/scr/pixel.gif\" width=\"1\" height=\"1\">\r\n</form>"
+    }
+  },
+  {
+    "model": "convention.registration",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "registration_date": "2016-03-05T19:49:20.322Z",
+      "last_updated": "2016-03-09T06:41:54.247Z",
+      "payment": "paypal",
+      "payment_received": false
+    }
+  },
+  {
+    "model": "convention.registration",
+    "pk": 2,
+    "fields": {
+      "user": 3,
+      "registration_date": "2016-03-14T03:08:15.314Z",
+      "last_updated": "2016-03-14T03:08:15.317Z",
+      "payment": "cash",
+      "payment_received": false
+    }
+  },
+  {
+    "model": "convention.blockregistration",
+    "pk": 183,
+    "fields": {
+      "time_block": "Friday Night",
+      "registration": 1,
+      "attendance": "M"
+    }
+  },
+  {
+    "model": "convention.blockregistration",
+    "pk": 184,
+    "fields": {
+      "time_block": "Friday Midnight",
+      "registration": 1,
+      "attendance": "M"
+    }
+  },
+  {
+    "model": "convention.blockregistration",
+    "pk": 185,
+    "fields": {
+      "time_block": "Saturday Morning",
+      "registration": 1,
+      "attendance": "Y"
+    }
+  },
+  {
+    "model": "convention.blockregistration",
+    "pk": 186,
+    "fields": {
+      "time_block": "Saturday Afternoon",
+      "registration": 1,
+      "attendance": "Y"
+    }
+  },
+  {
+    "model": "convention.blockregistration",
+    "pk": 187,
+    "fields": {
+      "time_block": "Saturday Evening",
+      "registration": 1,
+      "attendance": "Y"
+    }
+  },
+  {
+    "model": "convention.blockregistration",
+    "pk": 188,
+    "fields": {
+      "time_block": "Saturday Midnight",
+      "registration": 1,
+      "attendance": "Y"
+    }
+  },
+  {
+    "model": "convention.blockregistration",
+    "pk": 189,
+    "fields": {
+      "time_block": "Sunday Morning",
+      "registration": 1,
+      "attendance": "N"
+    }
+  },
+  {
+    "model": "convention.blockregistration",
+    "pk": 190,
+    "fields": {
+      "time_block": "Friday Night",
+      "registration": 2,
+      "attendance": "M"
+    }
+  },
+  {
+    "model": "convention.blockregistration",
+    "pk": 191,
+    "fields": {
+      "time_block": "Friday Midnight",
+      "registration": 2,
+      "attendance": "M"
+    }
+  },
+  {
+    "model": "convention.blockregistration",
+    "pk": 192,
+    "fields": {
+      "time_block": "Saturday Morning",
+      "registration": 2,
+      "attendance": "M"
+    }
+  },
+  {
+    "model": "convention.blockregistration",
+    "pk": 193,
+    "fields": {
+      "time_block": "Saturday Afternoon",
+      "registration": 2,
+      "attendance": "M"
+    }
+  },
+  {
+    "model": "convention.blockregistration",
+    "pk": 194,
+    "fields": {
+      "time_block": "Saturday Evening",
+      "registration": 2,
+      "attendance": "M"
+    }
+  },
+  {
+    "model": "convention.blockregistration",
+    "pk": 195,
+    "fields": {
+      "time_block": "Saturday Midnight",
+      "registration": 2,
+      "attendance": "M"
+    }
+  },
+  {
+    "model": "convention.blockregistration",
+    "pk": 196,
+    "fields": {
+      "time_block": "Sunday Morning",
+      "registration": 2,
+      "attendance": "N"
+    }
+  }
+]

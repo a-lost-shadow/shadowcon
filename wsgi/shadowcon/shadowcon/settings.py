@@ -47,7 +47,7 @@ INSTALLED_APPS = (
     'page.apps.PageConfig',
     'ckeditor',
     'contact.apps.ContactConfig',
-    'con.apps.ConConfig',
+    'convention.apps.ConConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

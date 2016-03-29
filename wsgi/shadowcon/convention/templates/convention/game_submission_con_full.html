@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load con_info %}
+
+{% block content %}
+<h2>Con Full</h2>
+<p>Unfortunately we have already filled the con at this time and cannot accept your game submission.</p>
+{% if is_registration_open %}
+<p>Please <a href="{% url 'convention:register_attendance' %}">Register</a>
+{% else %}
+<p>Once registration opens on {% con_registration_opens %} please register
+{% endif %}
+to place yourself on the wait list.  We will notify you if a spot opens up.</p>
+{% endblock %}

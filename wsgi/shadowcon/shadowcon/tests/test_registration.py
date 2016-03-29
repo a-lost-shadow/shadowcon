@@ -17,17 +17,17 @@ class NewUserRegistrationTest(ShadowConTestCase):
                                   }
 
     def test_get_registration_form(self):
-        response = self.client.get(reverse('con:new_user'))
+        response = self.client.get(reverse('convention:new_user'))
         self.assertEquals(response.status_code, 200)
         self.assertSectionContains(response, "Create New Account", "h2")
         self.assertSectionContains(response, "ShadowCon 2016", "title")
 
     def test_new_user_submit_redirect(self):
-        response = self.client.post(reverse('con:new_user'), self.registration_data)
+        response = self.client.post(reverse('convention:new_user'), self.registration_data)
         self.assertRedirects(response, reverse('registration_complete'))
 
     def test_new_user_email(self):
-        self.client.post(reverse('con:new_user'), self.registration_data)
+        self.client.post(reverse('convention:new_user'), self.registration_data)
 
         email = self.get_email()
 
@@ -38,7 +38,7 @@ class NewUserRegistrationTest(ShadowConTestCase):
         self.assertGreater(str(email.body).find("In order to activate your account, please go to"), -1)
 
     def test_new_user_model(self):
-        self.client.post(reverse('con:new_user'), self.registration_data)
+        self.client.post(reverse('convention:new_user'), self.registration_data)
         user = User.objects.get(username="username")
         self.assertEquals(user.first_name, "first")
         self.assertEquals(user.last_name, "last")
@@ -53,7 +53,7 @@ class NewUserRegistrationTest(ShadowConTestCase):
         self.assertSectionContains(response, "ShadowCon 2016", "title")
 
     def get_activate_link(self):
-        self.client.post(reverse('con:new_user'), self.registration_data)
+        self.client.post(reverse('convention:new_user'), self.registration_data)
 
         email = self.get_email()
         start = str(email.body).index('/accounts/activate')
@@ -106,7 +106,7 @@ class PasswordResetChangeTest(ShadowConTestCase):
         self.assertSectionContains(response, '<p><a href="%s">%s</a></p>' % (reverse('password_reset'),
                                                                              'Lost password\\?'),
                                    'section id="main" role="main"', '/section')
-        self.assertSectionContains(response, '<p><a href="%s">%s</a></p>' % (reverse('con:new_user'),
+        self.assertSectionContains(response, '<p><a href="%s">%s</a></p>' % (reverse('convention:new_user'),
                                                                              'Create New Account'),
                                    'section id="main" role="main"', '/section')
 

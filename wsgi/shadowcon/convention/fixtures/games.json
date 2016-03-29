@@ -1,0 +1,135 @@
+[
+ {
+    "model": "convention.game",
+    "pk": 2,
+    "fields": {
+      "title": "Created with a view",
+      "gm": "Adrian Barnes",
+      "time_block": 3,
+      "time_slot": 3,
+      "location": 3,
+      "number_players": "2",
+      "duration": "4 hours",
+      "system": "Daystar",
+      "triggers": "Sunshine and Rainbows",
+      "description": "<p>First attempt at submitting a game via a view.</p>",
+      "user": 1,
+      "last_modified": "2016-03-06T00:09:18Z",
+      "last_scheduled": "2016-03-12T23:45:54.613Z"
+    }
+  },
+  {
+    "model": "convention.game",
+    "pk": 3,
+    "fields": {
+      "title": "Down with the sun",
+      "gm": "Vampires",
+      "time_block": 5,
+      "time_slot": 6,
+      "location": 2,
+      "number_players": "20",
+      "duration": "4 hours",
+      "system": "Bonfire",
+      "triggers": "Fire, Blood",
+      "description": "<p>Vampires come out to play.</p>",
+      "user": 1,
+      "last_modified": "2016-03-06T00:09:18.412Z",
+      "last_scheduled": "2016-03-12T23:45:54.748Z"
+    }
+  },
+  {
+    "model": "convention.game",
+    "pk": 13,
+    "fields": {
+      "title": "Midnight Game",
+      "gm": "Sleep Deprivation",
+      "time_block": 6,
+      "time_slot": 1,
+      "location": 1,
+      "number_players": "20",
+      "duration": "4 hours",
+      "system": "Sleep",
+      "triggers": "Sleep",
+      "description": "<p>Not sleep</p>",
+      "user": 1,
+      "last_modified": "2015-03-12T07:30:52Z",
+      "last_scheduled": "2016-03-12T23:45:55.133Z"
+    }
+  },
+  {
+    "model": "convention.game",
+    "pk": 14,
+    "fields": {
+      "title": "Staff Game",
+      "gm": "staff",
+      "time_block": 3,
+      "time_slot": 4,
+      "location": 2,
+      "number_players": "6",
+      "duration": "6 hours",
+      "system": "Meeting",
+      "triggers": "Meetings",
+      "description": "<p>The staff&#39;s idea of a game</p>",
+      "user": 3,
+      "last_modified": "2016-03-13T18:04:04Z",
+      "last_scheduled": null
+    }
+  },
+  {
+    "model": "convention.game",
+    "pk": 15,
+    "fields": {
+      "title": "Missing Time Block",
+      "gm": "Isaac Friend of Adrian",
+      "time_block": null,
+      "time_slot": 1,
+      "location": 3,
+      "number_players": "2",
+      "duration": "2 minutes",
+      "system": "Reality",
+      "triggers": "Everything",
+      "description": "<p>I don&#39;t have a time block</p>",
+      "user": 1,
+      "last_modified": "2016-03-13T18:05:00Z",
+      "last_scheduled": null
+    }
+  },
+  {
+    "model": "convention.game",
+    "pk": 16,
+    "fields": {
+      "title": "Missing Time Slot",
+      "gm": "God",
+      "time_block": 1,
+      "time_slot": null,
+      "location": 1,
+      "number_players": "The world",
+      "duration": "You're life",
+      "system": "Reality",
+      "triggers": "Everything",
+      "description": "<p>I don&#39;t have a time slot</p>",
+      "user": 1,
+      "last_modified": "2016-03-13T18:05:35Z",
+      "last_scheduled": null
+    }
+  },
+  {
+    "model": "convention.game",
+    "pk": 17,
+    "fields": {
+      "title": "Missing Location",
+      "gm": "Vampires",
+      "time_block": 1,
+      "time_slot": 9,
+      "location": null,
+      "number_players": "3-5",
+      "duration": "6 hours",
+      "system": "Daystar",
+      "triggers": "Fire, Blood",
+      "description": "<p>I don&#39;t have a location</p>",
+      "user": 3,
+      "last_modified": "2016-03-13T18:06:27Z",
+      "last_scheduled": null
+    }
+  }
+]

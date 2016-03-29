@@ -23,13 +23,13 @@ class PageTest(ShadowConTestCase):
         Page(name="Tag test", url="tag_test", content="{{a}} {{b}} {{c}}").save()
 
     def run_initial_test(self, url, name, expected_title=None):
-        data = None
+        initial_data = None
         for entry in self.initial:
             if name == entry['fields']['name']:
-                data = entry['fields']['content']
+                initial_data = entry['fields']['content']
                 break
 
-        self.assertIsNotNone(data, "Couldn't find '%s' in initial data" % name)
+        self.assertIsNotNone(initial_data, "Couldn't find '%s' in initial data" % name)
 
         if not expected_title:
             expected_title = "ShadowCon 2016 - %s" % name
@@ -37,7 +37,7 @@ class PageTest(ShadowConTestCase):
         response = self.client.get(url)
 
         section = self.get_section(response, 'section id="main" role="main"', '/section')
-        self.assertGreater(section.find(data), -1, "Couldn't find initial data for %s in response" % name)
+        self.assertGreater(section.find(initial_data), -1, "Couldn't find initial data for %s in response" % name)
         self.assertSectionContains(response, expected_title, 'title')
 
     def test_home_as_index(self):

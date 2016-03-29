@@ -1,7 +1,7 @@
 from django.core.urlresolvers import reverse
 from django.test import Client
 from django.utils import timezone
-from con.models import ConInfo
+from convention.models import ConInfo
 from datetime import date, datetime
 import pytz
 from shadowcon.tests.utils import ShadowConTestCase
@@ -49,24 +49,24 @@ class BaseTemplateTest(ShadowConTestCase):
         self.assertSectionContains(response, '<li><a href="#">Games</a>\\s+<ul>', "nav")
 
     def test_game_menu_contains_schedule(self):
-        url = reverse('con:show_schedule')
+        url = reverse('convention:show_schedule')
         response = self.client.get(self.url)
         self.assertSectionContains(response, '<li><a href="%s">Schedule</a></li>' % url, 'a href="#">Games</a', '/ul')
 
     def test_game_menu_contains_list(self):
-        url = reverse('con:games_list')
+        url = reverse('convention:games_list')
         menu_start = 'a href="#">Games</a'
         response = self.client.get(self.url)
         self.assertSectionContains(response, '<li><a href="%s">Description</a></li>' % url, menu_start, '/ul')
 
     def test_game_menu_contains_submissions(self):
-        url = reverse('con:user_profile')
+        url = reverse('convention:user_profile')
         response = self.client.get(self.url)
         menu_start = 'a href="#">Games</a'
         self.assertSectionContains(response, '<li><a href="%s">Edit Submissions</a></li>' % url, menu_start, '/ul')
 
     def test_game_menu_no_schedule_games_without_user(self):
-        url = reverse('con:edit_schedule')
+        url = reverse('convention:edit_schedule')
         text = "Change Schedule"
         response = self.client.get(self.url)
         menu_start = 'a href="#">Games</a'
@@ -74,7 +74,7 @@ class BaseTemplateTest(ShadowConTestCase):
 
     def test_game_menu_no_schedule_games_with_user(self):
         self.client.login(username="user", password="123")
-        url = reverse('con:edit_schedule')
+        url = reverse('convention:edit_schedule')
         text = "Change Schedule"
         response = self.client.get(self.url)
         menu_start = 'a href="#">Games</a'
@@ -82,14 +82,14 @@ class BaseTemplateTest(ShadowConTestCase):
 
     def test_game_menu_schedule_games_with_staff(self):
         self.client.login(username="staff", password="123")
-        url = reverse('con:edit_schedule')
+        url = reverse('convention:edit_schedule')
         response = self.client.get(self.url)
         menu_start = 'a href="#">Games</a'
         self.assertSectionContains(response, '<li><a href="%s">Change Schedule</a></li>' % url, menu_start, '/ul')
 
     def test_game_menu_schedule_games_with_admin(self):
         self.client.login(username="admin", password="123")
-        url = reverse('con:edit_schedule')
+        url = reverse('convention:edit_schedule')
         menu_start = 'a href="#">Games</a'
         response = self.client.get(self.url)
         self.assertSectionContains(response, '<li><a href="%s">Change Schedule</a></li>' % url, menu_start, '/ul')
@@ -159,19 +159,19 @@ class BaseTemplateTest(ShadowConTestCase):
 
     def test_account_menu_contains_profile_with_user(self):
         self.client.login(username="user", password="123")
-        url = reverse('con:user_profile')
+        url = reverse('convention:user_profile')
         response = self.client.get(self.url)
         self.assertSectionContains(response, '<li><a href="%s">Profile</a></li>' % url, 'a href="#">Account</a', '/ul')
 
     def test_account_menu_contains_profile_with_staff(self):
         self.client.login(username="staff", password="123")
-        url = reverse('con:user_profile')
+        url = reverse('convention:user_profile')
         response = self.client.get(self.url)
         self.assertSectionContains(response, '<li><a href="%s">Profile</a></li>' % url, 'a href="#">Account</a', '/ul')
 
     def test_account_menu_contains_profile_with_admin(self):
         self.client.login(username="admin", password="123")
-        url = reverse('con:user_profile')
+        url = reverse('convention:user_profile')
         response = self.client.get(self.url)
         self.assertSectionContains(response, '<li><a href="%s">Profile</a></li>' % url, 'a href="#">Account</a', '/ul')
 
@@ -250,9 +250,9 @@ class BaseTemplateTest(ShadowConTestCase):
         info.save()
         pattern = '<li><a href="%s">%s</a></li>'
         response = self.client.get(self.url)
-        self.assertSectionContains(response, pattern % (reverse("con:register_attendance"), "Register"), "aside",
+        self.assertSectionContains(response, pattern % (reverse("convention:register_attendance"), "Register"), "aside",
                                    'li id="deadlines"')
-        self.assertSectionContains(response, pattern % (reverse("con:submit_game"), "Submit Game"), "aside",
+        self.assertSectionContains(response, pattern % (reverse("convention:submit_game"), "Submit Game"), "aside",
                                    'li id="deadlines"')
 
     # ########################## Deadlines #############################
