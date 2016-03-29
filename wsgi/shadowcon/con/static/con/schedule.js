@@ -143,12 +143,26 @@ function registerSchedule(svgId, dataLoc, tableId) {
     $("#save").click(function() {
       save(content, 0, dataLoc);
     });
+    $("#revert").click(function() {
+      revert(svgId, dataLoc, tableId);
+    });
   });
+}
+
+function revert(svgId, dataLoc, tableId) {
+  console.log("Revert Run")
+  $("#save").prop('disabled', true)
+  $("#revert").prop('disabled', true)
+  $("#save").off("click", "#schedule-save")
+  $("#revert").off("click", "#schedule-revert")
+  registerSchedule(svgId, dataLoc, tableId)
 }
 
 function save(content, i, dataLoc) {
   if (i >= content.games.length) {
+      console.log("Save Finished")
       $("#save").prop('disabled', true)
+      $("#revert").prop('disabled', true)
       return;
   }
 
@@ -169,6 +183,9 @@ function save(content, i, dataLoc) {
 }
 
 function constructEditTable(svgId, tableId, data) {
+  // clear out any data rows if they're already defined
+  $(tableId).find("tr:gt(0)").remove();
+
   rows = "";
   for (i = 0; i < data.games.length; i++) {
     rows += "<tr><td>" + data.games[i].title + "</td><td>" + data.games[i].gm + "</td>"
@@ -213,6 +230,7 @@ function constructEditTable(svgId, tableId, data) {
 
   $(".block_edit").change(function() {
     $("#save").prop('disabled', false);
+    $("#revert").prop('disabled', false);
     var game = data.games[$(this).prop("name")];
     game.time_block = parseInt($(this).prop("value"), 10);
 
@@ -223,6 +241,7 @@ function constructEditTable(svgId, tableId, data) {
 
   $(".slot_edit").change(function() {
     $("#save").prop('disabled', false);
+    $("#revert").prop('disabled', false);
     var game = data.games[$(this).prop("name")];
     game.time_slot = parseInt($(this).prop("value"), 10);
 
@@ -233,6 +252,7 @@ function constructEditTable(svgId, tableId, data) {
 
   $(".location_edit").change(function() {
     $("#save").prop('disabled', false);
+    $("#revert").prop('disabled', false);
     var game = data.games[$(this).prop("name")];
     game.location = parseInt($(this).prop("value"), 10);
 
