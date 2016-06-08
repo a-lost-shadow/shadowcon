@@ -32,12 +32,10 @@ DEBUG = os.environ.get('DEBUG') == 'True'
 
 from socket import gethostname
 ALLOWED_HOSTS = [
-    gethostname(), # For internal OpenShift load balancer security purposes.
-    os.environ.get('OPENSHIFT_APP_DNS'), # Dynamically map to the OpenShift gear name.
+    gethostname(),  # For internal OpenShift load balancer security purposes.
+    os.environ.get('OPENSHIFT_APP_DNS'),  # Dynamically map to the OpenShift gear name.
     "new.shadowcon.net",
     "www.shadowcon.net",
-    #'example.com', # First DNS alias (set up in the app)
-    #'www.example.com', # Second DNS alias (set up in the app)
 ]
 
 
@@ -177,9 +175,15 @@ CKEDITOR_CONFIGS = {
 LOGIN_REDIRECT_URL = '/user//profile/'
 LOGIN_URL = '/login/'
 
-EMAIL_HOST = 'mailtrap.io'
-EMAIL_PORT = '2525'
-EMAIL_HOST_USER = 'd7ab5d07b2e713'
-EMAIL_HOST_PASSWORD = '311e614f5e104f'
+# EMAIL_HOST = 'mailtrap.io'
+# EMAIL_PORT = '2525'
+# EMAIL_HOST_USER = 'd7ab5d07b2e713'
+# EMAIL_HOST_PASSWORD = '311e614f5e104f'
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = os.environ.get('GMAIL_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('GMAIL_PASSWD')
+EMAIL_PORT = '587'
 
 ACCOUNT_ACTIVATION_DAYS = 7  # One-week registration activation window;
