@@ -3,83 +3,28 @@
     "model": "contact.emaillist",
     "pk": 1,
     "fields": {
-      "name": "Base List"
-    }
-  },
-  {
-    "model": "contact.emaillist",
-    "pk": 2,
-    "fields": {
       "name": "registration"
     }
   },
   {
     "model": "contact.emaillist",
-    "pk": 3,
+    "pk": 2,
     "fields": {
       "name": "game_submission"
     }
   },
   {
     "model": "contact.emaillist",
-    "pk": 4,
+    "pk": 3,
     "fields": {
       "name": "Website"
     }
   },
   {
     "model": "contact.emaillist",
-    "pk": 5,
-    "fields": {
-      "name": "Admin"
-    }
-  },
-  {
-    "model": "contact.groupemailentry",
-    "pk": 1,
-    "fields": {
-      "list": 4,
-      "group": 1
-    }
-  },
-  {
-    "model": "contact.useremailentry",
-    "pk": 1,
-    "fields": {
-      "list": 1,
-      "user": 1
-    }
-  },
-  {
-    "model": "contact.useremailentry",
-    "pk": 2,
-    "fields": {
-      "list": 2,
-      "user": 1
-    }
-  },
-  {
-    "model": "contact.useremailentry",
-    "pk": 3,
-    "fields": {
-      "list": 3,
-      "user": 1
-    }
-  },
-  {
-    "model": "contact.useremailentry",
     "pk": 4,
     "fields": {
-      "list": 4,
-      "user": 1
-    }
-  },
-  {
-    "model": "contact.useremailentry",
-    "pk": 5,
-    "fields": {
-      "list": 5,
-      "user": 2
+      "name": "Admin"
     }
   },
   {
@@ -87,7 +32,7 @@
     "pk": 1,
     "fields": {
       "name": "Something Broke",
-      "list": 4
+      "list": 3
     }
   },
   {
@@ -95,7 +40,7 @@
     "pk": 2,
     "fields": {
       "name": "Admins make things better",
-      "list": 5
+      "list": 4
     }
   }
 ]
