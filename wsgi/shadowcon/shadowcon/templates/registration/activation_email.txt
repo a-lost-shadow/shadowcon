@@ -4,6 +4,9 @@ In order to activate your account, please go to: http://{{ site }}{% url 'regist
 
 This link will expire in {{ expiration_days }} days.
 
+If you did not create this account, please disregard this e-mail.  A member of our community has probably mis-typed
+their e-mail address when creating an account.
+
 
 ShadowCon
 http://{{ site }}
