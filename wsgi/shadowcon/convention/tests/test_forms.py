@@ -117,7 +117,7 @@ class FormsTest(ShadowConTestCase):
         date = registration.registration_date.astimezone(pytz.timezone('US/Pacific'))
         expected_message += "\nInitially registered on %s" % date.strftime("%B %d, %Y %I:%M:%S %p %Z")
 
-        self.assertEmail(['admin@na.com'], "no-reply@shadowcon.net", expected_message, subject=subject)
+        self.assertEmail(['admin@na.com'], expected_message, subject=subject)
 
     def test_attendance_form_save_email_initial(self):
         user = User(username="username")

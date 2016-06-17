@@ -69,7 +69,7 @@ class AttendanceForm(Form):
         date = registration.registration_date.astimezone(pytz.timezone('US/Pacific'))
         message += "\nInitially registered on %s" % date.strftime("%B %d, %Y %I:%M:%S %p %Z")
 
-        mail_list("Registration", subject_details, message, "no-reply@shadowcon.net", list_name="registration")
+        mail_list("Registration", subject_details, message, list_name="registration")
 
     def save(self):
         new_entry = not hasattr(self, "registration")

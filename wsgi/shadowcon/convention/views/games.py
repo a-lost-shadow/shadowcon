@@ -54,7 +54,7 @@ class NewGameView(LoginRequiredMixin, ConHasSpaceOrAlreadyRegisteredMixin, gener
     def send_email(self):
         subject_details = "%s submitted '%s'" % (friendly_username(self.request.user), self.object.title)
         message = self.object.email_format(self.request)
-        mail_list("Game Submission", subject_details, message, "no-reply@shadowcon.net", list_name="game_submission")
+        mail_list("Game Submission", subject_details, message, list_name="game_submission")
 
     def form_valid(self, form):
         # since the form doesn't have the user or time, we need to insert it

@@ -46,14 +46,14 @@ class ShadowConTestCase(TestCase):
         self.assertEquals(len(mail.outbox), 1)
         return mail.outbox[0]
 
-    def assertEmail(self, to, from_email, body, subject_source=None, subject_details=None, subject=None):
+    def assertEmail(self, to, body, subject_source=None, subject_details=None, subject=None):
         if subject is None:
             subject = "ShadowCon [%s]: %s" % (subject_source, subject_details)
 
         email = self.get_email()
         self.assertEquals(email.subject, subject)
         self.assertEquals(email.to, to)
-        self.assertEquals(email.from_email, from_email)
+        self.assertEquals(email.from_email, "postmaster@mg.shadowcon.net")
         self.assertEquals(email.body, body)
 
 

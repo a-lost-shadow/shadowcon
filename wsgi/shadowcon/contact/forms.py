@@ -17,7 +17,9 @@ class ContactForm(Form):
         subject_source = reason
         subject_details = strip_tags(self.cleaned_data.get('summary'))
 
-        message = strip_tags(self.cleaned_data.get('message'))
-        sender = "%s <%s>" % (strip_tags(self.cleaned_data.get('name')), strip_tags(self.cleaned_data.get('email')))
+        message = "E-mail from '%s <%s>':\n%s" % (
+            strip_tags(self.cleaned_data.get('name')),
+            strip_tags(self.cleaned_data.get('email')),
+            strip_tags(self.cleaned_data.get('message')))
 
-        mail_list(subject_source, subject_details, message, sender, email_list)
+        mail_list(subject_source, subject_details, message, email_list)
