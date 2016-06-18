@@ -70,6 +70,9 @@ class ContactTest(ShadowConTestCase):
         response = self.client.post(self.url, self.test_data)
         self.assertRedirects(response, reverse("contact:thanks"))
 
+    def check_reply(self, email, name, address):
+        self.assertEquals(email.reply_to, [self.from_address, "%s <%s>" % (name, address)])
+
     def test_success_email(self):
         self.client.post(self.url, self.test_data)
 
@@ -80,7 +83,8 @@ class ContactTest(ShadowConTestCase):
             self.test_data['email'],
             self.test_data['message']))
         self.assertEquals(email.to, ['staff@na.com', 'admin@na.com'])
-        self.assertEquals(email.from_email, 'postmaster@mg.shadowcon.net')
+        self.assertEquals(email.from_email, self.from_address)
+        self.check_reply(email, self.test_data['name'], self.test_data['email'])
         self.assertEquals(email.subject, 'ShadowCon [Something Broke]: %s' % self.test_data['summary'])
 
     def run_unclean_test(self, key):
@@ -96,7 +100,8 @@ class ContactTest(ShadowConTestCase):
             self.test_data['email'],
             self.test_data['message']))
         self.assertEquals(email.to, ['staff@na.com', 'admin@na.com'])
-        self.assertEquals(email.from_email, 'postmaster@mg.shadowcon.net')
+        self.assertEquals(email.from_email, self.from_address)
+        self.check_reply(email, self.test_data['name'], self.test_data['email'])
         self.assertEquals(email.subject, 'ShadowCon [Something Broke]: %s' % self.test_data['summary'])
 
     def test_cleaned_name(self):
@@ -131,21 +136,37 @@ class ContactTest(ShadowConTestCase):
             test_data['email'],
             test_data['message']))
         self.assertEquals(email.to, ['user@na.com'])
-        self.assertEquals(email.from_email, "postmaster@mg.shadowcon.net")
+        self.assertEquals(email.from_email, self.from_address)
+        self.check_reply(email, test_data['name'], test_data['email'])
         self.assertEquals(email.subject, 'ShadowCon [Admins make things better]: A summary goes here')
 
-    def test_util(self):
+
+@ddt
+class AdminVersionTest(TestCase):
+    @data(EmailListAdmin, ContactReasonAdmin)
+    def test_has_versions(self, clazz):
+        self.assertTrue(CompareVersionAdmin.__subclasscheck__(clazz))
+
+
+class UtilsTest(ShadowConTestCase):
+    def run_base_test(self, reply_to):
         subject_source = "Itch"
         subject_details = "In my brain"
         message = "I can't scratch it"
-        mail_list(subject_source, subject_details, message, EmailList.objects.get(name="Admin"))
+        mail_list(subject_source, subject_details, message, EmailList.objects.get(name="Admin"), reply_to=reply_to)
 
         email = self.get_email()
 
         self.assertEquals(email.body, message)
         self.assertEquals(email.to, ['user@na.com'])
-        self.assertEquals(email.from_email, 'postmaster@mg.shadowcon.net')
+        self.assertEquals(email.from_email, self.from_address)
         self.assertEquals(email.subject, 'ShadowCon [%s]: %s' % (subject_source, subject_details))
+
+        return email
+
+    def test_util(self):
+        email = self.run_base_test(reply_to=None)
+        self.assertEquals(email.reply_to, [])
 
     def test_util_alternate(self):
         subject_source = "World Domination"
@@ -157,7 +178,7 @@ class ContactTest(ShadowConTestCase):
 
         self.assertEquals(email.body, message)
         self.assertEquals(email.to, ['staff@na.com', 'admin@na.com'])
-        self.assertEquals(email.from_email, 'postmaster@mg.shadowcon.net')
+        self.assertEquals(email.from_email, self.from_address)
         self.assertEquals(email.subject, 'ShadowCon [%s]: %s' % (subject_source, subject_details))
 
     def test_util_no_list(self):
@@ -168,9 +189,6 @@ class ContactTest(ShadowConTestCase):
     def test_email_list_name(self):
         self.assertEquals(str(EmailList.objects.get(name="Admin")), "Admin")
 
-
-@ddt
-class AdminVersionTest(TestCase):
-    @data(EmailListAdmin, ContactReasonAdmin)
-    def test_has_versions(self, clazz):
-        self.assertTrue(CompareVersionAdmin.__subclasscheck__(clazz))
+    def test_email_reply_to(self):
+        email = self.run_base_test("Bob <na@na.com>")
+        self.assertEquals(email.reply_to, [self.from_address, "Bob <na@na.com>"])

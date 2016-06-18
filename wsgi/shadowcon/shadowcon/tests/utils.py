@@ -5,7 +5,8 @@ import re
 
 
 class ShadowConTestCase(TestCase):
-    fixtures = ['auth', 'initial', 'games']
+    fixtures = ['auth', 'initial', 'games', 'test']
+    from_address = 'ShadowCon Website <postmaster@mg.shadowcon.net>'
 
     def get_section(self, response, section, section_terminator=None):
         if section_terminator is None:
@@ -53,7 +54,7 @@ class ShadowConTestCase(TestCase):
         email = self.get_email()
         self.assertEquals(email.subject, subject)
         self.assertEquals(email.to, to)
-        self.assertEquals(email.from_email, "postmaster@mg.shadowcon.net")
+        self.assertEquals(email.from_email, self.from_address)
         self.assertEquals(email.body, body)
 
 
