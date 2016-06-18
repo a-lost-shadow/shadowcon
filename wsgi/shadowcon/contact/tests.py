@@ -82,7 +82,7 @@ class ContactTest(ShadowConTestCase):
             self.test_data['name'],
             self.test_data['email'],
             self.test_data['message']))
-        self.assertEquals(email.to, ['staff@na.com', 'admin@na.com'])
+        self.assertEquals(email.to, ['staff-test@mg.shadowcon.net', 'admin-test@mg.shadowcon.net'])
         self.assertEquals(email.from_email, self.from_address)
         self.check_reply(email, self.test_data['name'], self.test_data['email'])
         self.assertEquals(email.subject, 'ShadowCon [Something Broke]: %s' % self.test_data['summary'])
@@ -99,7 +99,7 @@ class ContactTest(ShadowConTestCase):
             self.test_data['name'],
             self.test_data['email'],
             self.test_data['message']))
-        self.assertEquals(email.to, ['staff@na.com', 'admin@na.com'])
+        self.assertEquals(email.to, ['staff-test@mg.shadowcon.net', 'admin-test@mg.shadowcon.net'])
         self.assertEquals(email.from_email, self.from_address)
         self.check_reply(email, self.test_data['name'], self.test_data['email'])
         self.assertEquals(email.subject, 'ShadowCon [Something Broke]: %s' % self.test_data['summary'])
@@ -135,7 +135,7 @@ class ContactTest(ShadowConTestCase):
             test_data['name'],
             test_data['email'],
             test_data['message']))
-        self.assertEquals(email.to, ['user@na.com'])
+        self.assertEquals(email.to, ['user-test@mg.shadowcon.net'])
         self.assertEquals(email.from_email, self.from_address)
         self.check_reply(email, test_data['name'], test_data['email'])
         self.assertEquals(email.subject, 'ShadowCon [Admins make things better]: A summary goes here')
@@ -158,7 +158,7 @@ class UtilsTest(ShadowConTestCase):
         email = self.get_email()
 
         self.assertEquals(email.body, message)
-        self.assertEquals(email.to, ['user@na.com'])
+        self.assertEquals(email.to, ['user-test@mg.shadowcon.net'])
         self.assertEquals(email.from_email, self.from_address)
         self.assertEquals(email.subject, 'ShadowCon [%s]: %s' % (subject_source, subject_details))
 
@@ -177,7 +177,7 @@ class UtilsTest(ShadowConTestCase):
         email = self.get_email()
 
         self.assertEquals(email.body, message)
-        self.assertEquals(email.to, ['staff@na.com', 'admin@na.com'])
+        self.assertEquals(email.to, ['staff-test@mg.shadowcon.net', 'admin-test@mg.shadowcon.net'])
         self.assertEquals(email.from_email, self.from_address)
         self.assertEquals(email.subject, 'ShadowCon [%s]: %s' % (subject_source, subject_details))
 
@@ -190,5 +190,5 @@ class UtilsTest(ShadowConTestCase):
         self.assertEquals(str(EmailList.objects.get(name="Admin")), "Admin")
 
     def test_email_reply_to(self):
-        email = self.run_base_test("Bob <na@na.com>")
-        self.assertEquals(email.reply_to, [self.from_address, "Bob <na@na.com>"])
+        email = self.run_base_test("Bob <na-test@mg.shadowcon.net>")
+        self.assertEquals(email.reply_to, [self.from_address, "Bob <na-test@mg.shadowcon.net>"])

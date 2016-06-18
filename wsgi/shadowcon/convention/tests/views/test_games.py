@@ -448,7 +448,7 @@ class NewGameTest(ShadowConTestCase):
 
         self.client.post(self.url, game.__dict__)
         game = Game.objects.get(title=game.title)
-        self.assertEmail(['admin@na.com'], game.email_format(None), "Game Submission",
+        self.assertEmail(['admin-test@mg.shadowcon.net'], game.email_format(None), "Game Submission",
                          "staff submitted '%s'" % game.title)
 
     def test_create_revision(self):

@@ -32,7 +32,7 @@ class NewUserRegistrationTest(ShadowConTestCase):
         email = self.get_email()
 
         self.assertEquals(email.subject, "Verify your account with ShadowCon")
-        self.assertEquals(email.from_email, "webmaster@localhost")
+        self.assertEquals(email.from_email, self.from_address)
         self.assertEquals(len(email.to), 1)
         self.assertEquals(email.to[0], self.registration_data["email"])
         self.assertGreater(str(email.body).find("In order to activate your account, please go to"), -1)
@@ -141,7 +141,7 @@ class PasswordResetChangeTest(ShadowConTestCase):
                                    'section id="main" role="main"', '/section')
 
     def test_password_reset_confirm_valid_link(self):
-        self.client.post(reverse('password_reset'), {"email": "user@na.com"})
+        self.client.post(reverse('password_reset'), {"email": "user-test@mg.shadowcon.net"})
 
         email = self.get_email()
         start = str(email.body).index('/reset')
