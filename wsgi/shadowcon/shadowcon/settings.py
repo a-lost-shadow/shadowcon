@@ -186,4 +186,6 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWD')
 EMAIL_PORT = '587'
 
+DEFAULT_FROM_EMAIL = 'postmaster@mg.shadowcon.net'
+
 ACCOUNT_ACTIVATION_DAYS = 7  # One-week registration activation window;
