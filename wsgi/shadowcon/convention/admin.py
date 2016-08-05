@@ -1,6 +1,6 @@
 from django.contrib import admin
 from reversion_compare.admin import CompareVersionAdmin
-from .models import TimeBlock, TimeSlot, ConInfo, Location, Game, PaymentOption
+from .models import TimeBlock, TimeSlot, ConInfo, Location, Game, PaymentOption, BlockRegistration, Registration
 
 
 @admin.register(TimeBlock)
@@ -37,3 +37,13 @@ class GameAdmin(CompareVersionAdmin):
 class PaymentOptionAdmin(CompareVersionAdmin):
     model = PaymentOption
     exclude = ['slug']
+
+
+@admin.register(BlockRegistration)
+class BlockRegistrationAdmin(CompareVersionAdmin):
+    model = BlockRegistration
+
+
+@admin.register(Registration)
+class RegistrationAdmin(CompareVersionAdmin):
+    model = Registration
