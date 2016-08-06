@@ -40,6 +40,9 @@ Original Registration Date: {{ form.registration_str  }}
     </tr>
     {% endfor %}
   </table>
+  <br>
+  Before registering, please review the <a href="{% url 'page:display' 'honor_code' %}">honor code</a>.
+  <br>
   <input class="submit" type="submit" value="Submit Registration">
 </form>
 {% endblock %}
