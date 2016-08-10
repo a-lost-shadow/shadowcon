@@ -1,0 +1,19 @@
+table.attendance td {
+  padding-right: 15px;
+  padding-top: 5px;
+  text-align: center;
+}
+
+table.attendance tr:nth-child(odd) {
+  background-color: #2b1d12;
+}
+
+table.attendance tr:hover {
+  background-color: #a15720;
+}
+
+table.attendance th {
+  padding-right: 15px;
+  border-bottom: 2px solid #ddd;
+  background-color: black;
+}

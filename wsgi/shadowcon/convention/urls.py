@@ -14,4 +14,5 @@ urlpatterns = [
     url(r'^user/payment/$', user.PaymentView.as_view(), name='payment'),
     url(r'^user/new/$', user.NewUserView.as_view(), name='new_user'),
     url(r'^user/profile/$', user.show_profile, name='user_profile'),
+    url(r'^attendance/list/$', user.AttendanceList.as_view(), name='attendance_list')
 ]

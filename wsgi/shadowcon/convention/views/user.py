@@ -3,12 +3,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.views.generic.edit import FormView, UpdateView
+from django.views.generic import TemplateView
 from registration.backends.hmac.views import RegistrationView as BaseRegistrationView
 
 from ..forms import NewUserForm, AttendanceForm
-from ..models import Registration, PaymentOption
+from ..models import Registration, PaymentOption, BlockRegistration, TimeBlock, get_choice
 from ..utils import friendly_username, is_registration_open, is_pre_reg_open
-from .common import RegistrationOpenMixin, NotOnWaitingListMixin
+from .common import RegistrationOpenMixin, NotOnWaitingListMixin, IsStaffMixin
 
 
 @login_required
@@ -45,6 +46,46 @@ class AttendanceView(RegistrationOpenMixin, LoginRequiredMixin, FormView):
 
     def get_success_url(self):
         return reverse('convention:payment')
+
+
+def registration_count(time_block, attendance):
+    return str(len(BlockRegistration.objects.filter(time_block=time_block.text).filter(attendance__exact=attendance)))
+
+
+class AttendanceList(LoginRequiredMixin, IsStaffMixin, TemplateView):
+    template_name = 'convention/attendance_list.html'
+
+    def get_context_data(self, **kwargs):
+        time_blocks = TimeBlock.objects.exclude(text__startswith='Not').order_by('sort_id')
+
+        header = "<th></th>"
+        yes = "<td>" + get_choice(BlockRegistration.ATTENDANCE_YES, BlockRegistration.ATTENDANCE_CHOICES) + "</td>"
+        maybe = "<td>" + get_choice(BlockRegistration.ATTENDANCE_MAYBE, BlockRegistration.ATTENDANCE_CHOICES) + "</td>"
+        no = "<td>" + get_choice(BlockRegistration.ATTENDANCE_NO, BlockRegistration.ATTENDANCE_CHOICES) + "</td>"
+
+        if 'totals' not in kwargs:
+            for block in time_blocks:
+                header += "<th>" + block.text + "</th>"
+                yes += "<td>" + registration_count(block, BlockRegistration.ATTENDANCE_YES) + "</td>"
+                maybe += "<td>" + registration_count(block, BlockRegistration.ATTENDANCE_MAYBE) + "</td>"
+                no += "<td>" + registration_count(block, BlockRegistration.ATTENDANCE_NO) + "</td>"
+            kwargs['totals'] = "\n  <tr>" + header + "</tr>\n  " + "<tr>" + yes + "</tr>\n  " + \
+                               "<tr>" + maybe + "</tr>\n  " + "<tr>" + no + "</tr>\n"
+
+        if 'details' not in kwargs:
+            details = "\n  <tr>" + header + "</tr>"
+            for entry in Registration.objects.all():
+                details += "\n  <tr><td>" + friendly_username(entry.user) + "</td>"
+                reg_entries = {}
+                for reg in BlockRegistration.objects.filter(registration=entry):
+                    reg_entries[reg.time_block] = reg.attendance
+
+                for block in time_blocks:
+                    details += "<td>" + get_choice(reg_entries[block.text],
+                                                   BlockRegistration.ATTENDANCE_CHOICES) + "</td>"
+                details += "</tr>"
+            kwargs['details'] = details + "\n"
+        return super(AttendanceList, self).get_context_data(**kwargs)
 
 
 class NewUserView(BaseRegistrationView):

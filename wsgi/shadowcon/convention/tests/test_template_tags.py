@@ -176,6 +176,20 @@ class TemplateTagsTest(ShadowConTestCase):
         expected = '<li><a href="%s">Change Schedule</a></li>' % reverse('convention:edit_schedule')
         self.check_tag("user", "edit_schedule_link user", expected, context=Context({"user": user}))
 
+    def test_user_attendance_list_link_with_user(self):
+        user = User.objects.get(username="user")
+        self.check_tag("user", "attendance_list_link user", "", context=Context({"user": user}))
+
+    def test_user_attendance_list_link_with_staff(self):
+        user = User.objects.get(username="staff")
+        expected = '<li><a href="%s">View Attendance</a></li>' % reverse('convention:attendance_list')
+        self.check_tag("user", "attendance_list_link user", expected, context=Context({"user": user}))
+
+    def test_user_attendance_list_link_with_admin(self):
+        user = User.objects.get(username="admin")
+        expected = '<li><a href="%s">View Attendance</a></li>' % reverse('convention:attendance_list')
+        self.check_tag("user", "attendance_list_link user", expected, context=Context({"user": user}))
+
     def run_submitted_game_test(self, user):
         response = render_template_tag("games", "show_user_games user", context=Context({"user": user}))
 

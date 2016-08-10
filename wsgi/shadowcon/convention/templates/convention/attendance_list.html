@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load con_info %}
+{% load staticfiles %}
+
+{% block title %}- Attendance{% endblock %}
+
+{% block additional_header %}
+<link rel="stylesheet" href="{% static 'convention/attendance.css' %}" />
+{% endblock %}
+
+{% block content %}
+<h2>{% con_year %} Attendance</h2>
+
+<h3>Totals</h3>
+<div style="overflow-x:auto;"><table id="totals" class="attendance">{{ totals | safe }}</table></div>
+<br>
+<h3>Details</h3>
+<div style="overflow-x:auto;"><table id="details" class="attendance">{{ details | safe }}</table></div>
+{% endblock %}

@@ -54,6 +54,7 @@
                 <li><a href="{% url 'convention:user_profile' %}">Profile</a></li>
                 <li><a href="{% url 'logout' %}">Logout</a></li>
                 {% admin_link request.user %}
+                {% attendance_list_link request.user %}
               </ul>
             </li>
             {% else %}

@@ -356,3 +356,142 @@ class PaymentViewTest(ShadowConTestCase):
         response = self.client.post(self.url, {"payment": "cash"})
         self.assertSectionContains(response, "Registration Entry Not Found", "h2")
 
+
+class AttendanceListTest(ShadowConTestCase):
+    url = reverse('convention:attendance_list')
+
+    def setUp(self):
+        self.client = Client()
+        self.client.login(username="admin", password="123")
+        self.headers = "<tr><th></th><th>Friday Night</th><th>Friday Midnight</th><th>Saturday Morning</th><th>" \
+                       "Saturday Afternoon</th><th>Saturday Evening</th><th>Saturday Midnight</th><th>Sunday Morning" \
+                       "</th></tr>"
+        self.totals = 'table id="totals" class="attendance"'
+        self.details = 'table id="details" class="attendance"'
+
+        for entry in Registration.objects.all():
+            entry.delete()
+
+    def test_empty(self):
+        response = self.client.get(self.url)
+        self.assertSectionContains(response, self.headers, self.totals, "/table")
+        self.assertSectionContains(response, "<tr><td>Yes</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>"
+                                             "<td>0</td><td>0</td></tr>", self.totals, "/table")
+        self.assertSectionContains(response, "<tr><td>Maybe</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>"
+                                             "<td>0</td><td>0</td></tr>", self.totals, "/table")
+        self.assertSectionContains(response, "<tr><td>No</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>"
+                                             "<td>0</td><td>0</td></tr>", self.totals, "/table")
+
+        self.assertSectionContains(response, self.headers, self.details, "/table")
+        self.assertEquals(1, self.get_section(response, self.details, "/table").count("<tr>"))
+
+    def test_single_registration(self):
+        new_reg = Registration(user=User.objects.filter(username="admin").get(),
+                               registration_date=timezone.now(),
+                               last_updated=timezone.now(),
+                               payment=PaymentOption.objects.all()[0])
+        new_reg.save()
+
+        time_blocks = TimeBlock.objects.exclude(text__startswith='Not').order_by('sort_id')
+        count = 0
+        for block in time_blocks:
+            entry = BlockRegistration(time_block=block.text, registration=new_reg,
+                                      attendance=BlockRegistration.ATTENDANCE_CHOICES[count % 3][0])
+            entry.save()
+            count += 1
+
+        response = self.client.get(self.url)
+        self.assertSectionContains(response, "<tr><td>Yes</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td>"
+                                             "<td>0</td><td>0</td></tr>", self.totals, "/table")
+        self.assertSectionContains(response, "<tr><td>Maybe</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td>"
+                                             "<td>0</td><td>1</td></tr>", self.totals, "/table")
+        self.assertSectionContains(response, "<tr><td>No</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td>"
+                                             "<td>1</td><td>0</td></tr>", self.totals, "/table")
+        self.assertEquals(2, self.get_section(response, self.details, "/table").count("<tr>"))
+        self.assertSectionContains(response, "<tr><td>Adrian Barnes</td><td>Maybe</td><td>Yes</td><td>No</td>"
+                                             "<td>Maybe</td><td>Yes</td><td>No</td><td>Maybe</td></tr>",
+                                   self.details, "/table")
+
+    def test_double_same_registration(self):
+        time_blocks = TimeBlock.objects.exclude(text__startswith='Not').order_by('sort_id')
+        new_reg = Registration(user=User.objects.filter(username="admin").get(),
+                               registration_date=timezone.now(),
+                               last_updated=timezone.now(),
+                               payment=PaymentOption.objects.all()[0])
+        new_reg.save()
+
+        count = 0
+        for block in time_blocks:
+            entry = BlockRegistration(time_block=block.text, registration=new_reg,
+                                      attendance=BlockRegistration.ATTENDANCE_CHOICES[count % 3][0])
+            entry.save()
+            count += 1
+
+        new_reg = Registration(user=User.objects.filter(username="staff").get(),
+                               registration_date=timezone.now(),
+                               last_updated=timezone.now(),
+                               payment=PaymentOption.objects.all()[0])
+        new_reg.save()
+
+        count = 0
+        for block in time_blocks:
+            entry = BlockRegistration(time_block=block.text, registration=new_reg,
+                                      attendance=BlockRegistration.ATTENDANCE_CHOICES[count % 3][0])
+            entry.save()
+            count += 1
+
+        response = self.client.get(self.url)
+        self.assertSectionContains(response, "<tr><td>Yes</td><td>0</td><td>2</td><td>0</td><td>0</td><td>2</td>"
+                                             "<td>0</td><td>0</td></tr>", self.totals, "/table")
+        self.assertSectionContains(response, "<tr><td>Maybe</td><td>2</td><td>0</td><td>0</td><td>2</td><td>0</td>"
+                                             "<td>0</td><td>2</td></tr>", self.totals, "/table")
+        self.assertSectionContains(response, "<tr><td>No</td><td>0</td><td>0</td><td>2</td><td>0</td><td>0</td>"
+                                             "<td>2</td><td>0</td></tr>", self.totals, "/table")
+        self.assertEquals(3, self.get_section(response, self.details, "/table").count("<tr>"))
+        self.assertSectionContains(response, "<tr><td>Adrian Barnes</td><td>Maybe</td><td>Yes</td><td>No</td>"
+                                             "<td>Maybe</td><td>Yes</td><td>No</td><td>Maybe</td></tr>",
+                                   self.details, "/table")
+        self.assertSectionContains(response, "<tr><td>staff</td><td>Maybe</td><td>Yes</td><td>No</td>"
+                                             "<td>Maybe</td><td>Yes</td><td>No</td><td>Maybe</td></tr>",
+                                   self.details, "/table")
+
+    def test_double_different_registration(self):
+        time_blocks = TimeBlock.objects.exclude(text__startswith='Not').order_by('sort_id')
+        new_reg = Registration(user=User.objects.filter(username="admin").get(),
+                               registration_date=timezone.now(),
+                               last_updated=timezone.now(),
+                               payment=PaymentOption.objects.all()[0])
+        new_reg.save()
+
+        count = 0
+        for block in time_blocks:
+            entry = BlockRegistration(time_block=block.text, registration=new_reg,
+                                      attendance=BlockRegistration.ATTENDANCE_CHOICES[count % 3][0])
+            entry.save()
+            count += 1
+
+        new_reg = Registration(user=User.objects.filter(username="staff").get(),
+                               registration_date=timezone.now(),
+                               last_updated=timezone.now(),
+                               payment=PaymentOption.objects.all()[0])
+        new_reg.save()
+
+        for block in time_blocks:
+            entry = BlockRegistration(time_block=block.text, registration=new_reg,
+                                      attendance=BlockRegistration.ATTENDANCE_CHOICES[1][0])
+            entry.save()
+
+        response = self.client.get(self.url)
+        self.assertSectionContains(response, "<tr><td>Yes</td><td>1</td><td>2</td><td>1</td><td>1</td><td>2</td>"
+                                             "<td>1</td><td>1</td></tr>", self.totals, "/table")
+        self.assertSectionContains(response, "<tr><td>Maybe</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td>"
+                                             "<td>0</td><td>1</td></tr>", self.totals, "/table")
+        self.assertSectionContains(response, "<tr><td>No</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td>"
+                                             "<td>1</td><td>0</td></tr>", self.totals, "/table")
+        self.assertEquals(3, self.get_section(response, self.details, "/table").count("<tr>"))
+        self.assertSectionContains(response, "<tr><td>Adrian Barnes</td><td>Maybe</td><td>Yes</td><td>No</td>"
+                                             "<td>Maybe</td><td>Yes</td><td>No</td><td>Maybe</td></tr>",
+                                   self.details, "/table")
+        self.assertSectionContains(response, "<tr><td>staff</td><td>Yes</td><td>Yes</td><td>Yes</td>"
+                                             "<td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>",
+                                   self.details, "/table")
