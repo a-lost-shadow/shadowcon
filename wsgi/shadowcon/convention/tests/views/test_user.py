@@ -63,34 +63,34 @@ class UserProfileTest(ShadowConTestCase):
         self.assertSectionContains(response, "2016 Registration:\\s+<ul>\\s+<li>Not Registered", "h2", "br /")
 
     def test_payment_option(self):
-        self.assertGreater(str(self.response).find("Payment Method: Paypal"), -1)
+        self.assertGreater(str(self.response).find("Donation Method: Paypal"), -1)
 
     def test_payment_option_alternate(self):
         registration = Registration.objects.get(user=User.objects.get(username="admin"))
         registration.payment = PaymentOption.objects.get(name="Chase Quick Pay")
         registration.save()
         response = self.client.get(self.url)
-        self.assertGreater(str(response).find("Payment Method: Chase Quick Pay"), -1)
+        self.assertGreater(str(response).find("Donation Method: Chase Quick Pay"), -1)
 
     def test_payment_option_not_registered(self):
         self.client.login(username="user", password="123")
         response = self.client.get(self.url)
-        self.assertEquals(str(response).find("Payment Method:"), -1)
+        self.assertEquals(str(response).find("Donation Method:"), -1)
 
     def test_payment_received(self):
-        self.assertGreater(str(self.response).find("Payment Received: no"), -1)
+        self.assertGreater(str(self.response).find("Donation Received: no"), -1)
 
     def test_payment_received_alternate(self):
         registration = Registration.objects.get(user=User.objects.get(username="admin"))
         registration.payment_received = True
         registration.save()
         response = self.client.get(self.url)
-        self.assertGreater(str(response).find("Payment Received: yes"), -1)
+        self.assertGreater(str(response).find("Donation Received: yes"), -1)
 
     def test_payment_received_not_registered(self):
         self.client.login(username="user", password="123")
         response = self.client.get(self.url)
-        self.assertEquals(str(response).find("Payment Received:"), -1)
+        self.assertEquals(str(response).find("Donation Received:"), -1)
 
     def test_registration_links_con_open(self):
         con = ConInfo.objects.all()[0]
@@ -120,7 +120,7 @@ class UserProfileTest(ShadowConTestCase):
         self.assertGreater(str(response).find(pattern), -1)
 
     def test_payment_link_not_paid(self):
-        self.assertGreater(str(self.response).find('<a href="%s">Payment Options</a>' % reverse('convention:payment')),
+        self.assertGreater(str(self.response).find('<a href="%s">Donation Options</a>' % reverse('convention:payment')),
                            -1)
 
     def test_payment_link_paid(self):
@@ -128,12 +128,12 @@ class UserProfileTest(ShadowConTestCase):
         registration.payment_received = True
         registration.save()
         response = self.client.get(self.url)
-        self.assertEquals(str(response).find('<a href="%s">Payment Options</a>' % reverse('convention:payment')), -1)
+        self.assertEquals(str(response).find('<a href="%s">Donation Options</a>' % reverse('convention:payment')), -1)
 
     def test_payment_link_not_registered(self):
         self.client.login(username="user", password="123")
         response = self.client.get(self.url)
-        self.assertEquals(str(response).find('<a href="%s">Payment Options</a>' % reverse('convention:payment')), -1)
+        self.assertEquals(str(response).find('<a href="%s">Donation Options</a>' % reverse('convention:payment')), -1)
 
     def test_game_list(self):
         self.assertSectionContains(self.response, "Submitted Games", "h3")
@@ -308,7 +308,7 @@ class PaymentViewTest(ShadowConTestCase):
         self.assertSectionContains(response, "Registration Entry Not Found", "h2")
 
     def test_get_header(self):
-        self.assertSectionContains(self.response, "Payment", "h2")
+        self.assertSectionContains(self.response, "Donation", "h2")
 
     def test_get_attendance(self):
         self.assertSectionContains(self.response, "2016 Registration:\\s+<ul>\\s+<li>Friday Night: Maybe", "h2", "br /")
@@ -355,3 +355,4 @@ class PaymentViewTest(ShadowConTestCase):
         self.client.login(username="user", password="123")
         response = self.client.post(self.url, {"payment": "cash"})
         self.assertSectionContains(response, "Registration Entry Not Found", "h2")
+
