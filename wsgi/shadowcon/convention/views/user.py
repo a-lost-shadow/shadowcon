@@ -85,6 +85,14 @@ class AttendanceList(LoginRequiredMixin, IsStaffMixin, TemplateView):
                                                    BlockRegistration.ATTENDANCE_CHOICES) + "</td>"
                 details += "</tr>"
             kwargs['details'] = details + "\n"
+
+        if 'payments' not in kwargs:
+            payments = "\n  <tr><th></th><th>Donation Option</th><th>Donation Received</th></tr>"
+            for entry in Registration.objects.all():
+                received = "Yes" if entry.payment_received else "No"
+                payments += "\n  <tr><td>" + friendly_username(entry.user) + "</td>" + "<td>" + entry.payment.name + \
+                            "</td>" + "<td>" + received + "</td></tr>"
+            kwargs['payments'] = payments + "\n"
         return super(AttendanceList, self).get_context_data(**kwargs)
 
 
