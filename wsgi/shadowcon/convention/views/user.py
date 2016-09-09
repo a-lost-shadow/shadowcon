@@ -52,6 +52,10 @@ def registration_count(time_block, attendance):
     return str(len(BlockRegistration.objects.filter(time_block=time_block.text).filter(attendance__exact=attendance)))
 
 
+def missing_count(time_block):
+    return str(len(Registration.objects.all()) - len(BlockRegistration.objects.filter(time_block=time_block.text)))
+
+
 class AttendanceList(LoginRequiredMixin, IsStaffMixin, TemplateView):
     template_name = 'convention/attendance_list.html'
 
@@ -62,6 +66,7 @@ class AttendanceList(LoginRequiredMixin, IsStaffMixin, TemplateView):
         yes = "<td>" + get_choice(BlockRegistration.ATTENDANCE_YES, BlockRegistration.ATTENDANCE_CHOICES) + "</td>"
         maybe = "<td>" + get_choice(BlockRegistration.ATTENDANCE_MAYBE, BlockRegistration.ATTENDANCE_CHOICES) + "</td>"
         no = "<td>" + get_choice(BlockRegistration.ATTENDANCE_NO, BlockRegistration.ATTENDANCE_CHOICES) + "</td>"
+        missing = "<td>Missing</td>"
 
         if 'totals' not in kwargs:
             for block in time_blocks:
@@ -69,8 +74,9 @@ class AttendanceList(LoginRequiredMixin, IsStaffMixin, TemplateView):
                 yes += "<td>" + registration_count(block, BlockRegistration.ATTENDANCE_YES) + "</td>"
                 maybe += "<td>" + registration_count(block, BlockRegistration.ATTENDANCE_MAYBE) + "</td>"
                 no += "<td>" + registration_count(block, BlockRegistration.ATTENDANCE_NO) + "</td>"
-            kwargs['totals'] = "\n  <tr>" + header + "</tr>\n  " + "<tr>" + yes + "</tr>\n  " + \
-                               "<tr>" + maybe + "</tr>\n  " + "<tr>" + no + "</tr>\n"
+                missing += "<td>" + missing_count(block) + "</td>"
+            kwargs['totals'] = "\n  <tr>" + header + "</tr>\n  <tr>" + yes + "</tr>\n  <tr>" + maybe + \
+                               "</tr>\n  <tr>" + no + "</tr>\n  <tr>" + missing + "</tr>\n"
 
         if 'details' not in kwargs:
             details = "\n  <tr>" + header + "</tr>"
@@ -81,8 +87,12 @@ class AttendanceList(LoginRequiredMixin, IsStaffMixin, TemplateView):
                     reg_entries[reg.time_block] = reg.attendance
 
                 for block in time_blocks:
-                    details += "<td>" + get_choice(reg_entries[block.text],
-                                                   BlockRegistration.ATTENDANCE_CHOICES) + "</td>"
+                    if block.text in reg_entries:
+                        details += "<td>" + get_choice(reg_entries[block.text],
+                                                       BlockRegistration.ATTENDANCE_CHOICES) + "</td>"
+                    else:
+                        details += "<td>Missing</td>"
+
                 details += "</tr>"
             kwargs['details'] = details + "\n"
 

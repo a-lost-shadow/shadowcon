@@ -544,3 +544,33 @@ class AttendanceListTest(ShadowConTestCase):
                                    "</td><td>Yes</td></tr>",
                                    self.payments, "/table")
 
+    def test_block_added_after_registration(self):
+        new_reg = Registration(user=User.objects.filter(username="admin").get(),
+                               registration_date=timezone.now(),
+                               last_updated=timezone.now(),
+                               payment=PaymentOption.objects.all()[0])
+        new_reg.save()
+
+        time_blocks = TimeBlock.objects.exclude(text__startswith='Not').order_by('sort_id')
+        count = 0
+        for block in time_blocks:
+            entry = BlockRegistration(time_block=block.text, registration=new_reg,
+                                      attendance=BlockRegistration.ATTENDANCE_CHOICES[count % 3][0])
+            entry.save()
+            count += 1
+
+        TimeBlock(text="New Block", sort_id=100).save()
+
+        response = self.client.get(self.url)
+        self.assertSectionContains(response, "<tr><td>Yes</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td>"
+                                             "<td>0</td><td>0</td><td>0</td></tr>", self.totals, "/table")
+        self.assertSectionContains(response, "<tr><td>Maybe</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td>"
+                                             "<td>0</td><td>1</td><td>0</td></tr>", self.totals, "/table")
+        self.assertSectionContains(response, "<tr><td>No</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td>"
+                                             "<td>1</td><td>0</td><td>0</td></tr>", self.totals, "/table")
+        self.assertSectionContains(response, "<tr><td>Missing</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>"
+                                             "<td>0</td><td>0</td><td>1</td></tr>", self.totals, "/table")
+        self.assertEquals(2, self.get_section(response, self.details, "/table").count("<tr>"))
+        self.assertSectionContains(response, "<tr><td>Adrian Barnes</td><td>Maybe</td><td>Yes</td><td>No</td>"
+                                             "<td>Maybe</td><td>Yes</td><td>No</td><td>Maybe</td><td>Missing</td></tr>",
+                                   self.details, "/table")
