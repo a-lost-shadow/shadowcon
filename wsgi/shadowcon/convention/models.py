@@ -8,7 +8,9 @@ from django.template.defaultfilters import slugify
 from django.utils.html import strip_tags
 from django.conf import settings
 from reversion import revisions as reversion
+from datetime import datetime
 import re
+import pytz
 
 from .fields import HourField
 
@@ -33,6 +35,8 @@ class ConInfo(models.Model):
     date = models.DateField()
     pre_reg_deadline = models.DateField()
     game_sub_deadline = models.DateField()
+    game_reg_deadline = models.DateTimeField(
+        default=pytz.timezone("US/Pacific").localize(datetime(2016, 9, 15, 18, 0, 0)))
     location = models.CharField(max_length=1024)
     pre_reg_cost = models.FloatField()
     door_cost = models.FloatField()
@@ -41,10 +45,11 @@ class ConInfo(models.Model):
 
     def __str__(self):
         format_str = "Date: %s, Location: %s, Game Submission Deadline: %s, PreReg Deadline: %s, " + \
-                     "PreReg Cost: %s, Door Cost: %s, Registration Opens: %s, Max Attendees: %s"
+                     "PreReg Cost: %s, Door Cost: %s, Registration Opens: %s, Max Attendees: %s, " + \
+                     "Game Registration Deadline: %s"
         return format_str % (self.date, self.location, self.game_sub_deadline,
                              self.pre_reg_deadline, self.pre_reg_cost, self.door_cost,
-                             self.registration_opens, self.max_attendees)
+                             self.registration_opens, self.max_attendees, self.game_reg_deadline)
 
 
 weekdays = {u'monday': True,

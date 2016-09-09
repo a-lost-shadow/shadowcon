@@ -41,6 +41,9 @@
                 {% edit_schedule_link request.user %}
               </ul>
             </li>
+            {% if user.is_authenticated %}
+            {% game_registration_link request.user %}
+            {% endif %}
             <li><a href="#">Site</a>
               <ul>
                 <li><a href="{% url 'page:display' 'site/directions' %}">Directions</a></li>
@@ -75,6 +78,9 @@
       <aside>
         <ul>
           {% register_links request.user %}
+          {% if user.is_authenticated %}
+          {% game_registration_link request.user %}
+          {% endif %}
           <li id="deadlines">
             <h3>Deadlines:</h3>
             <ul>
@@ -86,6 +92,11 @@
               <li>Game Submission:<br/>
                 <ul>
                   <li>{% con_game_sub_deadline %}</li>
+                </ul>
+              </li>
+              <li>Game Registration:<br/>
+                <ul>
+                  <li>{% con_game_reg_deadline %}</li>
                 </ul>
               </li>
             </ul>
@@ -116,7 +127,7 @@
 
     /* If the user clicks on a popup menu, and then moves the mouse away the menu disappears.
        However, the header link remains bold until the user clicks elsewhere. Blur causes
-       the headre to lose focus and return to normal. */
+       the header to lose focus and return to normal. */
     $("nav li:has(ul)").each(function() {
       $(this).hover(function() {}, function() {
         $(this).find("a[href='#']").blur();

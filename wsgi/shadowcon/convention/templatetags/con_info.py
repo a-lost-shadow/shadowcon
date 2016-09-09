@@ -1,5 +1,5 @@
 from django import template
-from django.utils import dateformat
+from django.utils import dateformat, html
 from datetime import date
 import pytz
 
@@ -31,6 +31,11 @@ def con_game_sub_deadline():
 
 
 @register.simple_tag
+def con_game_reg_deadline():
+    return html.format_html(get_datetime_as_string(get_con_value("game_reg_deadline"), "<br />"))
+
+
+@register.simple_tag
 def con_location():
     return get_con_value("location")
 
@@ -45,8 +50,8 @@ def con_pre_reg_cost():
     return "$%.2f" % get_con_value("pre_reg_cost")
 
 
-def get_registration_open_string(raw_open_date, date_time_sep):
-    local = raw_open_date.astimezone(pytz.timezone('US/Pacific'))
+def get_datetime_as_string(value, date_time_sep):
+    local = value.astimezone(pytz.timezone('US/Pacific'))
     return dateformat.format(local, "F jS, Y") + date_time_sep + dateformat.format(local, "g:i:s A T")
 
 
@@ -56,9 +61,9 @@ def register_links(user):
 
     return {'is_registration_open': is_registration_open(),
             'is_pre_reg_open': is_pre_reg_open(user),
-            'open_date': get_registration_open_string(raw_open_date, "<br>")}
+            'open_date': get_datetime_as_string(raw_open_date, "<br>")}
 
 
 @register.simple_tag
 def con_registration_opens():
-    return get_registration_open_string(get_con_value("registration_opens"), " at ")
+    return get_datetime_as_string(get_con_value("registration_opens"), " at ")

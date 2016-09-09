@@ -61,6 +61,15 @@ class TemplateTagsTest(ShadowConTestCase):
         info.save()
         self.check_tag("con_info", "con_game_sub_deadline", "July 11th, 1823")
 
+    def test_con_game_reg_deadline(self):
+        self.check_tag("con_info", "con_game_reg_deadline", "September 15th, 2016<br />6:00:00 PM PDT")
+
+    def test_con_game_reg_deadline_alternate(self):
+        info = ConInfo.objects.all()[0]
+        info.game_reg_deadline = pytz.timezone("US/Pacific").localize(datetime(1927, 2, 13, 07, 30, 0))
+        info.save()
+        self.check_tag("con_info", "con_game_reg_deadline", "February 13th, 1927<br />7:30:00 AM PST")
+
     def test_con_location(self):
         self.check_tag("con_info", "con_location", "Behind the tardis")
 
@@ -117,7 +126,7 @@ class TemplateTagsTest(ShadowConTestCase):
         info.save()
         self.check_tag("con_info", "register_links user", """
 
-          <li><a href="/user/attendance/">Pre-register</a></li>
+          <li><a href="/user/attendance/">Pre-register Attendance</a></li>
 
           <li><a href="/games/register/">Submit Game</a></li>
 
@@ -130,7 +139,7 @@ class TemplateTagsTest(ShadowConTestCase):
     def test_con_registration_links_after(self):
         self.check_tag("con_info", "register_links user", """
 
-          <li><a href="/user/attendance/">Register</a></li>
+          <li><a href="/user/attendance/">Register Attendance</a></li>
 
           <li><a href="/games/register/">Submit Game</a></li>
 
@@ -212,3 +221,14 @@ class TemplateTagsTest(ShadowConTestCase):
         user = User(username="new_user")
         user.save()
         self.run_submitted_game_test(user)
+
+    def test_game_registration_link_with_registration(self):
+        user = User.objects.get(username="admin")
+        expected = '<li><a href="https://goo.gl/forms/xKWoC8boOUIFi32U2">Game Registration</a></li>'
+        self.check_tag("user", "game_registration_link user", expected, context=Context({"user": user}))
+
+    def test_game_registration_link_with_no_registration(self):
+        user = User(username="new_user")
+        user.save()
+        expected = ''
+        self.check_tag("user", "game_registration_link user", expected, context=Context({"user": user}))

@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from django.utils import html
 
 from ..utils import get_registration
+from ..models import Registration
 
 register = template.Library()
 
@@ -35,5 +36,14 @@ def attendance_list_link(user):
     if (user.is_staff or user.is_superuser) and user.is_active:
         return html.format_html('<li><a href="{}">View Attendance</a></li>',
                                 reverse('convention:attendance_list'))
+    else:
+        return ""
+
+
+@register.simple_tag
+def game_registration_link(user):
+    registration_object = Registration.objects.filter(user=user)
+    if registration_object:
+        return html.format_html('<li><a href="https://goo.gl/forms/xKWoC8boOUIFi32U2">Game Registration</a></li>')
     else:
         return ""

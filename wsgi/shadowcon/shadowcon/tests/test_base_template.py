@@ -94,6 +94,28 @@ class BaseTemplateTest(ShadowConTestCase):
         response = self.client.get(self.url)
         self.assertSectionContains(response, '<li><a href="%s">Change Schedule</a></li>' % url, menu_start, '/ul')
 
+    def test_nav_contains_game_registration_menu_with_registration(self):
+        self.client.login(username="admin", password="123")
+        response = self.client.get(self.url)
+        self.assertSectionContains(response,
+                                   '<li><a href="https://goo.gl/forms/xKWoC8boOUIFi32U2">Game Registration</a></li>',
+                                   "nav")
+
+    def test_nav_does_not_contain_game_registration_menu_with_no_user(self):
+        response = self.client.get(self.url)
+        self.assertSectionContains(response,
+                                   '<li><a href="https://goo.gl/forms/xKWoC8boOUIFi32U2">Game Registration</a></li>',
+                                   "nav",
+                                   expected=False)
+
+    def test_nav_does_not_contain_game_registration_menu_with_no_registration(self):
+        self.client.login(username="user", password="123")
+        response = self.client.get(self.url)
+        self.assertSectionContains(response,
+                                   '<li><a href="https://goo.gl/forms/xKWoC8boOUIFi32U2">Game Registration</a></li>',
+                                   "nav",
+                                   expected=False)
+
     # ########################## Site Menu #############################
     def test_nav_contains_site_menu(self):
         response = self.client.get(self.url)
@@ -250,10 +272,37 @@ class BaseTemplateTest(ShadowConTestCase):
         info.save()
         pattern = '<li><a href="%s">%s</a></li>'
         response = self.client.get(self.url)
-        self.assertSectionContains(response, pattern % (reverse("convention:register_attendance"), "Register"), "aside",
+        self.assertSectionContains(response,
+                                   pattern % (reverse("convention:register_attendance"), "Register Attendance"),
+                                   "aside",
                                    'li id="deadlines"')
         self.assertSectionContains(response, pattern % (reverse("convention:submit_game"), "Submit Game"), "aside",
                                    'li id="deadlines"')
+
+    def test_sidebar_game_registration_link_with_registration(self):
+        self.client.login(username="admin", password="123")
+        response = self.client.get(self.url)
+        self.assertSectionContains(response,
+                                   '<li><a href="https://goo.gl/forms/xKWoC8boOUIFi32U2">Game Registration</a></li>',
+                                   "aside",
+                                   'li id="deadlines"')
+
+    def test_sidebar_game_registration_link_with_no_user(self):
+        response = self.client.get(self.url)
+        self.assertSectionContains(response,
+                                   '<li><a href="https://goo.gl/forms/xKWoC8boOUIFi32U2">Game Registration</a></li>',
+                                   "aside",
+                                   'li id="deadlines"',
+                                   expected=False)
+
+    def test_sidebar_game_registration_link_with_no_registration(self):
+        self.client.login(username="user", password="123")
+        response = self.client.get(self.url)
+        self.assertSectionContains(response,
+                                   '<li><a href="https://goo.gl/forms/xKWoC8boOUIFi32U2">Game Registration</a></li>',
+                                   "aside",
+                                   'li id="deadlines"',
+                                   expected=False)
 
     # ########################## Deadlines #############################
 
@@ -280,6 +329,21 @@ class BaseTemplateTest(ShadowConTestCase):
         info.game_sub_deadline = date(3001, 12, 8)
         info.save()
         pattern = '<li>%s<br/>\\s+<ul>\\s+<li>%s</li>\\s+</ul>\\s+</li>' % ("Game Submission:", "December 8th, 3001")
+        response = self.client.get(self.url)
+        self.assertSectionContains(response, pattern, 'li id="deadlines"', '/aside')
+
+    def test_game_registration_deadline(self):
+        pattern = '<li>%s<br/>\\s+<ul>\\s+<li>%s</li>\\s+</ul>\\s+</li>' % ("Game Registration:",
+                                                                            "September 15th, 2016<br />6:00:00 PM PDT")
+        response = self.client.get(self.url)
+        self.assertSectionContains(response, pattern, 'li id="deadlines"', '/aside')
+
+    def test_game_registration_deadline_alternate(self):
+        info = ConInfo.objects.all()[0]
+        info.game_reg_deadline = pytz.timezone("US/Pacific").localize(datetime(3002, 12, 18, 13, 33, 14))
+        info.save()
+        pattern = '<li>%s<br/>\\s+<ul>\\s+<li>%s</li>\\s+</ul>\\s+</li>' % ("Game Registration:",
+                                                                            "December 18th, 3002<br />1:33:14 PM PST")
         response = self.client.get(self.url)
         self.assertSectionContains(response, pattern, 'li id="deadlines"', '/aside')
 
