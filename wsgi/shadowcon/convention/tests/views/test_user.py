@@ -367,9 +367,11 @@ class AttendanceListTest(ShadowConTestCase):
                        "Saturday Afternoon</th><th>Saturday Evening</th><th>Saturday Midnight</th><th>Sunday Morning" \
                        "</th></tr>"
         self.payment_headers = "<tr><th></th><th>Donation Option</th><th>Donation Received</th></tr>"
+        self.contact_info_headers = "<tr><th>Name</th><th>Username</th><th>E-mail</th><th>Registered</th></tr>"
         self.totals = 'table id="totals" class="attendance"'
         self.details = 'table id="details" class="attendance"'
         self.payments = 'table id="donations" class="attendance"'
+        self.contact_info = 'table id="contact_info" class="attendance"'
 
         for entry in Registration.objects.all():
             entry.delete()
@@ -389,6 +391,19 @@ class AttendanceListTest(ShadowConTestCase):
 
         self.assertSectionContains(response, self.payment_headers, self.payments, "/table")
         self.assertEquals(1, self.get_section(response, self.payments, "/table").count("<tr>"))
+
+        self.assertSectionContains(response, self.contact_info_headers, self.contact_info, "/table")
+        self.assertEquals(4, self.get_section(response, self.contact_info, "/table").count("<tr>"))
+        self.assertSectionContains(response,
+                                   "<tr><td>Adrian Barnes</td><td>admin</td><td>admin-test@mg.shadowcon.net</td>" +
+                                   "<td>No</td></tr>",
+                                   self.contact_info, "/table")
+        self.assertSectionContains(response,
+                                   "<tr><td> </td><td>user</td><td>user-test@mg.shadowcon.net</td><td>No</td></tr>",
+                                   self.contact_info, "/table")
+        self.assertSectionContains(response,
+                                   "<tr><td> </td><td>staff</td><td>staff-test@mg.shadowcon.net</td><td>No</td></tr>",
+                                   self.contact_info, "/table")
 
     def test_single_registration(self):
         new_reg = Registration(user=User.objects.filter(username="admin").get(),
@@ -421,6 +436,19 @@ class AttendanceListTest(ShadowConTestCase):
         self.assertSectionContains(response, "<tr><td>Adrian Barnes</td><td>" + PaymentOption.objects.all()[0].name +
                                    "</td><td>No</td></tr>",
                                    self.payments, "/table")
+
+        self.assertSectionContains(response, self.contact_info_headers, self.contact_info, "/table")
+        self.assertEquals(4, self.get_section(response, self.contact_info, "/table").count("<tr>"))
+        self.assertSectionContains(response,
+                                   "<tr><td>Adrian Barnes</td><td>admin</td><td>admin-test@mg.shadowcon.net</td>" +
+                                   "<td>Yes</td></tr>",
+                                   self.contact_info, "/table")
+        self.assertSectionContains(response,
+                                   "<tr><td> </td><td>user</td><td>user-test@mg.shadowcon.net</td><td>No</td></tr>",
+                                   self.contact_info, "/table")
+        self.assertSectionContains(response,
+                                   "<tr><td> </td><td>staff</td><td>staff-test@mg.shadowcon.net</td><td>No</td></tr>",
+                                   self.contact_info, "/table")
 
     def test_double_same_registration(self):
         time_blocks = TimeBlock.objects.exclude(text__startswith='Not').order_by('sort_id')
@@ -473,6 +501,19 @@ class AttendanceListTest(ShadowConTestCase):
                                    "</td><td>No</td></tr>",
                                    self.payments, "/table")
 
+        self.assertSectionContains(response, self.contact_info_headers, self.contact_info, "/table")
+        self.assertEquals(4, self.get_section(response, self.contact_info, "/table").count("<tr>"))
+        self.assertSectionContains(response,
+                                   "<tr><td>Adrian Barnes</td><td>admin</td><td>admin-test@mg.shadowcon.net</td>" +
+                                   "<td>Yes</td></tr>",
+                                   self.contact_info, "/table")
+        self.assertSectionContains(response,
+                                   "<tr><td> </td><td>user</td><td>user-test@mg.shadowcon.net</td><td>No</td></tr>",
+                                   self.contact_info, "/table")
+        self.assertSectionContains(response,
+                                   "<tr><td> </td><td>staff</td><td>staff-test@mg.shadowcon.net</td><td>Yes</td></tr>",
+                                   self.contact_info, "/table")
+
     def test_double_different_registration(self):
         time_blocks = TimeBlock.objects.exclude(text__startswith='Not').order_by('sort_id')
         new_reg = Registration(user=User.objects.filter(username="admin").get(),
@@ -521,6 +562,19 @@ class AttendanceListTest(ShadowConTestCase):
         self.assertSectionContains(response, "<tr><td>staff</td><td>" + PaymentOption.objects.all()[1].name +
                                    "</td><td>No</td></tr>",
                                    self.payments, "/table")
+
+        self.assertSectionContains(response, self.contact_info_headers, self.contact_info, "/table")
+        self.assertEquals(4, self.get_section(response, self.contact_info, "/table").count("<tr>"))
+        self.assertSectionContains(response,
+                                   "<tr><td>Adrian Barnes</td><td>admin</td><td>admin-test@mg.shadowcon.net</td>" +
+                                   "<td>Yes</td></tr>",
+                                   self.contact_info, "/table")
+        self.assertSectionContains(response,
+                                   "<tr><td> </td><td>user</td><td>user-test@mg.shadowcon.net</td><td>No</td></tr>",
+                                   self.contact_info, "/table")
+        self.assertSectionContains(response,
+                                   "<tr><td> </td><td>staff</td><td>staff-test@mg.shadowcon.net</td><td>Yes</td></tr>",
+                                   self.contact_info, "/table")
 
     def test_single_registration_payment_received(self):
         new_reg = Registration(user=User.objects.filter(username="admin").get(),

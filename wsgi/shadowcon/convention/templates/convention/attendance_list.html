@@ -13,10 +13,13 @@
 
 <h3>Totals</h3>
 <div style="overflow-x:auto;"><table id="totals" class="attendance">{{ totals | safe }}</table></div>
-<br>
+<br />
 <h3>Details</h3>
 <div style="overflow-x:auto;"><table id="details" class="attendance">{{ details | safe }}</table></div>
-<br>
+<br />
 <h3>Donations</h3>
 <div style="overflow-x:auto;"><table id="donations" class="attendance">{{ payments | safe }}</table></div>
+<br />
+<h3>Contact Info</h3>
+<div style="overflow-x:auto;"><table id="contact_info" class="attendance">{{ contact_info | safe }}</table></div>
 {% endblock %}

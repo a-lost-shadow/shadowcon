@@ -1,4 +1,5 @@
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin
 from django.shortcuts import render, redirect
@@ -103,6 +104,17 @@ class AttendanceList(LoginRequiredMixin, IsStaffMixin, TemplateView):
                 payments += "\n  <tr><td>" + friendly_username(entry.user) + "</td>" + "<td>" + entry.payment.name + \
                             "</td>" + "<td>" + received + "</td></tr>"
             kwargs['payments'] = payments + "\n"
+
+        if 'contact_info' not in kwargs:
+            contact_info = "\n  <tr><th>Name</th><th>Username</th><th>E-mail</th><th>Registered</th></tr>"
+            for entry in User.objects.all():
+                registered = "No"
+                if Registration.objects.filter(user=entry):
+                    registered = "Yes"
+                contact_info += "\n  <tr><td>" + entry.first_name + " " + entry.last_name + "</td><td>" + \
+                                entry.username + "</td><td>" + entry.email + "</td><td>" + registered + "</td></tr>"
+            kwargs['contact_info'] = contact_info + "\n"
+
         return super(AttendanceList, self).get_context_data(**kwargs)
 
 
