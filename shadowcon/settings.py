@@ -13,14 +13,17 @@ import os
 import dj_database_url
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print "BASE: " + BASE_DIR
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+print "PROJECT_ROOT: " + PROJECT_ROOT
 DJ_PROJECT_DIR = PROJECT_ROOT
-WSGI_DIR = os.path.dirname(BASE_DIR)
-REPO_DIR = os.path.dirname(WSGI_DIR)
-DATA_DIR = os.environ.get('OPENSHIFT_DATA_DIR', BASE_DIR)
+print "DJ_PROJECT_DIR: " + DJ_PROJECT_DIR
+WSGI_DIR = BASE_DIR
+print "WSGI: " + WSGI_DIR
+DATA_DIR = BASE_DIR
+print "DATA_DIR: " + DATA_DIR
 
 import sys
-sys.path.append(os.path.join(REPO_DIR, 'libs'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
