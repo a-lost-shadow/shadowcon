@@ -10,8 +10,11 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-DJ_PROJECT_DIR = os.path.dirname(__file__)
-BASE_DIR = os.path.dirname(DJ_PROJECT_DIR)
+import dj_database_url
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+DJ_PROJECT_DIR = PROJECT_ROOT
 WSGI_DIR = os.path.dirname(BASE_DIR)
 REPO_DIR = os.path.dirname(WSGI_DIR)
 DATA_DIR = os.environ.get('OPENSHIFT_DATA_DIR', BASE_DIR)
@@ -25,10 +28,11 @@ SECRETS = secrets.getter(os.path.join(DATA_DIR, 'secrets.json'))
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = SECRETS['secret_key']
+#TODO Fix Me
+SECRET_KEY = ")vkg*r1we!i=7$ffr!x!r3b06^8zw=e_h!c#xzc4g+0231!*3^"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG') == 'True'
+DEBUG = True #TODO revet os.environ.get('DEBUG') == 'True'
 
 from socket import gethostname
 ALLOWED_HOSTS = [
@@ -36,6 +40,7 @@ ALLOWED_HOSTS = [
     os.environ.get('OPENSHIFT_APP_DNS'),  # Dynamically map to the OpenShift gear name.
     "new.shadowcon.net",
     "www.shadowcon.net",
+	"localhost",
 ]
 
 
@@ -175,16 +180,16 @@ CKEDITOR_CONFIGS = {
 LOGIN_REDIRECT_URL = '/user//profile/'
 LOGIN_URL = '/login/'
 
-# EMAIL_HOST = 'mailtrap.io'
-# EMAIL_PORT = '2525'
-# EMAIL_HOST_USER = 'd7ab5d07b2e713'
-# EMAIL_HOST_PASSWORD = '311e614f5e104f'
+EMAIL_HOST = 'mailtrap.io'
+EMAIL_PORT = '2525'
+EMAIL_HOST_USER = 'd7ab5d07b2e713'
+EMAIL_HOST_PASSWORD = '311e614f5e104f'
 
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.mailgun.org'
-EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWD')
-EMAIL_PORT = '587'
+# EMAIL_USE_TLS = True
+# EMAIL_HOST = 'smtp.mailgun.org'
+# EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
+# EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWD')
+# EMAIL_PORT = '587'
 
 DEFAULT_FROM_EMAIL = 'ShadowCon Website <postmaster@mg.shadowcon.net>'
 
