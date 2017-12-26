@@ -21,8 +21,6 @@ DATA_DIR = os.environ.get('OPENSHIFT_DATA_DIR', BASE_DIR)
 
 import sys
 sys.path.append(os.path.join(REPO_DIR, 'libs'))
-import secrets
-SECRETS = secrets.getter(os.path.join(DATA_DIR, 'secrets.json'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
