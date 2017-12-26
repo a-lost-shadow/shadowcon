@@ -18,10 +18,6 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 print "PROJECT_ROOT: " + PROJECT_ROOT
 DJ_PROJECT_DIR = PROJECT_ROOT
 print "DJ_PROJECT_DIR: " + DJ_PROJECT_DIR
-WSGI_DIR = BASE_DIR
-print "WSGI: " + WSGI_DIR
-DATA_DIR = BASE_DIR
-print "DATA_DIR: " + DATA_DIR
 
 import sys
 
@@ -57,7 +53,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+  #  'django.contrib.staticfiles',
     'django_ajax',
     'reversion',
     'reversion_compare',
@@ -72,6 +68,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	'whitenoise.middleware.WhiteNoiseMiddleware',
 )
 
 ROOT_URLCONF = 'shadowcon.urls'
@@ -101,7 +98,7 @@ WSGI_APPLICATION = 'shadowcon.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(DATA_DIR, 'db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
@@ -143,12 +140,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 STATICFILES_DIRS = [
     os.path.join(DJ_PROJECT_DIR, 'static'),
 ]
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(WSGI_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 CKEDITOR_JQUERY_URL = '//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
 
