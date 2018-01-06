@@ -11,3 +11,4 @@ pytz==2015.7
 gunicorn==19.7.1
 dj-database-url==0.4.2
 whitenoise==4.0b4
+psycopg2==2.7.3.2
