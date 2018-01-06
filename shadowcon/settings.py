@@ -176,16 +176,18 @@ CKEDITOR_CONFIGS = {
 LOGIN_REDIRECT_URL = '/user//profile/'
 LOGIN_URL = '/login/'
 
-EMAIL_HOST = 'mailtrap.io'
-EMAIL_PORT = '2525'
-EMAIL_HOST_USER = 'd7ab5d07b2e713'
-EMAIL_HOST_PASSWORD = '311e614f5e104f'
 
-# EMAIL_USE_TLS = True
-# EMAIL_HOST = 'smtp.mailgun.org'
-# EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
-# EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWD')
-# EMAIL_PORT = '587'
+if 'EMAIL_USER' in os.environ and 'EMAIL_PASSWD' in os.environ:
+    EMAIL_USE_TLS = True
+    EMAIL_HOST = 'smtp.mailgun.org'
+    EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWD')
+    EMAIL_PORT = '587'
+else:
+    EMAIL_HOST = 'mailtrap.io'
+    EMAIL_PORT = '2525'
+    EMAIL_HOST_USER = 'd7ab5d07b2e713'
+    EMAIL_HOST_PASSWORD = '311e614f5e104f'
 
 DEFAULT_FROM_EMAIL = 'ShadowCon Website <postmaster@mg.shadowcon.net>'
 
