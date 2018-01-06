@@ -1,77 +1,53 @@
-Django on OpenShift
-===================
+# Heroku Django Starter Template
 
-This git repository helps you get up and running quickly w/ a Django
-installation on OpenShift.  The Django project name used in this repo
-is 'myproject' but you can feel free to change it.  Right now the
-backend is sqlite3 and the database runtime is found in
-`$OPENSHIFT_DATA_DIR/db.sqlite3`.
+An utterly fantastic project starter template for Django 1.11.
 
-Before you push this app for the first time, you will need to change
-the [Django admin password](#admin-user-name-and-password).
-Then, when you first push this
-application to the cloud instance, the sqlite database is copied from
-`wsgi/myproject/db.sqlite3` with your newly changed login
-credentials. Other than the password change, this is the stock
-database that is created when `python manage.py syncdb` is run with
-only the admin app installed.
+## Features
 
-On subsequent pushes, a `python manage.py syncdb` is executed to make
-sure that any models you added are created in the DB.  If you do
-anything that requires an alter table, you could add the alter
-statements in `GIT_ROOT/.openshift/action_hooks/alter.sql` and then use
-`GIT_ROOT/.openshift/action_hooks/deploy` to execute that script (make
-sure to back up your database w/ `rhc app snapshot save` first :) )
+- Production-ready configuration for Static Files, Database Settings, Gunicorn, etc.
+- Enhancements to Django's static file serving functionality via WhiteNoise.
+- Latest Python 3.6 runtime environment. 
 
-You can also turn on the DEBUG mode for Django application using the
-`rhc env set DEBUG=True --app APP_NAME`. If you do this, you'll get
-nicely formatted error pages in browser for HTTP 500 errors.
+## How to Use
 
-Do not forget to turn this environment variable off and fully restart
-the application when you finish:
+To use this project, follow these steps:
 
-```
-$ rhc env unset DEBUG
-$ rhc app stop && rhc app start
-```
+1. Create your working environment.
+2. Install Django (`$ pip install django`)
+3. Create a new project using this template
 
-Running on OpenShift
---------------------
+## Creating Your Project
 
-Create an account at https://www.openshift.com
+Using this template to create a new Django app is easy::
 
-Install the RHC client tools if you have not already done so:
-    
-    sudo gem install rhc
-    rhc setup
+    $ django-admin.py startproject --template=https://github.com/heroku/heroku-django-template/archive/master.zip --name=Procfile helloworld
 
-Select the version of python (2.7 or 3.3) and create a application
+(If this doesn't work on windows, replace `django-admin.py` with `django-admin`)
 
-    rhc app create django python-$VERSION
+You can replace ``helloworld`` with your desired project name.
 
-Add this upstream repo
+## Deployment to Heroku
 
-    cd django
-    git remote add upstream -m master git://github.com/openshift/django-example.git
-    git pull -s recursive -X theirs upstream master
+    $ git init
+    $ git add -A
+    $ git commit -m "Initial commit"
 
-Then push the repo upstream
+    $ heroku create
+    $ git push heroku master
 
-    git push
+    $ heroku run python manage.py migrate
 
-Now, you have to create [admin account](#admin-user-name-and-password), so you 
-can setup your Django instance.
-	
-That's it. You can now checkout your application at:
+See also, a [ready-made application](https://github.com/heroku/python-getting-started), ready to deploy.
 
-    http://django-$yournamespace.rhcloud.com
+## Using Python 2.7?
 
-Admin user name and password
-----------------------------
-Use `rhc ssh` to log into python gear and run this command:
+Just update `runtime.txt` to `python-2.7.13` (no trailing spaces or newlines!).
 
-	python $OPENSHIFT_REPO_DIR/wsgi/myproject/manage.py createsuperuser
 
-You should be now able to login at:
+## License: MIT
 
-	http://django-$yournamespace.rhcloud.com/admin/
+## Further Reading
+
+- [Gunicorn](https://warehouse.python.org/project/gunicorn/)
+- [WhiteNoise](https://warehouse.python.org/project/whitenoise/)
+- [dj-database-url](https://warehouse.python.org/project/dj-database-url/)

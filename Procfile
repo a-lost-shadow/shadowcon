@@ -1,1 +1,1 @@
-web: python wsgi\shadowcon\manage.py runserver
+web: gunicorn shadowcon.wsgi
