@@ -13,31 +13,25 @@ import os
 import dj_database_url
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print "BASE: " + BASE_DIR
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-print "PROJECT_ROOT: " + PROJECT_ROOT
-DJ_PROJECT_DIR = PROJECT_ROOT
-print "DJ_PROJECT_DIR: " + DJ_PROJECT_DIR
-
-import sys
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-#TODO Fix Me
-SECRET_KEY = ")vkg*r1we!i=7$ffr!x!r3b06^8zw=e_h!c#xzc4g+0231!*3^"
+DEFAULT_SECRET_KEY = "Not really secret, only for develoment"
+SECRET_KEY = os.environ.get('SECRET_KEY', DEFAULT_SECRET_KEY)
+#TODO REMOVE!!!!!
+print "SECRET_KEY => " + SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True #TODO revet os.environ.get('DEBUG') == 'True'
+DEBUG = os.environ.get('DEBUG') == 'True'
 
-from socket import gethostname
 ALLOWED_HOSTS = [
-    gethostname(),  # For internal OpenShift load balancer security purposes.
-    os.environ.get('OPENSHIFT_APP_DNS'),  # Dynamically map to the OpenShift gear name.
     "new.shadowcon.net",
     "www.shadowcon.net",
 	"localhost",
+    "shadowcon.herokuapp.com",
 ]
 
 
@@ -53,6 +47,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'django_ajax',
     'reversion',
@@ -61,6 +56,7 @@ INSTALLED_APPS = (
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -68,7 +64,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-	'whitenoise.middleware.WhiteNoiseMiddleware',
 )
 
 ROOT_URLCONF = 'shadowcon.urls'
@@ -76,7 +71,7 @@ ROOT_URLCONF = 'shadowcon.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(DJ_PROJECT_DIR, 'templates')],
+        'DIRS': [os.path.join(PROJECT_ROOT, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -95,11 +90,11 @@ WSGI_APPLICATION = 'shadowcon.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
+localSQLiteUrl = 'sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')
+
+db_from_env = dj_database_url.config(conn_max_age=500, default=localSQLiteUrl)
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    'default': db_from_env,
 }
 
 # Password validation
@@ -143,11 +138,14 @@ USE_TZ = True
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 STATICFILES_DIRS = [
-    os.path.join(DJ_PROJECT_DIR, 'static'),
+    os.path.join(PROJECT_ROOT, 'static'),
 ]
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# Honor the 'X-Forwarded-Proto' header for request.is_secure()
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 CKEDITOR_JQUERY_URL = '//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
 

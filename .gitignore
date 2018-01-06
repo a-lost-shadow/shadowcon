@@ -12,3 +12,5 @@ generate_coverage.sh
 htmlcov
 .env
 staticfiles
+static
+.idea
