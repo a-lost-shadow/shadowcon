@@ -23,8 +23,7 @@ DEFAULT_SECRET_KEY = "Not really secret, only for development"
 SECRET_KEY = os.environ.get('SECRET_KEY', DEFAULT_SECRET_KEY)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = os.environ.get('DEBUG') == 'True'
-DEBUG = True
+DEBUG = os.environ.get('DEBUG') == 'True'
 
 ALLOWED_HOSTS = [
     "new.shadowcon.net",
