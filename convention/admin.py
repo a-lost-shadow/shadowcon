@@ -1,6 +1,7 @@
 from django.contrib import admin
 from reversion_compare.admin import CompareVersionAdmin
 from .models import TimeBlock, TimeSlot, ConInfo, Location, Game, PaymentOption, BlockRegistration, Registration
+from .models import Trigger
 
 
 @admin.register(TimeBlock)
@@ -47,3 +48,8 @@ class BlockRegistrationAdmin(CompareVersionAdmin):
 @admin.register(Registration)
 class RegistrationAdmin(CompareVersionAdmin):
     model = Registration
+
+
+@admin.register(Trigger)
+class TriggerAdmin(CompareVersionAdmin):
+    model = Trigger

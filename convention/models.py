@@ -113,6 +113,14 @@ class Location(models.Model):
 
 
 @reversion.register()
+class Trigger(models.Model):
+    text = models.CharField(max_length=256)
+
+    def __str__(self):
+        return self.text
+
+
+@reversion.register()
 class Game(models.Model):
     title = models.CharField(max_length=256)
     gm = models.CharField(max_length=256)

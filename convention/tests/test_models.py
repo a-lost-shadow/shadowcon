@@ -4,7 +4,7 @@ from django.test.utils import override_settings
 from django.utils.html import strip_tags
 from shadowcon.tests.utils import ShadowConTestCase
 from ..models import ConInfo, Game, BlockRegistration, TimeBlock, TimeSlot, PaymentOption, Registration, Location
-from ..models import get_absolute_url, am_pm_print
+from ..models import get_absolute_url, am_pm_print, Trigger
 from ..utils import get_choice
 
 
@@ -143,6 +143,12 @@ class ModelsTest(ShadowConTestCase):
 
     def test_location_string_alternate(self):
         self.assertEquals("Alternate", str(Location(text="Alternate")))
+
+    def test_trigger_string(self):
+        self.assertEquals("Test Trigger", str(Trigger(text="Test Trigger")))
+
+    def test_trigger_string_alternate(self):
+        self.assertEquals("Alternate Trigger", str(Trigger(text="Alternate Trigger")))
 
     def check_game_string(self, string, game):
         self.assertTrue("Title: %s" % game.title in string)
