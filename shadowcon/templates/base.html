@@ -37,6 +37,7 @@
               <ul>
                 <li><a href="{% url 'convention:show_schedule' %}">Schedule</a></li>
                 <li><a href="{% url 'convention:games_list' %}">Description</a></li>
+                <li><a href="{% url 'convention:submit_game' %}">Submit Game</a></li>
                 <li><a href="{% url 'convention:user_profile' %}">Edit Submissions</a></li>
                 {% edit_schedule_link request.user %}
               </ul>

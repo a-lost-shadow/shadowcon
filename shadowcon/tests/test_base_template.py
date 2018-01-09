@@ -59,6 +59,12 @@ class BaseTemplateTest(ShadowConTestCase):
         response = self.client.get(self.url)
         self.assertSectionContains(response, '<li><a href="%s">Description</a></li>' % url, menu_start, '/ul')
 
+    def test_game_menu_contains_submit_game(self):
+        url = reverse('convention:submit_game')
+        response = self.client.get(self.url)
+        menu_start = 'a href="#">Games</a'
+        self.assertSectionContains(response, '<li><a href="%s">Submit Game</a></li>' % url, menu_start, '/ul')
+
     def test_game_menu_contains_submissions(self):
         url = reverse('convention:user_profile')
         response = self.client.get(self.url)
