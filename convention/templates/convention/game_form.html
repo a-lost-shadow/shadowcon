@@ -1,12 +1,22 @@
 {% extends "base.html" %}
+{% load con_info %}
+
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<form action="." method="POST">
-  {% csrf_token %}
-  {{ form.media }}
-  {{ form.as_p }}
-  <input class="submit" type="submit" value="Submit Game">
-  <input type="hidden" name="next" value="{{ next }}" />
-</form>
+<table>
+  <td>
+    <form action="." method="POST">
+      {% csrf_token %}
+      {{ form.media }}
+      {{ form.as_p }}
+      <input class="submit" type="submit" value="Submit Game">
+      <input type="hidden" name="next" value="{{ next }}" />
+    </form>
+  </td>
+  <td class="trigger_column">
+    <h3>Example Triggers</h3>
+    {% triggers_as_list %}
+  </td>
+</table>
 {% endblock %}

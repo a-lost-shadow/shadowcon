@@ -177,8 +177,6 @@ nav a:focus, nav a:hover {
     text-decoration:none;
 }
 
-
-
 /* Middle Container */
 div#container {
     width:960px;
@@ -206,6 +204,7 @@ aside ul {
 
 aside a {
     font-size:22px;
+    font-weight:bold;
 }
 
 aside li {
@@ -288,4 +287,8 @@ footer a {
   transform: scaleX(-1);
   filter: FlipH;
   -ms-filter: "FlipH";
+}
+
+.trigger_column {
+  vertical-align: text-top;
 }

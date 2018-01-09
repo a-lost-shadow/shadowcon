@@ -183,6 +183,18 @@ class GameEditTest(ShadowConTestCase):
         info.save()
         self.test_can_modify_own_game_post()
 
+    def test_triggers_shown(self):
+        self.client.login(username='staff', password='123')
+        user = User.objects.get(username='staff')
+        game = Game.objects.filter(user=user)[0]
+        url = reverse('convention:edit_game', args=[game.id])
+
+        response = self.client.get(url)
+        self.assertSectionContains(response, '<h3>Example Triggers</h3>', 'h3', '/ul')
+        self.assertSectionContains(response, '<li>Food</li>', 'h3', '/ul')
+        self.assertSectionContains(response, '<li>Spiders</li>', 'h3', '/ul')
+        self.assertSectionContains(response, '<li>Kittens</li>', 'h3', '/ul')
+
 
 class NewGameTest(ShadowConTestCase):
     url = reverse('convention:submit_game')
@@ -472,6 +484,18 @@ class NewGameTest(ShadowConTestCase):
         versions = reversion.get_for_object(actual)
         self.assertEquals(len(versions), 1)
         self.assertEquals(versions[0].revision.comment, "Form Submission - New")
+
+    def test_triggers_shown(self):
+        self.client.login(username='staff', password='123')
+        user = User.objects.get(username='staff')
+        game = Game.objects.filter(user=user)[0]
+        url = reverse('convention:edit_game', args=[game.id])
+
+        response = self.client.get(url)
+        self.assertSectionContains(response, '<h3>Example Triggers</h3>', 'h3', '/ul')
+        self.assertSectionContains(response, '<li>Food</li>', 'h3', '/ul')
+        self.assertSectionContains(response, '<li>Spiders</li>', 'h3', '/ul')
+        self.assertSectionContains(response, '<li>Kittens</li>', 'h3', '/ul')
 
 
 @ddt
