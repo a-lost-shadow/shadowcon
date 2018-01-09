@@ -188,7 +188,8 @@ function constructEditTable(svgId, tableId, data) {
 
   rows = "";
   for (i = 0; i < data.games.length; i++) {
-    rows += "<tr><td>" + data.games[i].title + "</td><td>" + data.games[i].gm + "</td>"
+    rows += "<tr><td>" + data.games[i].title + "</td><td>" + data.games[i].gm + "</td><td>" +
+            data.games[i].preferred_time + "</td><td>" + data.games[i].special_requests + "</td>"
 
     // time block
     rows += "<td><select class='block_edit form-control' name='" + i + "'><option value='-1'>Not Selected</option>";

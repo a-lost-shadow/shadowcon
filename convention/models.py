@@ -119,30 +119,37 @@ class Game(models.Model):
     time_block = models.ForeignKey(TimeBlock, blank=True, null=True)
     time_slot = models.ForeignKey(TimeSlot, blank=True, null=True)
     location = models.ForeignKey(Location, blank=True, null=True)
-    number_players = models.CharField(max_length=32)
-    duration = models.CharField(max_length=64)
+    number_players = models.CharField(max_length=32, verbose_name="Number of Players")
+    game_length = models.CharField(max_length=64, verbose_name="Game Length")
     system = models.CharField(max_length=256)
     triggers = models.CharField(max_length=256)
     description = RichTextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    preferred_time = models.CharField(max_length=256, blank=True, verbose_name="Preferred Time(s)", default="")
+    special_requests = models.CharField(max_length=256, blank=True, verbose_name="Special Request(s)",
+                                        help_text="(e.g. preferred room)", default="")
     last_modified = models.DateTimeField()
     last_scheduled = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         format_str = "Title: %s, GM: %s, Time Block: %s, Time Slot: %s, Location: %s, " + \
-                     "Duration: %s, Number Players: %s, System: %s, Triggers: %s, User: %s, " + \
-                     "Description: <CLOB>, Last Modified: %s, Last Scheduled: %s"
+                     "Game Length: %s, Number Players: %s, System: %s, Triggers: %s, User: %s, " + \
+                     "Description: <CLOB>, Preferred Time: %s, Special Requests: %s, Last Modified: %s, " + \
+                     "Last Scheduled: %s"
         return format_str % (self.title, self.gm, self.time_block, self.time_slot, self.location,
-                             self.duration, self.number_players, self.system, self.triggers,
-                             self.user, self.last_modified, self.last_scheduled)
+                             self.game_length, self.number_players, self.system, self.triggers,
+                             self.user, self.preferred_time, self.special_requests,
+                             self.last_modified, self.last_scheduled)
 
     def email_format(self, request):
         return "\n".join(["Title: %s",
                           "GM: %s",
                           "Number Players:%s",
-                          "Duration: %s",
+                          "Game Length: %s",
                           "System: %s",
                           "Triggers: %s",
+                          "Preferred Time(s): %s",
+                          "Special Request(s): %s",
                           "",
                           "Raw Description:",
                           "%s",
@@ -151,7 +158,8 @@ class Game(models.Model):
                           "%s",
                           "",
                           "Admin Link:",
-                          "%s"]) % (self.title, self.gm, self.number_players, self.duration, self.system, self.triggers,
+                          "%s"]) % (self.title, self.gm, self.number_players, self.game_length, self.system,
+                                    self.triggers, self.preferred_time, self.special_requests,
                                     strip_tags(self.description), self.description,
                                     get_absolute_url(request, "admin:convention_game_change", args=(self.id,)))
 

@@ -26,11 +26,13 @@ def get_games():
 def modify_game(game):
     game.title = "Unit Test Title"
     game.gm = "Unit Test GM"
-    game.duration = "Unit Test Duration"
+    game.game_length = "Unit Test Game Length"
     game.number_players = "Unit Test Player Count"
     game.system = "Unit Test System"
     game.triggers = "Unit Test Triggers"
     game.description = "<b>Unit Test Description</b>"
+    game.preferred_time = "Unit Test Preferred Time"
+    game.special_requests = "Unit Test Special Request"
     game.time_block = TimeBlock.objects.all()[0]
     game.time_slot = TimeSlot.objects.all()[0]
     game.location = Location.objects.all()[0]
@@ -39,11 +41,13 @@ def modify_game(game):
 def check_game(test_class, actual, modified_date):
     test_class.assertEquals(actual.title, "Unit Test Title")
     test_class.assertEquals(actual.gm, "Unit Test GM")
-    test_class.assertEquals(actual.duration, "Unit Test Duration")
+    test_class.assertEquals(actual.game_length, "Unit Test Game Length")
     test_class.assertEquals(actual.number_players, "Unit Test Player Count")
     test_class.assertEquals(actual.system, "Unit Test System")
     test_class.assertEquals(actual.triggers, "Unit Test Triggers")
     test_class.assertEquals(actual.description, "<b>Unit Test Description</b>")
+    test_class.assertEquals(actual.preferred_time, "Unit Test Preferred Time")
+    test_class.assertEquals(actual.special_requests, "Unit Test Special Request")
     test_class.assertGreater(actual.last_modified, modified_date)
     test_class.assertIsNone(actual.last_scheduled)
     test_class.assertIsNone(actual.time_block)
@@ -104,10 +108,12 @@ class GameEditTest(ShadowConTestCase):
         self.assertEquals(response.status_code, 200)
         self.assertSectionContains(response, 'value="%s"' % game.title, 'label for="id_title"', '/p')
         self.assertSectionContains(response, 'value="%s"' % game.gm, 'label for="id_gm"', '/p')
-        self.assertSectionContains(response, 'value="%s"' % game.duration, 'label for="id_duration"', '/p')
+        self.assertSectionContains(response, 'value="%s"' % game.game_length, 'label for="id_game_length"', '/p')
         self.assertSectionContains(response, 'value="%s"' % game.number_players, 'label for="id_number_players"', '/p')
         self.assertSectionContains(response, 'value="%s"' % game.system, 'label for="id_system"', '/p')
         self.assertSectionContains(response, 'value="%s"' % game.triggers, 'label for="id_triggers"', '/p')
+        self.assertSectionContains(response, 'value="%s"' % game.preferred_time, 'label for="id_preferred_time"', '/p')
+        self.assertSectionContains(response, 'value="%s"' % game.special_requests, 'label for="id_special_requests"', '/p')
         desc = self.extract_between(self.get_section(response, 'label for="id_description"', '/p'),
                                     'ckeditortype">', '</textarea>')[14:-11]
         self.assertEquals(desc, escape(game.description))
@@ -203,10 +209,12 @@ class NewGameTest(ShadowConTestCase):
         self.assertEquals(response.status_code, 200)
         self.assertSectionContains(response, 'value=', 'label for="id_title"', '/p', False)
         self.assertSectionContains(response, 'value="%s"' % expected_username, 'label for="id_gm"', '/p')
-        self.assertSectionContains(response, 'value=', 'label for="id_duration"', '/p', False)
+        self.assertSectionContains(response, 'value=', 'label for="id_game_length"', '/p', False)
         self.assertSectionContains(response, 'value=', 'label for="id_number_players"', '/p', False)
         self.assertSectionContains(response, 'value=', 'label for="id_system"', '/p', False)
         self.assertSectionContains(response, 'value=', 'label for="id_triggers"', '/p', False)
+        self.assertSectionContains(response, 'value=', 'label for="id_preferred_time"', '/p', False)
+        self.assertSectionContains(response, 'value=', 'label for="id_special_requests"', '/p', False)
         desc = self.extract_between(self.get_section(response, 'label for="id_description"', '/p'),
                                     'ckeditortype">', '</textarea>')[14:-11]
         self.assertEquals(desc, "")
@@ -538,7 +546,7 @@ class GameEditScheduleTest(ShadowConTestCase):
         self.assertSectionContains(self.response, "", 'div id="schedule"', '/div')
 
     def test_javascript_schedule_table(self):
-        pattern = "<tr>\\s+\\s+<th>Game</th>\\s+<th>GM</th>\\s+" \
+        pattern = "<tr>\\s+\\s+<th>Game</th>\\s+<th>GM</th>\\s+<th>Preference</th>\\s+<th>Special Requests</th>\\s+" \
                   "<th>Block</th>\\s+<th>Slot</th>\\s+<th>Location</th>\\s+</tr>"
         self.assertSectionContains(self.response, pattern, 'table id="schedule_edit" width="100%" border="1"', '/table')
 

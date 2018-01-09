@@ -13,7 +13,8 @@ from ..utils import friendly_username
 from .common import ConHasSpaceOrAlreadyRegisteredMixin, IsStaffMixin, RevisionMixin
 from contact.utils import mail_list
 
-game_fields = ['title', 'gm', 'duration', 'number_players', 'system', 'triggers', 'description']
+game_fields = ['title', 'gm', 'game_length', 'number_players', 'system', 'triggers', 'preferred_time',
+               'special_requests', 'description']
 
 
 def get_games():
@@ -152,6 +153,8 @@ class SchedulerHandler(AJAXMixin, generic.base.View):
                                         "location": get_index(x.location, locations),
                                         "time_block": get_index(x.time_block, blocks),
                                         "time_slot": get_index(x.time_slot, slots),
+                                        "preferred_time": x.preferred_time,
+                                        "special_requests": x.special_requests,
                                         "start": get_start(x),
                                         "width": get_width(x.time_slot),
                                         },

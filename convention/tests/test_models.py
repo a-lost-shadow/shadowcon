@@ -148,9 +148,11 @@ class ModelsTest(ShadowConTestCase):
         self.assertTrue("Title: %s" % game.title in string)
         self.assertTrue("GM: %s" % game.gm in string)
         self.assertTrue("Number Players: %s" % game.number_players in string)
-        self.assertTrue("Duration: %s" % game.duration in string)
+        self.assertTrue("Game Length: %s" % game.game_length in string)
         self.assertTrue("System: %s" % game.system in string)
         self.assertTrue("Triggers: %s" % game.triggers in string)
+        self.assertTrue("Preferred Time: %s" % game.preferred_time in string)
+        self.assertTrue("Special Requests: %s" % game.special_requests in string)
 
     def test_game_string(self):
         game = Game.objects.all()[0]
