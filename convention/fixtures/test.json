@@ -146,5 +146,26 @@
       "registration": 2,
       "attendance": "N"
     }
+  },
+  {
+    "model": "convention.trigger",
+    "pk": 1,
+    "fields": {
+      "text": "Kittens"
+    }
+  },
+  {
+    "model": "convention.trigger",
+    "pk": 2,
+    "fields": {
+      "text": "Spiders"
+    }
+  },
+  {
+    "model": "convention.trigger",
+    "pk": 3,
+    "fields": {
+      "text": "Food"
+    }
   }
 ]
