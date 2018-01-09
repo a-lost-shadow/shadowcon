@@ -145,6 +145,10 @@ class TemplateTagsTest(ShadowConTestCase):
 
 """)
 
+    def test_con_triggers_as_list(self):
+        self.check_tag("con_info", "triggers_as_list", u"<ul>\n  \n  <li>Food</li>\n  \n  <li>Kittens</li>\n  \n  " +
+                                                       u"<li>Spiders</li>\n  \n</ul>\n")
+
     def test_user_attendance_with_user(self):
         user = User.objects.get(username="user")
         self.check_tag("user", "user_attendance user", expected_attendance(user), context=Context({"user": user}))

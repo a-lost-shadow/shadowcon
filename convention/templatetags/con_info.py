@@ -4,6 +4,7 @@ from datetime import date
 import pytz
 
 from ..utils import get_con_value, is_pre_reg_open, is_registration_open
+from ..models import Trigger
 
 register = template.Library()
 
@@ -67,3 +68,8 @@ def register_links(user):
 @register.simple_tag
 def con_registration_opens():
     return get_datetime_as_string(get_con_value("registration_opens"), " at ")
+
+
+@register.inclusion_tag('convention/trigger_list.html')
+def triggers_as_list():
+    return {'triggers': sorted([x.text for x in Trigger.objects.all()])}
