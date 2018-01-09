@@ -44,6 +44,6 @@ def attendance_list_link(user):
 def game_registration_link(user):
     registration_object = Registration.objects.filter(user=user)
     if registration_object:
-        return html.format_html('<li><b><a href="https://goo.gl/forms/xKWoC8boOUIFi32U2">Game Registration</a></b></li>')
+        return html.format_html('<li><a href="https://goo.gl/forms/xKWoC8boOUIFi32U2">Game Registration</a></li>')
     else:
         return ""
