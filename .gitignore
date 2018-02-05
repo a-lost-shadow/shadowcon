@@ -3,6 +3,8 @@
 *.bak
 *.orig
 *~
+*.sublime-workspace
+*.sublime-project
 .project
 .pydevproject
 shadowcon/.idea/workspace.xml 
