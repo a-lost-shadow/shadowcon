@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 from registration.forms import RegistrationForm as BaseRegistrationForm, get_user_model
 from reversion import revisions as reversion
 
-from .models import BlockRegistration, TimeBlock, Registration, PaymentOption
+from .models import BlockRegistration, TimeBlock, Registration, PaymentOption, Referral
 from .utils import get_registration, friendly_username
 from contact.utils import mail_list
 
@@ -18,6 +18,7 @@ import pytz
 class NewUserForm(BaseRegistrationForm):
     first_name = CharField(max_length=30, required=False)
     last_name = CharField(max_length=30, required=False)
+    referral_code = CharField(max_length=8, required=False)
 
     class Meta(BaseRegistrationForm.Meta):
         fields = [
@@ -28,6 +29,22 @@ class NewUserForm(BaseRegistrationForm):
             'password1',
             'password2'
         ]
+
+    def clean_referral_code(self):
+        code = self.cleaned_data.get('referral_code')
+
+        if code == "":
+            return code
+
+        referrals = Referral.objects.filter(code=code)
+        if len(referrals) is 0:
+            raise ValidationError(_("The provided referral code %s does not exist." % code), code="invalid referral")
+
+        referral = referrals[0]
+        if referral.referred_user is not None:
+            raise ValidationError(_("The provided referral code %s has already been used." % code), code="already used referral")
+
+        return code
 
 
 class AttendanceForm(Form):
