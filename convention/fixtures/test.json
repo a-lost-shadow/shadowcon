@@ -167,5 +167,22 @@
     "fields": {
       "text": "Food"
     }
+  },
+  {
+    "model": "convention.referral",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "code": "AABBCCDD"
+    }
+  },
+  {
+    "model": "convention.referral",
+    "pk": 2,
+    "fields": {
+      "user": 1,
+      "referred_user": 2,
+      "code": "EEFFGGHH"
+    }
   }
 ]

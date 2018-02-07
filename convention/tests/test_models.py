@@ -2,9 +2,10 @@ from ddt import data, ddt
 from django.http.request import HttpRequest
 from django.test.utils import override_settings
 from django.utils.html import strip_tags
+from django.contrib.auth.models import User
 from shadowcon.tests.utils import ShadowConTestCase
 from ..models import ConInfo, Game, BlockRegistration, TimeBlock, TimeSlot, PaymentOption, Registration, Location
-from ..models import get_absolute_url, am_pm_print, Trigger
+from ..models import get_absolute_url, am_pm_print, Trigger, Referral
 from ..utils import get_choice
 
 
@@ -265,4 +266,34 @@ class ModelsTest(ShadowConTestCase):
         item.registration.delete()
 
         items = Registration.objects.filter(id=reg_id)
+        self.assertEquals(0, len(items))
+
+    def test_referral_string_unredeemed(self):
+        item = Referral.objects.all()[0]
+        string = str(item)
+        self.assertTrue("Referral code: %s" % item.code in string)
+        self.assertTrue("From: %s" % item.user in string)
+        self.assertTrue("To: unredeemed" in string)
+
+    def test_referral_string_redeemed(self):
+        item = Referral.objects.all()[1]
+        string = str(item)
+        self.assertTrue("Referral code: %s" % item.code in string)
+        self.assertTrue("From: %s" % item.user in string)
+        self.assertTrue("To: %s" % item.referred_user in string)
+
+    def test_referral_delete_user(self):
+        item = Referral.objects.all()[0]
+        referral_id = item.id
+        item.user.delete()
+
+        items = Referral.objects.filter(id = referral_id)
+        self.assertEquals(0, len(items))
+
+    def test_referral_delete_referred_user(self):
+        item = Referral.objects.all()[1]
+        referral_id = item.id
+        item.referred_user.delete()
+
+        items = Referral.objects.filter(id = referral_id)
         self.assertEquals(0, len(items))
