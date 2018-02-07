@@ -1,7 +1,7 @@
 from django.contrib import admin
 from reversion_compare.admin import CompareVersionAdmin
 from .models import TimeBlock, TimeSlot, ConInfo, Location, Game, PaymentOption, BlockRegistration, Registration
-from .models import Trigger
+from .models import Trigger, Referral
 
 
 @admin.register(TimeBlock)
@@ -53,3 +53,10 @@ class RegistrationAdmin(CompareVersionAdmin):
 @admin.register(Trigger)
 class TriggerAdmin(CompareVersionAdmin):
     model = Trigger
+
+
+@admin.register(Referral)
+class ReferralAdmin(CompareVersionAdmin):
+    model = Referral
+    ordering = ['user']
+    exclude = ['referred_user', 'code']

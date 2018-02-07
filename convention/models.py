@@ -7,6 +7,7 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils.html import strip_tags
 from django.conf import settings
+from django.utils import crypto
 from reversion import revisions as reversion
 from datetime import datetime
 import re
@@ -233,3 +234,20 @@ class BlockRegistration(models.Model):
                (self.registration,
                 self.time_block,
                 get_choice(self.attendance, self.ATTENDANCE_CHOICES))
+
+
+def generate_code():
+    while True:
+        code = crypto.get_random_string(8, "ABCDEFGHJKLMNPQRTSUV23456789")
+        if len(Referral.objects.filter(code=code)) is 0:
+            return code
+
+
+class Referral(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    referred_user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="referer", null=True)
+    code = models.CharField(max_length=8, unique=True, db_index=True, default=generate_code)
+
+    def __str__(self):
+        return "From: %s, Referral code: %s, To: %s" % \
+            (self.user, self.code, self.referred_user if self.referred_user else "unredeemed")
