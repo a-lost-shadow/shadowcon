@@ -297,3 +297,11 @@ class ModelsTest(ShadowConTestCase):
 
         items = Referral.objects.filter(id = referral_id)
         self.assertEquals(0, len(items))
+
+    def test_deleting_referral_does_not_delete_user(self):
+        item = Referral.objects.all()[1]
+        owner = item.user
+        referred = item.referred_user
+        item.delete()
+        self.assertIn(owner, User.objects.all())
+        self.assertIn(referred, User.objects.all())
