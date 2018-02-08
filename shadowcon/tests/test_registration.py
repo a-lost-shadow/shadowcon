@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from django.template.exceptions import TemplateDoesNotExist
 from django.test import Client
 from shadowcon.tests.utils import ShadowConTestCase
+from convention.models import Referral
 
 
 class NewUserRegistrationTest(ShadowConTestCase):
@@ -89,6 +90,40 @@ class NewUserRegistrationTest(ShadowConTestCase):
         with self.assertRaises(TemplateDoesNotExist) as e:
             self.client.get(link)
         self.assertEquals(e.exception.message, "registration/activate.html")
+
+    def test_referral_code(self):
+        oldUser = User(username="OldUser", first_name="Old", last_name="User", password="123")
+        oldUser.save()
+        referral = Referral(user=oldUser, code="12345678")
+        referral.save()
+
+        self.registration_data["referral_code"] = referral.code
+        self.client.post(reverse('convention:new_user'), self.registration_data)
+        user = User.objects.get(username="username")
+        updatedReferral = Referral.objects.get(code=referral.code)
+        self.assertEquals(user, updatedReferral.referred_user)
+
+    def test_bad_referral_code(self):
+        oldUser = User(username="OldUser", first_name="Old", last_name="User", password="123")
+        oldUser.save()
+
+        self.registration_data["referral_code"] = "12345678"
+        response = self.client.post(reverse('convention:new_user'), self.registration_data)
+        self.assertSectionContains(response, "The provided referral code 12345678 does not exist.",
+                                   'section id="main" role="main"', '/section')
+
+    def test_referral_code_taken(self):
+        oldUser1 = User(username="OldUser1", first_name="Old", last_name="User", password="123")
+        oldUser1.save()
+        oldUser2 = User(username="OldUser2", first_name="Old", last_name="User", password="123")
+        oldUser2.save()
+        referral = Referral(user=oldUser1, referred_user=oldUser2, code="12345678")
+        referral.save()
+
+        self.registration_data["referral_code"] = "12345678"
+        response = self.client.post(reverse('convention:new_user'), self.registration_data)
+        self.assertSectionContains(response, "The provided referral code 12345678 has already been used.",
+                                   'section id="main" role="main"', '/section')
 
 
 # Mainly just want to test that our templates are being loaded
