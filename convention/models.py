@@ -245,7 +245,8 @@ def generate_code():
 
 class Referral(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    referred_user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="referer", null=True)
+    referred_user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="referer", null=True,
+                                         blank=True)
     code = models.CharField(max_length=8, unique=True, db_index=True, default=generate_code)
 
     def __str__(self):
