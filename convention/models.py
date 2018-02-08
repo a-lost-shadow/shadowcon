@@ -238,7 +238,7 @@ class BlockRegistration(models.Model):
 
 def generate_code():
     while True:
-        code = crypto.get_random_string(8, "ABCDEFGHJKLMNPQRTSUV23456789")
+        code = crypto.get_random_string(8, "ABCDEFGHJKLMNPRSTUVWXY345679")
         if len(Referral.objects.filter(code=code)) is 0:
             return code
 

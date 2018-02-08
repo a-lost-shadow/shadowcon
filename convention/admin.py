@@ -59,4 +59,4 @@ class TriggerAdmin(CompareVersionAdmin):
 class ReferralAdmin(CompareVersionAdmin):
     model = Referral
     ordering = ['user']
-    exclude = ['referred_user', 'code']
+    readonly_fields = ['code']
