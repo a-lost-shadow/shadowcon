@@ -42,9 +42,6 @@
                 {% edit_schedule_link request.user %}
               </ul>
             </li>
-            {% if user.is_authenticated %}
-            {% game_registration_link request.user %}
-            {% endif %}
             <li><a href="#">Site</a>
               <ul>
                 <li><a href="{% url 'page:display' 'site/directions' %}">Directions</a></li>
@@ -79,9 +76,6 @@
       <aside>
         <ul>
           {% register_links request.user %}
-          {% if user.is_authenticated %}
-          {% game_registration_link request.user %}
-          {% endif %}
           <li id="deadlines">
             <h3>Deadlines:</h3>
             <ul>

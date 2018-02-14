@@ -225,14 +225,3 @@ class TemplateTagsTest(ShadowConTestCase):
         user = User(username="new_user")
         user.save()
         self.run_submitted_game_test(user)
-
-    def test_game_registration_link_with_registration(self):
-        user = User.objects.get(username="admin")
-        expected = '<li><a href="https://goo.gl/forms/xKWoC8boOUIFi32U2">Game Registration</a></li>'
-        self.check_tag("user", "game_registration_link user", expected, context=Context({"user": user}))
-
-    def test_game_registration_link_with_no_registration(self):
-        user = User(username="new_user")
-        user.save()
-        expected = ''
-        self.check_tag("user", "game_registration_link user", expected, context=Context({"user": user}))
