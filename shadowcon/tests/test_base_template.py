@@ -100,28 +100,6 @@ class BaseTemplateTest(ShadowConTestCase):
         response = self.client.get(self.url)
         self.assertSectionContains(response, '<li><a href="%s">Change Schedule</a></li>' % url, menu_start, '/ul')
 
-    def test_nav_contains_game_registration_menu_with_registration(self):
-        self.client.login(username="admin", password="123")
-        response = self.client.get(self.url)
-        self.assertSectionContains(response,
-                                   '<li><a href="https://goo.gl/forms/xKWoC8boOUIFi32U2">Game Registration</a></li>',
-                                   "nav")
-
-    def test_nav_does_not_contain_game_registration_menu_with_no_user(self):
-        response = self.client.get(self.url)
-        self.assertSectionContains(response,
-                                   '<li><a href="https://goo.gl/forms/xKWoC8boOUIFi32U2">Game Registration</a></li>',
-                                   "nav",
-                                   expected=False)
-
-    def test_nav_does_not_contain_game_registration_menu_with_no_registration(self):
-        self.client.login(username="user", password="123")
-        response = self.client.get(self.url)
-        self.assertSectionContains(response,
-                                   '<li><a href="https://goo.gl/forms/xKWoC8boOUIFi32U2">Game Registration</a></li>',
-                                   "nav",
-                                   expected=False)
-
     # ########################## Site Menu #############################
     def test_nav_contains_site_menu(self):
         response = self.client.get(self.url)
@@ -284,31 +262,6 @@ class BaseTemplateTest(ShadowConTestCase):
                                    'li id="deadlines"')
         self.assertSectionContains(response, pattern % (reverse("convention:submit_game"), "Submit Game"), "aside",
                                    'li id="deadlines"')
-
-    def test_sidebar_game_registration_link_with_registration(self):
-        self.client.login(username="admin", password="123")
-        response = self.client.get(self.url)
-        self.assertSectionContains(response,
-                                   '<li><a href="https://goo.gl/forms/xKWoC8boOUIFi32U2">Game Registration</a></li>',
-                                   "aside",
-                                   'li id="deadlines"')
-
-    def test_sidebar_game_registration_link_with_no_user(self):
-        response = self.client.get(self.url)
-        self.assertSectionContains(response,
-                                   '<li><a href="https://goo.gl/forms/xKWoC8boOUIFi32U2">Game Registration</a></li>',
-                                   "aside",
-                                   'li id="deadlines"',
-                                   expected=False)
-
-    def test_sidebar_game_registration_link_with_no_registration(self):
-        self.client.login(username="user", password="123")
-        response = self.client.get(self.url)
-        self.assertSectionContains(response,
-                                   '<li><a href="https://goo.gl/forms/xKWoC8boOUIFi32U2">Game Registration</a></li>',
-                                   "aside",
-                                   'li id="deadlines"',
-                                   expected=False)
 
     # ########################## Deadlines #############################
 

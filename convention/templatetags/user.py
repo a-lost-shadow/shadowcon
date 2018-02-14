@@ -38,12 +38,3 @@ def attendance_list_link(user):
                                 reverse('convention:attendance_list'))
     else:
         return ""
-
-
-@register.simple_tag
-def game_registration_link(user):
-    registration_object = Registration.objects.filter(user=user)
-    if registration_object:
-        return html.format_html('<li><a href="https://goo.gl/forms/xKWoC8boOUIFi32U2">Game Registration</a></li>')
-    else:
-        return ""
