@@ -56,15 +56,21 @@ class UtilsTest(ShadowConTestCase):
 
     def test_registration_closed(self):
         con = ConInfo.objects.all()[0]
-        con.registration_open = timezone.now() + timedelta(minutes=1)
+        con.registration_opens = timezone.now() + timedelta(minutes=1)
         con.save()
-        self.assertEquals(is_registration_open(), True)
+        self.assertEquals(is_registration_open(), False)
 
     def test_registration_open(self):
         con = ConInfo.objects.all()[0]
-        con.registration_open = timezone.now() - timedelta(minutes=1)
+        con.registration_opens = timezone.now() - timedelta(minutes=1)
         con.save()
         self.assertEquals(is_registration_open(), True)
+
+    def test_registration_date_missing(self):
+        con = ConInfo.objects.all()[0]
+        con.registration_opens = None
+        con.save()
+        self.assertEquals(is_registration_open(), False)
 
     def test_pre_reg_open(self):
         self.assertTrue(is_pre_reg_open(User.objects.get(username="admin")))

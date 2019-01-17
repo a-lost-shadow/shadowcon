@@ -24,7 +24,7 @@ def get_con_value(parameter):
 
 def is_registration_open():
     open_date = get_con_value("registration_opens")
-    return open_date <= timezone.now()
+    return open_date is not None and open_date <= timezone.now()
 
 
 def is_pre_reg_open(user):

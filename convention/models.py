@@ -33,16 +33,16 @@ def get_choice(value, choices):
 
 
 class ConInfo(models.Model):
-    date = models.DateField()
-    pre_reg_deadline = models.DateField()
-    game_sub_deadline = models.DateField()
-    game_reg_deadline = models.DateTimeField(
+    date = models.DateField(blank=True, null=True)
+    pre_reg_deadline = models.DateField(blank=True, null=True)
+    game_sub_deadline = models.DateField(blank=True, null=True)
+    game_reg_deadline = models.DateTimeField(blank=True, null=True,
         default=pytz.timezone("US/Pacific").localize(datetime(2016, 9, 15, 18, 0, 0)))
-    location = models.CharField(max_length=1024)
-    pre_reg_cost = models.FloatField()
-    door_cost = models.FloatField()
-    registration_opens = models.DateTimeField()
-    max_attendees = models.PositiveIntegerField()
+    location = models.CharField(max_length=1024, blank=True, null=True)
+    pre_reg_cost = models.FloatField(blank=True, null=True)
+    door_cost = models.FloatField(blank=True, null=True)
+    registration_opens = models.DateTimeField(blank=True, null=True)
+    max_attendees = models.PositiveIntegerField(blank=True, null=True)
 
     def __str__(self):
         format_str = "Date: %s, Location: %s, Game Submission Deadline: %s, PreReg Deadline: %s, " + \
