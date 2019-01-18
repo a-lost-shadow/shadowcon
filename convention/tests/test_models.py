@@ -62,14 +62,7 @@ class ModelsTest(ShadowConTestCase):
     def test_con_info_string(self):
         item = ConInfo.objects.all()[0]
         string = str(item)
-        self.assertTrue("Date: %s" % item.date in string)
-        self.assertTrue("Location: %s" % item.location in string)
-        self.assertTrue("Game Submission Deadline: %s" % item.game_sub_deadline in string)
-        self.assertTrue("PreReg Deadline: %s" % item.pre_reg_deadline in string)
-        self.assertTrue("PreReg Cost: %s" % item.pre_reg_cost in string)
-        self.assertTrue("Door Cost: %s" % item.door_cost in string)
-        self.assertTrue("Registration Opens: %s" % item.registration_opens in string)
-        self.assertTrue("Max Attendees: %s" % item.max_attendees in string)
+        self.assertEquals(item.title, string)
 
     def test_time_block_first_word(self):
         item = TimeBlock(text="Word Separation Test", sort_id=1)
@@ -151,20 +144,18 @@ class ModelsTest(ShadowConTestCase):
     def test_trigger_string_alternate(self):
         self.assertEquals("Alternate Trigger", str(Trigger(text="Alternate Trigger")))
 
-    def check_game_string(self, string, game):
-        self.assertTrue("Title: %s" % game.title in string)
-        self.assertTrue("GM: %s" % game.gm in string)
-        self.assertTrue("Number Players: %s" % game.number_players in string)
-        self.assertTrue("Game Length: %s" % game.game_length in string)
-        self.assertTrue("System: %s" % game.system in string)
-        self.assertTrue("Triggers: %s" % game.triggers in string)
-        self.assertTrue("Preferred Time: %s" % game.preferred_time in string)
-        self.assertTrue("Special Requests: %s" % game.special_requests in string)
-
     def test_game_string(self):
         game = Game.objects.all()[0]
         game_str = str(game)
-        self.check_game_string(game_str, game)
+        self.assertTrue("Convention: %s" % game.convention in game_str)
+        self.assertTrue("Title: %s" % game.title in game_str)
+        self.assertTrue("GM: %s" % game.gm in game_str)
+        self.assertTrue("Number Players: %s" % game.number_players in game_str)
+        self.assertTrue("Game Length: %s" % game.game_length in game_str)
+        self.assertTrue("System: %s" % game.system in game_str)
+        self.assertTrue("Triggers: %s" % game.triggers in game_str)
+        self.assertTrue("Preferred Time: %s" % game.preferred_time in game_str)
+        self.assertTrue("Special Requests: %s" % game.special_requests in game_str)
         self.assertTrue("Time Block: %s" % game.time_block in game_str)
         self.assertTrue("Time Slot: %s" % game.time_slot in game_str)
         self.assertTrue("Location: %s" % game.location in game_str)
@@ -239,6 +230,7 @@ class ModelsTest(ShadowConTestCase):
     def test_registration_string(self):
         item = Registration.objects.all()[0]
         string = str(item)
+        self.assertTrue("Convention: %s" % item.convention in string)
         self.assertTrue("User: %s" % item.user in string)
         self.assertTrue("Registration Date: %s" % item.registration_date in string)
         self.assertTrue("Last Updated: %s" % item.last_updated in string)

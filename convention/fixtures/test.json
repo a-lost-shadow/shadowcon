@@ -7,7 +7,8 @@
       "registration_date": "2016-03-05T19:49:20.322Z",
       "last_updated": "2016-03-09T06:41:54.247Z",
       "payment": "paypal",
-      "payment_received": false
+      "payment_received": false,
+      "convention": 1
     }
   },
   {
@@ -18,7 +19,8 @@
       "registration_date": "2016-03-14T03:08:15.314Z",
       "last_updated": "2016-03-14T03:08:15.317Z",
       "payment": "cash",
-      "payment_received": false
+      "payment_received": false,
+      "convention": 1
     }
   },
   {

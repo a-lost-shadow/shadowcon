@@ -3,6 +3,7 @@
     "model": "convention.coninfo",
     "pk": 1,
     "fields": {
+      "title": "Shadowcon 2016",
       "date": "2016-04-01",
       "pre_reg_deadline": "2016-03-15",
       "game_sub_deadline": "2016-03-22",
@@ -145,21 +146,24 @@
     "model": "convention.location",
     "pk": 1,
     "fields": {
-      "text": "Boiler Room"
+      "text": "Boiler Room",
+      "convention": 1
     }
   },
   {
     "model": "convention.location",
     "pk": 2,
     "fields": {
-      "text": "Dance Floor"
+      "text": "Dance Floor",
+      "convention": 1
     }
   },
   {
     "model": "convention.location",
     "pk": 3,
     "fields": {
-      "text": "Dungeon"
+      "text": "Dungeon",
+      "convention": 1
     }
   },
   {

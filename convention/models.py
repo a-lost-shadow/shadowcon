@@ -33,6 +33,7 @@ def get_choice(value, choices):
 
 
 class ConInfo(models.Model):
+    title = models.CharField(default="Shadowcon 1984", max_length=256)
     date = models.DateField(blank=True, null=True)
     pre_reg_deadline = models.DateField(blank=True, null=True)
     game_sub_deadline = models.DateField(blank=True, null=True)
@@ -45,12 +46,7 @@ class ConInfo(models.Model):
     max_attendees = models.PositiveIntegerField(blank=True, null=True)
 
     def __str__(self):
-        format_str = "Date: %s, Location: %s, Game Submission Deadline: %s, PreReg Deadline: %s, " + \
-                     "PreReg Cost: %s, Door Cost: %s, Registration Opens: %s, Max Attendees: %s, " + \
-                     "Game Registration Deadline: %s"
-        return format_str % (self.date, self.location, self.game_sub_deadline,
-                             self.pre_reg_deadline, self.pre_reg_cost, self.door_cost,
-                             self.registration_opens, self.max_attendees, self.game_reg_deadline)
+        return self.title
 
 
 weekdays = {u'monday': True,
@@ -108,6 +104,7 @@ class TimeSlot(models.Model):
 
 class Location(models.Model):
     text = models.CharField(max_length=256)
+    convention = models.ForeignKey(ConInfo, related_name="rooms")
 
     def __str__(self):
         return self.text
@@ -139,13 +136,14 @@ class Game(models.Model):
                                         help_text="(e.g. preferred room)", default="")
     last_modified = models.DateTimeField()
     last_scheduled = models.DateTimeField(blank=True, null=True)
+    convention = models.ForeignKey(ConInfo)
 
     def __str__(self):
-        format_str = "Title: %s, GM: %s, Time Block: %s, Time Slot: %s, Location: %s, " + \
+        format_str = "Convention: %s, Title: %s, GM: %s, Time Block: %s, Time Slot: %s, Location: %s, " + \
                      "Game Length: %s, Number Players: %s, System: %s, Triggers: %s, User: %s, " + \
                      "Description: <CLOB>, Preferred Time: %s, Special Requests: %s, Last Modified: %s, " + \
                      "Last Scheduled: %s"
-        return format_str % (self.title, self.gm, self.time_block, self.time_slot, self.location,
+        return format_str % (self.convention, self.title, self.gm, self.time_block, self.time_slot, self.location,
                              self.game_length, self.number_players, self.system, self.triggers,
                              self.user, self.preferred_time, self.special_requests,
                              self.last_modified, self.last_scheduled)
@@ -209,10 +207,11 @@ class Registration(models.Model):
     last_updated = models.DateTimeField()
     payment = models.ForeignKey(PaymentOption)
     payment_received = models.BooleanField(default=False)
+    convention = models.ForeignKey(ConInfo)
 
     def __str__(self):
-        return "User: %s, Registration Date: %s, Payment: %s, Payment Received: %s, Last Updated: %s" % \
-               (self.user, self.registration_date, self.payment, self.payment_received, self.last_updated)
+        return "Convention: %s, User: %s, Registration Date: %s, Payment: %s, Payment Received: %s, Last Updated: %s" % \
+               (self.convention, self.user, self.registration_date, self.payment, self.payment_received, self.last_updated)
 
 
 @reversion.register()

@@ -7,7 +7,7 @@ from registration.forms import RegistrationForm as BaseRegistrationForm, get_use
 from reversion import revisions as reversion
 
 from .models import BlockRegistration, TimeBlock, Registration, PaymentOption, Referral
-from .utils import get_registration, friendly_username
+from .utils import get_registration, friendly_username, get_current_con
 from contact.utils import mail_list
 
 from collections import OrderedDict
@@ -51,7 +51,8 @@ class AttendanceForm(Form):
     def __init__(self, user=None, *args, **kwargs):
         super(AttendanceForm, self).__init__(*args, **kwargs)
 
-        registration = Registration.objects.filter(user=user)
+        convention = get_current_con()
+        registration = Registration.objects.filter(user=user).filter(convention=convention)
         if registration:
             self.registration = registration[0]
             date = self.registration.registration_date.astimezone(pytz.timezone('US/Pacific'))
@@ -91,7 +92,8 @@ class AttendanceForm(Form):
     def save(self):
         new_entry = not hasattr(self, "registration")
         if new_entry:
-            self.registration = Registration(user=self.user,
+            self.registration = Registration(convention=get_current_con(),
+                                             user=self.user,
                                              registration_date=timezone.now(),
                                              payment=PaymentOption.objects.all()[0])
 

@@ -3,7 +3,7 @@ from django.shortcuts import render
 from reversion import revisions as reversion
 
 from ..models import Registration
-from ..utils import is_registration_open, get_con_value
+from ..utils import is_registration_open, get_con_value, get_current_con
 
 
 class RegistrationOpenMixin(AccessMixin):
@@ -38,7 +38,8 @@ def is_on_wait_list(entries, request):
 class NotOnWaitingListMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
         try:
-            if is_on_wait_list(Registration.objects.order_by('registration_date'), request):
+            convention = get_current_con()
+            if is_on_wait_list(Registration.objects.order_by('registration_date').filter(convention=convention), request):
                 return render(request, 'convention/registration_wait_list.html', {})
         except ValueError:
             return render(request, 'convention/registration_not_found.html', {})
@@ -48,7 +49,8 @@ class NotOnWaitingListMixin(AccessMixin):
 
 class ConHasSpaceOrAlreadyRegisteredMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
-        entries = Registration.objects.order_by('registration_date')
+        convention = get_current_con()
+        entries = Registration.objects.order_by('registration_date').filter(convention=convention)
         if len(entries) >= get_con_value('max_attendees'):
             try:
                 if is_on_wait_list(entries, request):

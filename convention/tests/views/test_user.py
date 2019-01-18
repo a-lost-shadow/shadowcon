@@ -409,7 +409,8 @@ class AttendanceListTest(ShadowConTestCase):
         new_reg = Registration(user=User.objects.filter(username="admin").get(),
                                registration_date=timezone.now(),
                                last_updated=timezone.now(),
-                               payment=PaymentOption.objects.all()[0])
+                               payment=PaymentOption.objects.all()[0],
+                               convention=ConInfo.objects.all()[0])
         new_reg.save()
 
         time_blocks = TimeBlock.objects.exclude(text__startswith='Not').order_by('sort_id')
@@ -455,7 +456,8 @@ class AttendanceListTest(ShadowConTestCase):
         new_reg = Registration(user=User.objects.filter(username="admin").get(),
                                registration_date=timezone.now(),
                                last_updated=timezone.now(),
-                               payment=PaymentOption.objects.all()[0])
+                               payment=PaymentOption.objects.all()[0],
+                               convention=ConInfo.objects.all()[0])
         new_reg.save()
 
         count = 0
@@ -468,7 +470,8 @@ class AttendanceListTest(ShadowConTestCase):
         new_reg = Registration(user=User.objects.filter(username="staff").get(),
                                registration_date=timezone.now(),
                                last_updated=timezone.now(),
-                               payment=PaymentOption.objects.all()[0])
+                               payment=PaymentOption.objects.all()[0],
+                               convention=ConInfo.objects.all()[0])
         new_reg.save()
 
         count = 0
@@ -519,7 +522,8 @@ class AttendanceListTest(ShadowConTestCase):
         new_reg = Registration(user=User.objects.filter(username="admin").get(),
                                registration_date=timezone.now(),
                                last_updated=timezone.now(),
-                               payment=PaymentOption.objects.all()[0])
+                               payment=PaymentOption.objects.all()[0],
+                               convention=ConInfo.objects.all()[0])
         new_reg.save()
 
         count = 0
@@ -532,7 +536,8 @@ class AttendanceListTest(ShadowConTestCase):
         new_reg = Registration(user=User.objects.filter(username="staff").get(),
                                registration_date=timezone.now(),
                                last_updated=timezone.now(),
-                               payment=PaymentOption.objects.all()[1])
+                               payment=PaymentOption.objects.all()[1],
+                               convention=ConInfo.objects.all()[0])
         new_reg.save()
 
         for block in time_blocks:
@@ -581,7 +586,8 @@ class AttendanceListTest(ShadowConTestCase):
                                registration_date=timezone.now(),
                                last_updated=timezone.now(),
                                payment=PaymentOption.objects.all()[0],
-                               payment_received=True)
+                               payment_received=True,
+                               convention=ConInfo.objects.all()[0])
         new_reg.save()
 
         time_blocks = TimeBlock.objects.exclude(text__startswith='Not').order_by('sort_id')
@@ -602,7 +608,8 @@ class AttendanceListTest(ShadowConTestCase):
         new_reg = Registration(user=User.objects.filter(username="admin").get(),
                                registration_date=timezone.now(),
                                last_updated=timezone.now(),
-                               payment=PaymentOption.objects.all()[0])
+                               payment=PaymentOption.objects.all()[0],
+                               convention=ConInfo.objects.all()[0])
         new_reg.save()
 
         time_blocks = TimeBlock.objects.exclude(text__startswith='Not').order_by('sort_id')

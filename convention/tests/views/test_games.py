@@ -36,6 +36,7 @@ def modify_game(game):
     game.time_block = TimeBlock.objects.all()[0]
     game.time_slot = TimeSlot.objects.all()[0]
     game.location = Location.objects.all()[0]
+    game.convention = ConInfo.objects.all()[0]
 
 
 def check_game(test_class, actual, modified_date):
