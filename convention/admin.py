@@ -20,12 +20,13 @@ class TimeSlotAdmin(CompareVersionAdmin):
 @admin.register(ConInfo)
 class ConInfoAdmin(CompareVersionAdmin):
     model = ConInfo
-    list_display = ('date', 'location', 'pre_reg_deadline', 'game_sub_deadline')
+    list_display = ('title', 'date', 'location', 'pre_reg_deadline', 'game_sub_deadline')
 
 
 @admin.register(Location)
 class LocationAdmin(CompareVersionAdmin):
     model = Location
+    list_display = ('text', 'convention')
 
 
 @admin.register(Game)

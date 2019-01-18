@@ -11,20 +11,21 @@ def friendly_username(user):
     return name
 
 
-def get_con_value(parameter):
+def get_current_con():
     con_objects = ConInfo.objects.all()
     if len(con_objects) == 0:
         raise ValueError("No con object found")
-    elif len(con_objects) > 1:
-        raise ValueError("Multiple con objects found")
 
-    info = con_objects[0]
-    return getattr(info, parameter)
+    return con_objects[len(con_objects)-1]
+
+
+def get_con_value(parameter):
+    return getattr(get_current_con(), parameter)
 
 
 def is_registration_open():
     open_date = get_con_value("registration_opens")
-    return open_date <= timezone.now()
+    return open_date is not None and open_date <= timezone.now()
 
 
 def is_pre_reg_open(user):
@@ -37,7 +38,8 @@ def is_pre_reg_open(user):
 def get_registration(user):
     registration = []
 
-    registration_object = Registration.objects.filter(user=user)
+    convention = get_current_con()
+    registration_object = Registration.objects.filter(user=user).filter(convention=convention)
     if registration_object:
         item_dict = {}
         for item in BlockRegistration.objects.filter(registration=registration_object):
