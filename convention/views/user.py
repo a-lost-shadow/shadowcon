@@ -15,7 +15,7 @@ from .common import RegistrationOpenMixin, NotOnWaitingListMixin, IsStaffMixin
 
 @login_required
 def show_profile(request):
-    registration = Registration.objects.filter(user=request.user)
+    registration = Registration.objects.filter(user=request.user).filter(convention=get_current_con())
     payment = None
     payment_received = None
 
@@ -136,7 +136,7 @@ class NewUserView(BaseRegistrationView):
 
 class NotAlreadyPaid(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
-        entry = Registration.objects.filter(user=request.user)[0]
+        entry = Registration.objects.filter(user=request.user).filter(convention=get_current_con())[0]
         if entry.payment_received:
             return redirect(reverse('convention:user_profile'))
 
