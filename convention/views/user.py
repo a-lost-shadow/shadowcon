@@ -8,7 +8,7 @@ from django.views.generic import TemplateView
 from registration.backends.hmac.views import RegistrationView as BaseRegistrationView
 
 from ..forms import NewUserForm, AttendanceForm
-from ..models import Registration, PaymentOption, BlockRegistration, TimeBlock, get_choice, Referral
+from ..models import Registration, PaymentOption, BlockRegistration, TimeBlock, get_choice
 from ..utils import friendly_username, is_registration_open, is_pre_reg_open, get_current_con
 from .common import RegistrationOpenMixin, NotOnWaitingListMixin, IsStaffMixin
 
@@ -121,17 +121,6 @@ class AttendanceList(LoginRequiredMixin, IsStaffMixin, TemplateView):
 
 class NewUserView(BaseRegistrationView):
     form_class = NewUserForm
-
-    def form_valid(self, form):
-        redirect = super(NewUserView, self).form_valid(form)
-
-        code = form.cleaned_data.get('referral_code')
-        if code != "":
-            referral = Referral.objects.filter(code=code)[0]
-            referral.referred_user = form.instance
-            referral.save()
-
-        return redirect
 
 
 class NotAlreadyPaid(AccessMixin):
