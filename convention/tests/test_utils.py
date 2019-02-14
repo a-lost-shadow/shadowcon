@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from ..utils import friendly_username, get_registration, get_con_value, is_registration_open, is_pre_reg_open
+from ..utils import friendly_username, get_registration, get_current_con, get_con_value, is_registration_open, is_pre_reg_open
 from ..models import ConInfo, Registration, BlockRegistration
 from datetime import timedelta
 from django.utils import timezone
@@ -7,6 +7,18 @@ from shadowcon.tests.utils import ShadowConTestCase
 
 
 class UtilsTest(ShadowConTestCase):
+    def test_get_current_con(self):
+        con = get_current_con()
+        self.assertNotEquals(con, None)
+        self.assertEquals(con.title, "Shadowcon 2016")
+
+    def test_get_current_con_alternate(self):
+        newcon = ConInfo(title="Shadowcon 2042")
+        newcon.save()
+        con = get_current_con()
+        self.assertNotEquals(con, None)
+        self.assertEquals(con.title, "Shadowcon 2042")
+
     def test_friendly_username_no_first_last(self):
         user = User(username="username")
         self.assertEquals(friendly_username(user), "username")
@@ -31,14 +43,6 @@ class UtilsTest(ShadowConTestCase):
             get_con_value('invalid')
         self.assertEquals(e.exception.message, "No con object found")
 
-    def test_con_value_multi_con_objects(self):
-        ConInfo(date=timezone.now(), pre_reg_deadline=timezone.now(), game_sub_deadline=timezone.now(), location="here",
-                pre_reg_cost=5, door_cost=6, registration_opens=timezone.now(), max_attendees=10).save()
-
-        with self.assertRaises(ValueError) as e:
-            get_con_value('invalid')
-        self.assertEquals(e.exception.message, "Multiple con objects found")
-
     def test_con_value_invalid_attribute(self):
         with self.assertRaises(AttributeError) as e:
             get_con_value('invalid')
@@ -56,15 +60,21 @@ class UtilsTest(ShadowConTestCase):
 
     def test_registration_closed(self):
         con = ConInfo.objects.all()[0]
-        con.registration_open = timezone.now() + timedelta(minutes=1)
+        con.registration_opens = timezone.now() + timedelta(minutes=1)
         con.save()
-        self.assertEquals(is_registration_open(), True)
+        self.assertEquals(is_registration_open(), False)
 
     def test_registration_open(self):
         con = ConInfo.objects.all()[0]
-        con.registration_open = timezone.now() - timedelta(minutes=1)
+        con.registration_opens = timezone.now() - timedelta(minutes=1)
         con.save()
         self.assertEquals(is_registration_open(), True)
+
+    def test_registration_date_missing(self):
+        con = ConInfo.objects.all()[0]
+        con.registration_opens = None
+        con.save()
+        self.assertEquals(is_registration_open(), False)
 
     def test_pre_reg_open(self):
         self.assertTrue(is_pre_reg_open(User.objects.get(username="admin")))

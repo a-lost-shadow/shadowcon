@@ -9,7 +9,7 @@ from reversion import revisions as reversion
 from collections import OrderedDict
 
 from ..models import Game, Location, TimeBlock, TimeSlot
-from ..utils import friendly_username
+from ..utils import friendly_username, get_current_con
 from .common import ConHasSpaceOrAlreadyRegisteredMixin, IsStaffMixin, RevisionMixin
 from contact.utils import mail_list
 
@@ -18,7 +18,8 @@ game_fields = ['title', 'gm', 'game_length', 'number_players', 'system', 'trigge
 
 
 def get_games():
-    return Game.objects.order_by('time_block', 'time_slot', 'title')
+    convention = get_current_con()
+    return Game.objects.filter(convention=convention).order_by('time_block', 'time_slot', 'title')
 
 
 class ScheduleView(generic.ListView):
@@ -58,9 +59,10 @@ class NewGameView(LoginRequiredMixin, ConHasSpaceOrAlreadyRegisteredMixin, gener
         mail_list("Game Submission", subject_details, message, list_name="game_submission")
 
     def form_valid(self, form):
-        # since the form doesn't have the user or time, we need to insert it
+        # since the form doesn't have the user, time or convention, we need to insert them
         form.instance.user = self.request.user
         form.instance.last_modified = timezone.now()
+        form.instance.convention = get_current_con()
 
         with reversion.create_revision():
             reversion.set_user(self.request.user)
@@ -141,10 +143,11 @@ def get_index(obj, object_list):
 
 class SchedulerHandler(AJAXMixin, generic.base.View):
     def get(self, request, *args, **kwargs):
-        locations = map(lambda x: x, Location.objects.all())
+        convention = get_current_con()
+        locations = map(lambda x: x, Location.objects.filter(convention = convention))
         blocks = map(lambda x: x, TimeBlock.objects.all().order_by('sort_id'))
         slots = map(lambda x: x, TimeSlot.objects.all().order_by('start'))
-        games = Game.objects.all()
+        games = get_games()
 
         return {"locations": map(lambda x: {"text": x.text, "id": x.id}, locations),
                 "games": map(lambda x: {"title": x.title,

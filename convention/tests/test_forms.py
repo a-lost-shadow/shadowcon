@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from ..forms import AttendanceForm
-from ..models import Registration, BlockRegistration, TimeBlock, PaymentOption
+from ..models import Registration, BlockRegistration, TimeBlock, PaymentOption, ConInfo
 from ..utils import friendly_username
 from datetime import timedelta
 from django.utils import timezone
@@ -139,7 +139,7 @@ class FormsTest(ShadowConTestCase):
 
         registration = Registration(user=user, registration_date=timezone.now()-timedelta(days=1),
                                     last_updated=timezone.now(), payment=PaymentOption.objects.all()[0],
-                                    payment_received=True)
+                                    payment_received=True, convention=ConInfo.objects.all()[0])
         registration.save()
 
         set_registration(registration, "Friday Night", BlockRegistration.ATTENDANCE_MAYBE)
@@ -187,7 +187,7 @@ class FormsTest(ShadowConTestCase):
 
         first_registered = timezone.now() - timedelta(days=1)
         registration = Registration(user=user, registration_date=first_registered, last_updated=first_registered,
-                                    payment=PaymentOption.objects.all()[0], payment_received=True)
+                                    payment=PaymentOption.objects.all()[0], payment_received=True, convention=ConInfo.objects.all()[0])
         registration.save()
         form = AttendanceForm(user=user)
 

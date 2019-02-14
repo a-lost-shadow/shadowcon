@@ -34,6 +34,12 @@ class TemplateTagsTest(ShadowConTestCase):
         info.save()
         self.check_tag("con_info", "con_date", "March 21st - 23rd, 3001")
 
+    def test_con_date_missing(self):
+        info = ConInfo.objects.all()[0]
+        info.date = None
+        info.save()
+        self.check_tag("con_info", "con_date", "")
+
     def test_con_year(self):
         self.check_tag("con_info", "con_year", "2016")
 
@@ -42,6 +48,12 @@ class TemplateTagsTest(ShadowConTestCase):
         info.date = date(4021, 3, 21)
         info.save()
         self.check_tag("con_info", "con_year", "4021")
+
+    def test_con_year_missing(self):
+        info = ConInfo.objects.all()[0]
+        info.date = None
+        info.save()
+        self.check_tag("con_info", "con_year", "TBD")
 
     def test_con_pre_reg_deadline(self):
         self.check_tag("con_info", "con_pre_reg_deadline", "March 15th, 2016")
@@ -52,6 +64,12 @@ class TemplateTagsTest(ShadowConTestCase):
         info.save()
         self.check_tag("con_info", "con_pre_reg_deadline", "June 8th, 5432")
 
+    def test_con_pre_reg_deadline_missing(self):
+        info = ConInfo.objects.all()[0]
+        info.pre_reg_deadline = None
+        info.save()
+        self.check_tag("con_info", "con_pre_reg_deadline", "TBD")
+
     def test_con_game_sub_deadline(self):
         self.check_tag("con_info", "con_game_sub_deadline", "March 22nd, 2016")
 
@@ -60,6 +78,12 @@ class TemplateTagsTest(ShadowConTestCase):
         info.game_sub_deadline = date(1823, 7, 11)
         info.save()
         self.check_tag("con_info", "con_game_sub_deadline", "July 11th, 1823")
+
+    def test_con_game_sub_deadline_missing(self):
+        info = ConInfo.objects.all()[0]
+        info.game_sub_deadline = None
+        info.save()
+        self.check_tag("con_info", "con_game_sub_deadline", "TBD")
 
     def test_con_game_reg_deadline(self):
         self.check_tag("con_info", "con_game_reg_deadline", "September 15th, 2016<br />6:00:00 PM PDT")
@@ -70,6 +94,12 @@ class TemplateTagsTest(ShadowConTestCase):
         info.save()
         self.check_tag("con_info", "con_game_reg_deadline", "February 13th, 1927<br />7:30:00 AM PST")
 
+    def test_con_game_reg_deadline_missing(self):
+        info = ConInfo.objects.all()[0]
+        info.game_reg_deadline = None
+        info.save()
+        self.check_tag("con_info", "con_game_reg_deadline", "TBD")
+
     def test_con_location(self):
         self.check_tag("con_info", "con_location", "Behind the tardis")
 
@@ -79,14 +109,26 @@ class TemplateTagsTest(ShadowConTestCase):
         info.save()
         self.check_tag("con_info", "con_location", "DC Universe")
 
+    def test_con_location_missing(self):
+        info = ConInfo.objects.all()[0]
+        info.location = None
+        info.save()
+        self.check_tag("con_info", "con_location", "TBD")
+
     def test_con_door_cost(self):
         self.check_tag("con_info", "con_door_cost", "$20.00")
 
-    def test_con__alternate(self):
+    def test_con_door_cost_alternate(self):
         info = ConInfo.objects.all()[0]
         info.door_cost = "31.56"
         info.save()
         self.check_tag("con_info", "con_door_cost", "$31.56")
+
+    def test_con_door_cost_missing(self):
+        info = ConInfo.objects.all()[0]
+        info.door_cost = None
+        info.save()
+        self.check_tag("con_info", "con_door_cost", "TBD")
 
     def test_con_pre_reg_cost(self):
         self.check_tag("con_info", "con_pre_reg_cost", "$10.00")
@@ -97,6 +139,12 @@ class TemplateTagsTest(ShadowConTestCase):
         info.save()
         self.check_tag("con_info", "con_pre_reg_cost", "$25.82")
 
+    def test_con_pre_reg_cost_missing(self):
+        info = ConInfo.objects.all()[0]
+        info.pre_reg_cost = None
+        info.save()
+        self.check_tag("con_info", "con_pre_reg_cost", "TBD")
+
     def test_con_registration_opens_before(self):
         info = ConInfo.objects.all()[0]
         info.registration_opens = pytz.timezone("US/Pacific").localize(datetime(2037, 6, 3, 22, 27, 42))
@@ -105,6 +153,12 @@ class TemplateTagsTest(ShadowConTestCase):
 
     def test_con_registration_opens_after(self):
         self.check_tag("con_info", "con_registration_opens", "March 11th, 2015 at 6:38:22 PM PDT")
+
+    def test_con_registration_opens_missing(self):
+        info = ConInfo.objects.all()[0]
+        info.registration_opens = None
+        info.save()
+        self.check_tag("con_info", "con_registration_opens", "TBD")
 
     def test_con_registration_links_before_no_games_submitted(self):
         info = ConInfo.objects.all()[0]

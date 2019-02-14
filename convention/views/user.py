@@ -9,13 +9,13 @@ from registration.backends.hmac.views import RegistrationView as BaseRegistratio
 
 from ..forms import NewUserForm, AttendanceForm
 from ..models import Registration, PaymentOption, BlockRegistration, TimeBlock, get_choice, Referral
-from ..utils import friendly_username, is_registration_open, is_pre_reg_open
+from ..utils import friendly_username, is_registration_open, is_pre_reg_open, get_current_con
 from .common import RegistrationOpenMixin, NotOnWaitingListMixin, IsStaffMixin
 
 
 @login_required
 def show_profile(request):
-    registration = Registration.objects.filter(user=request.user)
+    registration = Registration.objects.filter(user=request.user).filter(convention=get_current_con())
     payment = None
     payment_received = None
 
@@ -50,7 +50,7 @@ class AttendanceView(RegistrationOpenMixin, LoginRequiredMixin, FormView):
 
 
 def registration_count(time_block, attendance):
-    return str(len(BlockRegistration.objects.filter(time_block=time_block.text).filter(attendance__exact=attendance)))
+    return str(len(BlockRegistration.objects.filter(time_block=time_block.text).filter(attendance__exact=attendance).filter(registration__convention=get_current_con())))
 
 
 def missing_count(time_block):
@@ -62,6 +62,7 @@ class AttendanceList(LoginRequiredMixin, IsStaffMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         time_blocks = TimeBlock.objects.exclude(text__startswith='Not').order_by('sort_id')
+        convention = get_current_con()
 
         header = "<th></th>"
         yes = "<td>" + get_choice(BlockRegistration.ATTENDANCE_YES, BlockRegistration.ATTENDANCE_CHOICES) + "</td>"
@@ -81,7 +82,7 @@ class AttendanceList(LoginRequiredMixin, IsStaffMixin, TemplateView):
 
         if 'details' not in kwargs:
             details = "\n  <tr>" + header + "</tr>"
-            for entry in Registration.objects.all():
+            for entry in Registration.objects.filter(convention=convention):
                 details += "\n  <tr><td>" + friendly_username(entry.user) + "</td>"
                 reg_entries = {}
                 for reg in BlockRegistration.objects.filter(registration=entry):
@@ -99,7 +100,7 @@ class AttendanceList(LoginRequiredMixin, IsStaffMixin, TemplateView):
 
         if 'payments' not in kwargs:
             payments = "\n  <tr><th></th><th>Donation Option</th><th>Donation Received</th></tr>"
-            for entry in Registration.objects.all():
+            for entry in Registration.objects.filter(convention=convention):
                 received = "Yes" if entry.payment_received else "No"
                 payments += "\n  <tr><td>" + friendly_username(entry.user) + "</td>" + "<td>" + entry.payment.name + \
                             "</td>" + "<td>" + received + "</td></tr>"
@@ -109,7 +110,7 @@ class AttendanceList(LoginRequiredMixin, IsStaffMixin, TemplateView):
             contact_info = "\n  <tr><th>Name</th><th>Username</th><th>E-mail</th><th>Registered</th></tr>"
             for entry in User.objects.all():
                 registered = "No"
-                if Registration.objects.filter(user=entry):
+                if Registration.objects.filter(user=entry).filter(convention=convention):
                     registered = "Yes"
                 contact_info += "\n  <tr><td>" + entry.first_name + " " + entry.last_name + "</td><td>" + \
                                 entry.username + "</td><td>" + entry.email + "</td><td>" + registered + "</td></tr>"
@@ -135,7 +136,7 @@ class NewUserView(BaseRegistrationView):
 
 class NotAlreadyPaid(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
-        entry = Registration.objects.filter(user=request.user)[0]
+        entry = Registration.objects.filter(user=request.user).filter(convention=get_current_con())[0]
         if entry.payment_received:
             return redirect(reverse('convention:user_profile'))
 
@@ -148,7 +149,7 @@ class PaymentView(LoginRequiredMixin, NotOnWaitingListMixin, NotAlreadyPaid, Upd
     template_name = 'convention/register_payment.html'
 
     def get_object(self, queryset=None):
-        return Registration.objects.get(user=self.request.user)
+        return Registration.objects.filter(convention=get_current_con()).get(user=self.request.user)
 
     def get_success_url(self):
         return reverse('convention:user_profile')
