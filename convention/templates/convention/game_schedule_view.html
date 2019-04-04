@@ -18,12 +18,33 @@
 
 {% block content %}
 <h2>{% con_year %} Schedule</h2>
+{% if object_list.in_games %}
+  <h3>Games You're In</h3>
+  <table class="schedule" border="1">
+    <tr><th>Time</th><th>Game</th><th>GM</th><th>Players</th></tr>
+    {% for gamedata in object_list.user_games %}
+    <tr>
+      <td>{{ gamedata.game.combined_time }}</td>
+      <td>{{ gamedata.game.title }}</td>
+      <td>{{ gamedata.game.gm }}</td>
+      <td>
+        {% for player in gamedata.players %}
+          {{ player }}<br>
+        {% endfor %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endif %}
+<br />
+<br />
+<br />
 <div id="schedule"></div>
 <br />
 <br />
 <br />
-{% for time_block, games in object_list.items %}
 <table id="{{ time_block }}" class="schedule" border="1">
+{% for time_block, games in object_list.by_time_block.items %}
   <tr><th colspan="4" align="left">{{ time_block }}</th></tr>
   {% for game in games %}
   <tr>
@@ -33,7 +54,6 @@
     <td>{{ game.gm }}</td>
   </tr>
   {% endfor %}
-</table>
-<br />
 {% endfor %}
+</table>
 {% endblock %}

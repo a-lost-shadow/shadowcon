@@ -139,14 +139,7 @@ class Game(models.Model):
     convention = models.ForeignKey(ConInfo)
 
     def __str__(self):
-        format_str = "Convention: %s, Title: %s, GM: %s, Time Block: %s, Time Slot: %s, Location: %s, " + \
-                     "Game Length: %s, Number Players: %s, System: %s, Triggers: %s, User: %s, " + \
-                     "Description: <CLOB>, Preferred Time: %s, Special Requests: %s, Last Modified: %s, " + \
-                     "Last Scheduled: %s"
-        return format_str % (self.convention, self.title, self.gm, self.time_block, self.time_slot, self.location,
-                             self.game_length, self.number_players, self.system, self.triggers,
-                             self.user, self.preferred_time, self.special_requests,
-                             self.last_modified, self.last_scheduled)
+        return "%s (%s)" % (self.title, self.convention)
 
     def email_format(self, request):
         return "\n".join(["Title: %s",
@@ -184,6 +177,14 @@ class Game(models.Model):
             return self.time_block.get_combined(self.time_slot)
         else:
             return "Not Scheduled"
+
+
+class GamePlayer(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    player = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "%s in %s" % (self.player, self.game)
 
 
 class PaymentOption(models.Model):

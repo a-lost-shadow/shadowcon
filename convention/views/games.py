@@ -8,7 +8,7 @@ from reversion import revisions as reversion
 
 from collections import OrderedDict
 
-from ..models import Game, Location, TimeBlock, TimeSlot
+from ..models import Game, GamePlayer, Location, TimeBlock, TimeSlot
 from ..utils import friendly_username, get_current_con
 from .common import ConHasSpaceOrAlreadyRegisteredMixin, IsStaffMixin, RevisionMixin
 from contact.utils import mail_list
@@ -22,18 +22,45 @@ def get_games():
     return Game.objects.filter(convention=convention).order_by('time_block', 'time_slot', 'title')
 
 
+def get_games_for_user(user):
+    convention = get_current_con()
+    return map(
+        lambda gamePlayer: {
+            "game": gamePlayer.game,
+            "players": map(
+                lambda playerGame: playerGame.player,
+                GamePlayer.objects.filter(game=gamePlayer.game)
+            )
+        },
+        filter(
+            lambda gamePlayer: gamePlayer.game.convention == convention,
+            GamePlayer.objects.filter(player=user)
+        )
+    )
+
+
+class ScheduleData:
+    by_time_block = OrderedDict()
+    user_games = []
+    in_games = False
+
+
 class ScheduleView(generic.ListView):
     template_name = 'convention/game_schedule_view.html'
 
     def get_queryset(self):
-        game_map = OrderedDict()
-        for game in get_games():
-            time_block = game.friendly_block()
-            if time_block not in game_map:
-                game_map[time_block] = []
-            game_map[time_block].append(game)
+        gamedata = ScheduleData()
+        gamedata.by_time_block = OrderedDict()
+        gamedata.user_games = get_games_for_user(self.request.user)
+        gamedata.in_games = len(gamedata.user_games) > 0
 
-        return game_map
+        for game in Game.objects.all().order_by('time_block'):
+            time_block = game.friendly_block()
+            if time_block not in gamedata.by_time_block:
+                gamedata.by_time_block[time_block] = []
+            gamedata.by_time_block[time_block].append(game)
+
+        return gamedata
 
 
 class ScheduleEditView(LoginRequiredMixin, IsStaffMixin, generic.TemplateView):
