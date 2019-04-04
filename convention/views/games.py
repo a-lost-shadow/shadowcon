@@ -54,7 +54,7 @@ class ScheduleView(generic.ListView):
         gamedata.user_games = get_games_for_user(self.request.user)
         gamedata.in_games = len(gamedata.user_games) > 0
 
-        for game in Game.objects.all().order_by('time_block'):
+        for game in get_games():
             time_block = game.friendly_block()
             if time_block not in gamedata.by_time_block:
                 gamedata.by_time_block[time_block] = []
