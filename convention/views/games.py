@@ -1,5 +1,6 @@
 from django_ajax.mixin import AJAXMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.utils import timezone
@@ -25,17 +26,11 @@ def get_games():
 def get_games_for_user(user):
     convention = get_current_con()
     return map(
-        lambda gamePlayer: {
-            "game": gamePlayer.game,
-            "players": map(
-                lambda playerGame: playerGame.player,
-                GamePlayer.objects.filter(game=gamePlayer.game)
-            )
+        lambda game: {
+            "game": game,
+            "players": User.objects.filter(gameplayer__game=game)
         },
-        filter(
-            lambda gamePlayer: gamePlayer.game.convention == convention,
-            GamePlayer.objects.filter(player=user)
-        )
+        Game.objects.filter(gameplayer__player=user, convention=convention).order_by('time_block', 'time_slot', 'title')
     )
 
 

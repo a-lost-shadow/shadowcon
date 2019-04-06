@@ -29,7 +29,11 @@
       <td>{{ gamedata.game.gm }}</td>
       <td>
         {% for player in gamedata.players %}
-          {{ player }}<br>
+          {% if player.first_name or player.last_name %}
+            {{ player.first_name }} {{ player.last_name }}<br>
+          {% else %}
+            {{ player }}
+          {% endif %}
         {% endfor %}
       </td>
     </tr>
