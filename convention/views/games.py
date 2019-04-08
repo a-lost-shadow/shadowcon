@@ -46,7 +46,10 @@ class ScheduleView(generic.ListView):
     def get_queryset(self):
         gamedata = ScheduleData()
         gamedata.by_time_block = OrderedDict()
-        gamedata.user_games = get_games_for_user(self.request.user)
+        if self.request.user.is_authenticated():
+            gamedata.user_games = get_games_for_user(self.request.user)
+        else:
+            gamedata.user_games = []
         gamedata.in_games = len(gamedata.user_games) > 0
 
         for game in get_games():
