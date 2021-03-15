@@ -12,10 +12,15 @@ def friendly_username(user):
 
 
 def get_current_con():
-    con_objects = ConInfo.objects.all()
+    dateless_coninfos = ConInfo.objects.filter(date=None)
+    if len(dateless_coninfos) == 1:
+        return dateless_coninfos[0]
+    if len(dateless_coninfos) > 1:
+        raise ValueError("Multiple con objects with no date found, can not determine which is the current one")
+
+    con_objects = ConInfo.objects.order_by('date').all()
     if len(con_objects) == 0:
         raise ValueError("No con object found")
-
     return con_objects[len(con_objects)-1]
 
 
